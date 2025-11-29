@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt.plugin)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -40,7 +42,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -56,4 +57,19 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+
+    // dependency injection
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
+    // networking
+    implementation(platform(libs.retrofit.bom))
+    implementation(platform (libs.okhttp.bom))
+
+    implementation(libs.retrofit)
+    // This is the Retrofit converter for serialization
+    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
 }
