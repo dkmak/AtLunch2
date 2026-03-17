@@ -1,9 +1,13 @@
-# **Android App Template** - Darryl Mak
+# **At Lunch** - Darryl Mak
 
-(Description):
-1. **Action 1** - Display a list of available sports leagues
-2. **Action 2** - Browse teams within a selected league
-3. **Action 3** - View detailed information about a team
+**Required Features**
+- [ ] The app will use the Google Places API for its data source
+- [ ] The app will prompt the user for permission to access their current location
+- [ ] Upon launch, the app will execute a search that displays nearby restaurants 
+- [ ] A search feature will be included that allows the user to search for restaurants 
+- [ ] The user can choose to display the search results as a list, or as pins on a map
+- [ ] The user can select a search result to present a restaurant detail page with basic information about
+the restaurant
 
 (insert visuals, video)
 
@@ -25,6 +29,8 @@
 5. run unit tests with `./gradlew clean testDebugUnitTest`
 
 ## Technical Details
+
+
 
 ### Architecture
 **MVVM** architecture

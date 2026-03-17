@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.androidapptemplate"
+    namespace = "com.atlunch"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.androidapptemplate"
+        applicationId = "com.atlunch"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

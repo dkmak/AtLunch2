@@ -1,4 +1,4 @@
-package com.atlunch
+package com.data
 
 import org.junit.Test
 

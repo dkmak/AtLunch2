@@ -1,4 +1,4 @@
-package com.androidapptemplate.ui.theme
+package com.atlunch.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

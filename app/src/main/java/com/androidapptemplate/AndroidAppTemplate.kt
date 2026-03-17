@@ -1,7 +1,7 @@
-package com.androidapptemplate
+package com.atlunch
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class AndroidAppTemplate: Application()
+class AtLunch: Application()
