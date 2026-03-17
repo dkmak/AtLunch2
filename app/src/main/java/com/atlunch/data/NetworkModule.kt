@@ -52,14 +52,14 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService{
-        return retrofit.create(ApiService::class.java)
+    fun provideApiService(retrofit: Retrofit): PlacesApiService{
+        return retrofit.create(PlacesApiService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideApiClient(apiService: ApiService): ApiClient{
-        return ApiClient(apiService)
+    fun provideApiClient(placesApiService: PlacesApiService): PlacesApiClient{
+        return PlacesApiClient(placesApiService)
     }
 
 }
