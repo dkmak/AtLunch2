@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ListItem
@@ -26,18 +24,22 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
 import com.atlunch.domain.PlacePreview
-import com.atlunch.presentation.ListPlacesUiState
-import com.atlunch.presentation.ListViewModel
+import com.atlunch.ui.listplaces.ListPlacesUiState
+import com.atlunch.ui.listplaces.ListViewModel
 import com.atlunch.ui.theme.AtLunchTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.serialization.Serializable
+import java.util.Map.entry
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -52,10 +54,27 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Serializable
+data object ListDestination: NavKey
+
 @Composable
-fun AtLunchApp(
+fun AtLunchApp() {
+    val navBackStack = rememberNavBackStack(ListDestination)
+    NavDisplay(
+        backStack = navBackStack,
+        entryProvider = entryProvider {
+            entry<ListDestination> {
+                ListPlacesScreen()
+            }
+        }
+    )
+}
+
+@Composable
+fun ListPlacesScreen(
     viewModel: ListViewModel = hiltViewModel()
-) {
+){
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -109,18 +128,18 @@ fun DisplayPlacesList(
     LazyColumn(modifier = modifier) {
         items(
             items = placePreviews,
-            key = { placePreview -> placePreview.id }
+            key = { placePreview -> placePreview.id}
         ) { preview ->
-            PlaceListItem(preview,
+            PlacePreviewListItem(preview,
                 onPlaceClicked = onPlaceClicked,
-                modifier.padding(16.dp)
+                modifier.padding(8.dp)
             )
         }
     }
 }
 
 @Composable
-fun PlaceListItem(
+fun PlacePreviewListItem(
     placePreview: PlacePreview,
     onPlaceClicked: () -> Unit,
     modifier: Modifier = Modifier

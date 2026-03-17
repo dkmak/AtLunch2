@@ -1,4 +1,4 @@
-package com.atlunch.presentation
+package com.atlunch.ui
 
 import com.atlunch.domain.DomainError
 

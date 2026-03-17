@@ -10,7 +10,7 @@ activityCompose = "1.12.0"
 composeBom = "2025.11.01"
 ###
 androidxLifecycle = "2.9.2"
-androidxNavigation ="2.8.0"
+androidxNavigation3 ="1.0.1"
 androidxRoom = "2.7.2"
 coil = "2.5.0"
 coroutines = "1.10.2"
@@ -42,8 +42,8 @@ androidx-compose-material-icons-core = { group = "androidx.compose.material", na
 
 ###
 androidx-lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidxLifecycle" }
-androidx-navigation-compose = { group="androidx.navigation", name ="navigation-compose", version.ref = "androidxNavigation"}
-
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "androidxNavigation3"}
+androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "androidxNavigation3"}
 
 ### Room
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidxRoom" }

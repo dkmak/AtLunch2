@@ -1,9 +1,10 @@
-package com.atlunch.presentation
+package com.atlunch.ui.listplaces
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.atlunch.domain.PlacePreview
 import com.atlunch.domain.PlacesRepository
+import com.atlunch.ui.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
