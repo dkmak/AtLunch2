@@ -39,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -72,6 +73,7 @@ dependencies {
     // networking
     implementation(platform(libs.retrofit.bom))
     implementation(platform (libs.okhttp.bom))
+    implementation(libs.okhttp.logging)
 
     implementation(libs.retrofit)
     // This is the Retrofit converter for serialization
