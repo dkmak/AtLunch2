@@ -13,14 +13,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,14 +46,42 @@ fun ListPlacesScreen(
     viewModel: ListViewModel = hiltViewModel(),
     onPlacePreviewClicked: (String) -> Unit
 ){
-
+    LaunchedEffect(Unit) {
+        viewModel.loadPlacesNearby()
+    }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var textFieldValue by remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxWidth()
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                OutlinedTextField(
+                    value = textFieldValue,
+                    onValueChange = {newValue ->
+                        textFieldValue = newValue
+                    },
+                    label = { Text("Search restaurants") },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                            viewModel.search(textFieldValue)
+                        }
+                    ),
+                )
+            }
+
             when (val state = uiState) {
                 is ListPlacesUiState.Failure -> {
                     Row(

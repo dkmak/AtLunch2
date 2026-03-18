@@ -3,9 +3,12 @@ package com.atlunch.data
 import com.atlunch.data.dto.toDomain
 import com.atlunch.data.network.Circle
 import com.atlunch.data.network.LatLng
+import com.atlunch.data.network.LocationBias
 import com.atlunch.data.network.LocationRestriction
 import com.atlunch.data.network.PlacesApiClient
 import com.atlunch.data.network.SearchNearbyRequest
+import com.atlunch.data.network.SearchQueryRequest
+import com.atlunch.domain.DomainError
 import com.atlunch.domain.PlaceDetails
 import com.atlunch.domain.PlacePreview
 import com.atlunch.domain.PlacesRepository
@@ -28,8 +31,8 @@ class PlacesRepositoryImpl @Inject constructor(
         long: Double
     ): Flow<List<PlacePreview>> = flow {
         val request = SearchNearbyRequest(
-            includedTypes = listOf("restaurant"),
-            maxResultCount = 20,
+            includedTypes = listOf("restaurant"), // hard coded
+            maxResultCount = 20, // hard coded
             locationRestriction = LocationRestriction(
                 circle = Circle(
                     center = LatLng(40.728480, -73.982142), // TODO this is for Westville
@@ -47,6 +50,27 @@ class PlacesRepositoryImpl @Inject constructor(
         val response = apiClient.getPlaceDetails(id = id)
         emit(response.toDomain())
     }. catch { throwable ->
+        throw throwable.toDomainError()
+    }
+
+    override fun searchQuery(query: String): Flow<List<PlacePreview>> = flow {
+        val request = SearchQueryRequest(
+            textQuery = query,
+            includedType = "restaurant", // hard coded
+            pageSize = 20, // hard coded, might be token if there are more results
+            locationBias = LocationBias(
+                circle = Circle(
+                    center = LatLng(40.728480, -73.982142), // TODO this is for Westville
+                    radius = 500.0
+                )
+            )
+        )
+        val response = apiClient.searchQuery(request)
+        if (response.places.isEmpty()){
+            throw DomainError.EmptyResult
+        }
+        emit(response.places.map { placePreviewDTO -> placePreviewDTO.toDomain() })
+    }.catch { throwable ->
         throw throwable.toDomainError()
     }
 }

@@ -11,4 +11,8 @@ interface PlacesRepository {
     fun getPlaceDetails(
         id: String
     ):Flow<PlaceDetails>
+
+    fun searchQuery(
+        query: String
+    ): Flow<List<PlacePreview>>
 }
