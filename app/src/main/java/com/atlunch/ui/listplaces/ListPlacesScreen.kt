@@ -32,9 +32,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -59,7 +61,7 @@ fun ListPlacesScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var textFieldValue by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-
+    val focusManager = LocalFocusManager.current
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background
@@ -88,8 +90,10 @@ fun ListPlacesScreen(
                         onDone = {
                             keyboardController?.hide()
                             viewModel.search(textFieldValue)
+                            focusManager.clearFocus()
                         }
                     ),
+                    shape = RoundedCornerShape(35.dp)
                 )
             }
 
@@ -204,17 +208,21 @@ fun PlacePreviewListItem(
                     Text(
                         text = placePreview.rating.toString(),
                         modifier = Modifier.padding(start = 6.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.bodyMedium
                     )
 
                     Text(
-                        text = "(${placePreview.userRatingCount} reviews)",
+                        text = "• (${placePreview.userRatingCount} reviews)",
                         modifier = Modifier.padding(start = 6.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
+
+                Text(
+                    text = placePreview.shortFormattedAddress,
+                    style = MaterialTheme.typography.bodyMedium,
+                    overflow = TextOverflow.Visible
+                )
             }
         }
     }
