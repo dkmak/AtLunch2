@@ -198,3 +198,38 @@ fun PlacePreviewListItemPreview() {
         )
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun DisplayPlacesListPreview() {
+    AtLunchTheme {
+        DisplayPlacesList(
+            placePreviews = listOf(
+                PlacePreview(
+                    restaurantName = "Joe's Pizza",
+                    id = "preview-place-1",
+                    rating = 4.7,
+                    userRatingCount = 128,
+                    shortFormattedAddress = "123 Main St"
+                ),
+                PlacePreview(
+                    restaurantName = "Sushi Corner",
+                    id = "preview-place-2",
+                    rating = 4.5,
+                    userRatingCount = 84,
+                    shortFormattedAddress = "456 Elm St"
+                ),
+                PlacePreview(
+                    restaurantName = "Burger House",
+                    id = "preview-place-3",
+                    rating = 4.3,
+                    userRatingCount = 201,
+                    shortFormattedAddress = "789 Oak Ave"
+                )
+            ),
+            onPlaceClicked = {},
+            modifier = Modifier
+                .padding(8.dp)
+        )
+    }
+}
