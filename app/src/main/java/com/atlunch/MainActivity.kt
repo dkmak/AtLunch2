@@ -23,21 +23,29 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.atlunch.domain.PlacePreview
+import com.atlunch.ui.listplaces.DisplayPlacesList
+import com.atlunch.ui.listplaces.ListDestination
+import com.atlunch.ui.listplaces.ListPlacesScreen
 import com.atlunch.ui.listplaces.ListPlacesUiState
 import com.atlunch.ui.listplaces.ListViewModel
+import com.atlunch.ui.placedetails.DetailsUiState
+import com.atlunch.ui.placedetails.PlaceDetailsViewModel
 import com.atlunch.ui.theme.AtLunchTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import java.util.Map.entry
 
@@ -55,7 +63,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Serializable
-data object ListDestination: NavKey
+data class DetailsDestination(
+    val placeId: String
+): NavKey
+
 
 @Composable
 fun AtLunchApp() {
@@ -64,17 +75,30 @@ fun AtLunchApp() {
         backStack = navBackStack,
         entryProvider = entryProvider {
             entry<ListDestination> {
-                ListPlacesScreen()
+                ListPlacesScreen(
+                    onPlacePreviewClicked = {id ->navBackStack.add(DetailsDestination(placeId = id))}
+                )
+            }
+
+            entry<DetailsDestination> { detailsDestination ->
+                PlaceDetailsScreen(
+                    placeId = detailsDestination.placeId,
+                    onBackClicked = {navBackStack.removeLastOrNull()}
+                )
             }
         }
     )
 }
 
 @Composable
-fun ListPlacesScreen(
-    viewModel: ListViewModel = hiltViewModel()
+fun PlaceDetailsScreen(
+    placeId: String,
+    viewModel: PlaceDetailsViewModel = hiltViewModel(),
+    onBackClicked: ()-> Unit
 ){
-
+    LaunchedEffect(placeId) {
+        viewModel.loadDetails(placeId)
+    }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -83,7 +107,7 @@ fun ListPlacesScreen(
                 .fillMaxWidth()
         ) {
             when (val state = uiState) {
-                is ListPlacesUiState.Failure -> {
+                is DetailsUiState.Failure -> {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -93,7 +117,7 @@ fun ListPlacesScreen(
                     }
                 }
 
-                ListPlacesUiState.Loading -> {
+                DetailsUiState.Loading -> {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -104,69 +128,18 @@ fun ListPlacesScreen(
                     }
                 }
 
-                is ListPlacesUiState.Success -> {
-                    DisplayPlacesList(
-                        placePreviews = state.placesPreviews,
-                        onPlaceClicked = {},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    )
+                is DetailsUiState.Success -> {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(state.placeDetails.restaurantName)
+                        Text(state.placeDetails.rating.toString())
+                        Text(state.placeDetails.userRatingCount.toString())
+                        Text(state.placeDetails.formattedAddress)
+                        Text(state.placeDetails.nationalPhoneNumber)
+                    }
                 }
             }
         }
     }
-}
 
 
-@Composable
-fun DisplayPlacesList(
-    placePreviews: List<PlacePreview>,
-    onPlaceClicked: () -> Unit,
-    modifier: Modifier
-) {
-    LazyColumn(modifier = modifier) {
-        items(
-            items = placePreviews,
-            key = { placePreview -> placePreview.id}
-        ) { preview ->
-            PlacePreviewListItem(preview,
-                onPlaceClicked = onPlaceClicked,
-                modifier.padding(8.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun PlacePreviewListItem(
-    placePreview: PlacePreview,
-    onPlaceClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.primary),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .clickable { onPlaceClicked() }
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = placePreview.restaurantName,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
-        }
-    }
 }

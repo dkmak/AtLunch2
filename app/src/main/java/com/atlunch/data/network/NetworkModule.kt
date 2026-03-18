@@ -1,4 +1,4 @@
-package com.atlunch.data
+package com.atlunch.data.network
 
 import dagger.Module
 import dagger.Provides
@@ -16,7 +16,7 @@ import com.atlunch.BuildConfig
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    const val BASE_URL = "https://places.googleapis.com/v1/"
+    const val BASE_URL = "https://places.googleapis.com/"
 
     @Provides
     @Singleton

@@ -10,5 +10,5 @@ fun Throwable.toUserMessage(): String =
             "No results were found."
         }
         else ->
-            this.message?:""
+            this.message?:"An unknown error occurred."
     }

@@ -1,12 +1,12 @@
-package com.atlunch
+package com.atlunch.data
 
-import com.atlunch.data.Circle
-import com.atlunch.data.LatLng
-import com.atlunch.data.LocationRestriction
-import com.atlunch.data.PlacesApiClient
-import com.atlunch.data.SearchNearbyRequest
 import com.atlunch.data.dto.toDomain
-import com.atlunch.data.toDomainError
+import com.atlunch.data.network.Circle
+import com.atlunch.data.network.LatLng
+import com.atlunch.data.network.LocationRestriction
+import com.atlunch.data.network.PlacesApiClient
+import com.atlunch.data.network.SearchNearbyRequest
+import com.atlunch.domain.PlaceDetails
 import com.atlunch.domain.PlacePreview
 import com.atlunch.domain.PlacesRepository
 import dagger.Binds
@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 class PlacesRepositoryImpl @Inject constructor(
     private val apiClient: PlacesApiClient
 ) : PlacesRepository {
@@ -30,18 +29,25 @@ class PlacesRepositoryImpl @Inject constructor(
     ): Flow<List<PlacePreview>> = flow {
         val request = SearchNearbyRequest(
             includedTypes = listOf("restaurant"),
-            maxResultCount = 10,
+            maxResultCount = 20,
             locationRestriction = LocationRestriction(
                 circle = Circle(
-                    center = LatLng(40.728480, -73.982142), // this is for Westville
+                    center = LatLng(40.728480, -73.982142), // TODO this is for Westville
                     radius = 500.0
                 )
             )
         )
         val response = apiClient.searchNearby(request)
         emit(response.places.map { placePreviewDTO -> placePreviewDTO.toDomain() })
+    }.catch { throwable ->
+        throw throwable.toDomainError() // TODO I'm not sure how I would never map an error to the viewModel
+    }
+
+    override fun getPlaceDetails(id: String): Flow<PlaceDetails> = flow {
+        val response = apiClient.getPlaceDetails(id = id)
+        emit(response.toDomain())
     }. catch { throwable ->
-        throw throwable.toDomainError() // I'm not sure how I would never map an error to the viewModel
+        throw throwable.toDomainError()
     }
 }
 

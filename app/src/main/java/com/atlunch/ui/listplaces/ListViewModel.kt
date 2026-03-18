@@ -21,7 +21,7 @@ sealed interface ListPlacesUiState {
 
 @HiltViewModel
 class ListViewModel @Inject constructor(
-    repository: PlacesRepository
+    private val repository: PlacesRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<ListPlacesUiState> = repository.searchNearby(0.0, 0.0) // placeholders

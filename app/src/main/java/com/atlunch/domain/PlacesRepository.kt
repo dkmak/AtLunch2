@@ -1,6 +1,5 @@
 package com.atlunch.domain
 
-import com.atlunch.data.SearchNearbyRequest
 import kotlinx.coroutines.flow.Flow
 
 interface PlacesRepository {
@@ -8,4 +7,8 @@ interface PlacesRepository {
         lat: Double,
         long: Double
     ): Flow<List<PlacePreview>>
+
+    fun getPlaceDetails(
+        id: String
+    ):Flow<PlaceDetails>
 }

@@ -1,11 +1,12 @@
 package com.atlunch.domain
 
-import kotlinx.serialization.SerialName
+import com.atlunch.data.dto.DisplayName
 
-data class PlacePreview (
+data class PlaceDetails (
     val restaurantName: String,
     val id: String,
     val rating: Double,
     val userRatingCount: Int,
-    val shortFormattedAddress: String
+    val formattedAddress: String,
+    val nationalPhoneNumber: String
 )

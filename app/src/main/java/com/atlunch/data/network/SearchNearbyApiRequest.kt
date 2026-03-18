@@ -1,4 +1,4 @@
-package com.atlunch.data
+package com.atlunch.data.network
 
 import kotlinx.serialization.Serializable
 
