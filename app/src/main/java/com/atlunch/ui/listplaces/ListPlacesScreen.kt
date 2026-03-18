@@ -116,13 +116,24 @@ fun ListPlacesScreen(
                 }
 
                 is ListPlacesUiState.Success -> {
-                    DisplayPlacesList(
-                        placePreviews = state.placesPreviews,
-                        onPlaceClicked = onPlacePreviewClicked,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    )
+                    if (state.placesPreviews.isEmpty()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            Text("No result found.")
+                        }
+                    } else {
+                        DisplayPlacesList(
+                            placePreviews = state.placesPreviews,
+                            onPlaceClicked = onPlacePreviewClicked,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        )
+                    }
+
                 }
             }
         }
@@ -150,6 +161,7 @@ fun DisplayPlacesList(
             )
         }
     }
+
 }
 
 @Composable
@@ -260,3 +272,4 @@ fun DisplayPlacesListPreview() {
         )
     }
 }
+

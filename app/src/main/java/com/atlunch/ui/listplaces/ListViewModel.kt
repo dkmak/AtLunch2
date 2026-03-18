@@ -2,8 +2,10 @@ package com.atlunch.ui.listplaces
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil.util.CoilUtils.result
 import com.atlunch.domain.PlacePreview
 import com.atlunch.domain.PlacesRepository
+import com.atlunch.domain.PlacesResult
 import com.atlunch.ui.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,24 +32,28 @@ class ListViewModel @Inject constructor(
 
     fun loadPlacesNearby() {
         repository.searchNearby(0.0, 0.0) // TODO placeholders
-            .onEach { list ->
-                _uiState.update { ListPlacesUiState.Success(list) }
-            }.catch { throwable ->
-                _uiState.update { ListPlacesUiState.Failure(throwable.toUserMessage()) }
+            .onEach { result ->
+                _uiState.update { result.toUiState() }
             }.launchIn(viewModelScope)
     }
 
     fun search(query: String){
         if (query.isNotEmpty()){
          repository.searchQuery(query)
-             .onEach { list ->
-                 _uiState.update { ListPlacesUiState.Success(list) }
+             .onEach { result ->
+                 _uiState.update { result.toUiState() }
              }.onStart {
                  _uiState.update { ListPlacesUiState.Loading }
-             }
-             .catch { throwable ->
-                 _uiState.update { ListPlacesUiState.Failure(throwable.toUserMessage()) }
              }.launchIn(viewModelScope)
+        }
+    }
+
+    private fun PlacesResult.toUiState(): ListPlacesUiState{ // low level exceptions don't reach the high level abstractions like presentation layer
+        return when(this){
+            is PlacesResult.PlacesSuccess -> ListPlacesUiState.Success(this.places)
+            is PlacesResult.PlacesError.Backend -> ListPlacesUiState.Failure(this.toUserMessage())
+            is PlacesResult.PlacesError.Network -> ListPlacesUiState.Failure(this.toUserMessage())
+            is PlacesResult.PlacesError.Unknown -> ListPlacesUiState.Failure(this.toUserMessage())
         }
     }
 }

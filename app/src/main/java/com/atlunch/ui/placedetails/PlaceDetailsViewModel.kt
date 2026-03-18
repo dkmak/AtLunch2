@@ -1,28 +1,16 @@
 package com.atlunch.ui.placedetails
 
-import android.telecom.Call
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.atlunch.DetailsDestination
-import com.atlunch.data.toDomainError
 import com.atlunch.domain.PlaceDetails
+import com.atlunch.domain.PlaceDetailsResult
 import com.atlunch.domain.PlacesRepository
-import com.atlunch.ui.listplaces.ListPlacesUiState
 import com.atlunch.ui.toUserMessage
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -41,10 +29,17 @@ class PlaceDetailsViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun loadDetails(id: String) {
-        repository.getPlaceDetails(id).onEach { details ->
-            _uiState.update { DetailsUiState.Success(details) }
-        }.catch { throwable ->
-            _uiState.update { DetailsUiState.Failure(throwable.toUserMessage()) }
+        repository.getPlaceDetails(id).onEach { result ->
+            _uiState.update { result.toUiState() }
         }.launchIn(viewModelScope)
+    }
+
+    private fun PlaceDetailsResult.toUiState(): DetailsUiState{
+        return when (this){
+            is PlaceDetailsResult.DetailsSuccess -> DetailsUiState.Success(this.placeDetails)
+            is PlaceDetailsResult.DetailsError.Backend -> DetailsUiState.Failure(this.toUserMessage())
+            is PlaceDetailsResult.DetailsError.Network -> DetailsUiState.Failure(this.toUserMessage())
+            is PlaceDetailsResult.DetailsError.Unknown -> DetailsUiState.Failure(this.toUserMessage())
+        }
     }
 }

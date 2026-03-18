@@ -8,14 +8,14 @@ import com.atlunch.data.network.LocationRestriction
 import com.atlunch.data.network.PlacesApiClient
 import com.atlunch.data.network.SearchNearbyRequest
 import com.atlunch.data.network.SearchQueryRequest
-import com.atlunch.domain.DomainError
-import com.atlunch.domain.PlaceDetails
-import com.atlunch.domain.PlacePreview
+import com.atlunch.domain.PlaceDetailsResult
 import com.atlunch.domain.PlacesRepository
+import com.atlunch.domain.PlacesResult
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -29,7 +29,7 @@ class PlacesRepositoryImpl @Inject constructor(
     override fun searchNearby(
         lat: Double,
         long: Double
-    ): Flow<List<PlacePreview>> = flow {
+    ): Flow<PlacesResult> = flow<PlacesResult> {
         val request = SearchNearbyRequest(
             includedTypes = listOf("restaurant"), // hard coded
             maxResultCount = 20, // hard coded
@@ -41,19 +41,26 @@ class PlacesRepositoryImpl @Inject constructor(
             )
         )
         val response = apiClient.searchNearby(request)
-        emit(response.places.map { placePreviewDTO -> placePreviewDTO.toDomain() })
+        val result = response.places.map { placePreviewDTO -> placePreviewDTO.toDomain() }
+        emit(PlacesResult.PlacesSuccess(result))
     }.catch { throwable ->
-        throw throwable.toDomainError() // TODO I'm not sure how I would never map an error to the viewModel
+        if (throwable is CancellationException){
+            throw throwable
+        }
+        emit(throwable.toPlacesDomainError())
     }
 
-    override fun getPlaceDetails(id: String): Flow<PlaceDetails> = flow {
+    override fun getPlaceDetails(id: String): Flow<PlaceDetailsResult> = flow<PlaceDetailsResult> {
         val response = apiClient.getPlaceDetails(id = id)
-        emit(response.toDomain())
+        emit(PlaceDetailsResult.DetailsSuccess(response.toDomain()))
     }. catch { throwable ->
-        throw throwable.toDomainError()
+        if (throwable is CancellationException){
+            throw throwable
+        }
+        emit(throwable.toPlaceDetailsDomainError())
     }
 
-    override fun searchQuery(query: String): Flow<List<PlacePreview>> = flow {
+    override fun searchQuery(query: String): Flow<PlacesResult> = flow<PlacesResult> {
         val request = SearchQueryRequest(
             textQuery = query,
             includedType = "restaurant", // hard coded
@@ -66,12 +73,13 @@ class PlacesRepositoryImpl @Inject constructor(
             )
         )
         val response = apiClient.searchQuery(request)
-        if (response.places.isEmpty()){
-            throw DomainError.EmptyResult
-        }
-        emit(response.places.map { placePreviewDTO -> placePreviewDTO.toDomain() })
+        val result = response.places.map { placePreviewDTO -> placePreviewDTO.toDomain() }
+        emit(PlacesResult.PlacesSuccess(result))
     }.catch { throwable ->
-        throw throwable.toDomainError()
+        if (throwable is CancellationException){
+            throw throwable
+        }
+        emit(throwable.toPlacesDomainError())
     }
 }
 

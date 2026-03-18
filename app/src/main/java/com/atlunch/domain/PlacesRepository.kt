@@ -6,13 +6,13 @@ interface PlacesRepository {
     fun searchNearby(
         lat: Double,
         long: Double
-    ): Flow<List<PlacePreview>>
+    ): Flow<PlacesResult>
 
     fun getPlaceDetails(
         id: String
-    ):Flow<PlaceDetails>
+    ): Flow<PlaceDetailsResult>
 
     fun searchQuery(
         query: String
-    ): Flow<List<PlacePreview>>
+    ): Flow<PlacesResult>
 }

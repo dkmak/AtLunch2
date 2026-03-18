@@ -1,14 +1,26 @@
 package com.atlunch.ui
 
-import com.atlunch.domain.DomainError
+import com.atlunch.domain.PlaceDetailsResult
+import com.atlunch.domain.PlacesResult
 
-fun Throwable.toUserMessage(): String =
+fun PlacesResult.PlacesError.toUserMessage(): String =
     when (this) {
-        is DomainError.Network ->
+        is PlacesResult.PlacesError.Network ->
             "Please check your internet connection and try again."
-        is DomainError.EmptyResult -> {
-            "No results were found."
+        is PlacesResult.PlacesError.Backend -> {
+            ""
         }
-        else ->
-            this.message?:"An unknown error occurred."
+        is PlacesResult.PlacesError.Unknown ->
+            "An unknown error occurred."
+    }
+
+fun PlaceDetailsResult.DetailsError.toUserMessage(): String =
+    when (this) {
+        is PlaceDetailsResult.DetailsError.Network ->
+            "Please check your internet connection and try again."
+        is PlaceDetailsResult.DetailsError.Backend -> {
+            ""
+        }
+        is PlaceDetailsResult.DetailsError.Unknown ->
+            "An unknown error occurred."
     }
