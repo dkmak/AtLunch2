@@ -1,6 +1,7 @@
 package com.atlunch.ui.listplaces
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -36,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.atlunch.domain.PlacePreview
+import com.atlunch.ui.theme.AtLunchTheme
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -126,7 +129,7 @@ fun DisplayPlacesList(
     onPlaceClicked: (String) -> Unit,
     modifier: Modifier
 ) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(modifier = modifier.background(MaterialTheme.colorScheme.background)) {
         items(
             items = placePreviews,
             key = { placePreview -> placePreview.id}
@@ -148,13 +151,9 @@ fun PlacePreviewListItem(
     Row(
         modifier = modifier
     ) {
-        Box(
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(
-                    border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.primary),
-                    shape = RoundedCornerShape(8.dp)
-                )
                 .clickable { onPlaceClicked(placePreview.id) }
         ) {
             Row(
@@ -169,5 +168,23 @@ fun PlacePreviewListItem(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PlacePreviewListItemPreview() {
+    AtLunchTheme {
+        PlacePreviewListItem(
+            placePreview = PlacePreview(
+                restaurantName = "Joe's Pizza",
+                id = "preview-place-id",
+                rating = 4.7,
+                userRatingCount = 128,
+                shortFormattedAddress = "123 Main St"
+            ),
+            onPlaceClicked = {},
+            modifier = Modifier.padding(8.dp)
+        )
     }
 }
