@@ -42,6 +42,7 @@ import com.atlunch.ui.listplaces.ListPlacesScreen
 import com.atlunch.ui.listplaces.ListPlacesUiState
 import com.atlunch.ui.listplaces.ListViewModel
 import com.atlunch.ui.placedetails.DetailsUiState
+import com.atlunch.ui.placedetails.PlaceDetailsScreen
 import com.atlunch.ui.placedetails.PlaceDetailsViewModel
 import com.atlunch.ui.theme.AtLunchTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -88,58 +89,4 @@ fun AtLunchApp() {
             }
         }
     )
-}
-
-@Composable
-fun PlaceDetailsScreen(
-    placeId: String,
-    viewModel: PlaceDetailsViewModel = hiltViewModel(),
-    onBackClicked: ()-> Unit
-){
-    LaunchedEffect(placeId) {
-        viewModel.loadDetails(placeId)
-    }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxWidth()
-        ) {
-            when (val state = uiState) {
-                is DetailsUiState.Failure -> {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        Text(text = state.message)
-                    }
-                }
-
-                DetailsUiState.Loading -> {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
-
-                is DetailsUiState.Success -> {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(state.placeDetails.restaurantName)
-                        Text(state.placeDetails.rating.toString())
-                        Text(state.placeDetails.userRatingCount.toString())
-                        Text(state.placeDetails.formattedAddress)
-                        Text(state.placeDetails.nationalPhoneNumber)
-                    }
-                }
-            }
-        }
-    }
-
-
 }

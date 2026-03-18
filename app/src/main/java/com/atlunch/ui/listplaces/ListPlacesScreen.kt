@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -31,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -69,6 +69,7 @@ fun ListPlacesScreen(
                     onValueChange = {newValue ->
                         textFieldValue = newValue
                     },
+                    modifier = Modifier.fillMaxWidth(),
                     label = { Text("Search restaurants") },
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done
@@ -170,5 +171,3 @@ fun PlacePreviewListItem(
         }
     }
 }
-
-// TODO PREVIEWS
