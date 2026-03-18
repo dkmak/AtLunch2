@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -42,13 +43,13 @@ import com.atlunch.ui.theme.AtLunchTheme
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object ListDestination: NavKey
+data object ListDestination : NavKey
 
 @Composable
 fun ListPlacesScreen(
     viewModel: ListViewModel = hiltViewModel(),
     onPlacePreviewClicked: (String) -> Unit
-){
+) {
     LaunchedEffect(Unit) {
         viewModel.loadPlacesNearby()
     }
@@ -56,7 +57,10 @@ fun ListPlacesScreen(
     var textFieldValue by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -69,7 +73,7 @@ fun ListPlacesScreen(
             ) {
                 OutlinedTextField(
                     value = textFieldValue,
-                    onValueChange = {newValue ->
+                    onValueChange = { newValue ->
                         textFieldValue = newValue
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -129,12 +133,15 @@ fun DisplayPlacesList(
     onPlaceClicked: (String) -> Unit,
     modifier: Modifier
 ) {
-    LazyColumn(modifier = modifier.background(MaterialTheme.colorScheme.background)) {
+    LazyColumn(
+        modifier = modifier.background(MaterialTheme.colorScheme.background)
+    ) {
         items(
             items = placePreviews,
-            key = { placePreview -> placePreview.id}
+            key = { placePreview -> placePreview.id }
         ) { preview ->
-            PlacePreviewListItem(preview,
+            PlacePreviewListItem(
+                preview,
                 onPlaceClicked = onPlaceClicked,
                 modifier.padding(8.dp)
             )
@@ -154,7 +161,10 @@ fun PlacePreviewListItem(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onPlaceClicked(placePreview.id) }
+                .clickable { onPlaceClicked(placePreview.id) },
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
         ) {
             Row(
                 modifier = Modifier
