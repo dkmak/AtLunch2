@@ -34,8 +34,8 @@ class PlacesRepositoryImpl @Inject constructor(
         long: Double
     ): Flow<PlacesResult> = flow<PlacesResult> {
         val request = SearchNearbyRequest(
-            includedTypes = listOf("restaurant"),
-            maxResultCount = MAX_RESULTS, // hard coded
+            includedTypes = listOf(INCLUDED_TYPE),
+            maxResultCount = MAX_RESULTS,
             locationRestriction = LocationRestriction(
                 circle = Circle(
                     center = LatLng(40.728480, -73.982142), // TODO this is for Westville
@@ -63,7 +63,7 @@ class PlacesRepositoryImpl @Inject constructor(
             val photoResourceResponse = apiClient.getPhotos(photoResource.name)
             photoResourceResponse.toDomain()
         }*/
-        
+
         val photoResources = detailsResponse.photos.take(MAX_PHOTOS)
         val photosDomain = coroutineScope {
             photoResources.map { photoResource ->
@@ -86,7 +86,7 @@ class PlacesRepositoryImpl @Inject constructor(
     override fun searchQuery(query: String): Flow<PlacesResult> = flow<PlacesResult> {
         val request = SearchQueryRequest(
             textQuery = query,
-            includedType = "restaurant", // hard coded
+            includedType = INCLUDED_TYPE, // hard coded
             pageSize = MAX_RESULTS, // hard coded, might be token if there are more results
             locationBias = LocationBias(
                 circle = Circle(
@@ -109,6 +109,7 @@ class PlacesRepositoryImpl @Inject constructor(
         const val MAX_PHOTOS = 8
         const val MAX_RESULTS = 20
         const val MAX_RADIUS = 1000.0
+        const val INCLUDED_TYPE = "restaurant"
     }
 }
 
