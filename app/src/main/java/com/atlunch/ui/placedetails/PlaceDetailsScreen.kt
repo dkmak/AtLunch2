@@ -138,7 +138,8 @@ fun PictureItem(photo: Photo) {
                 AsyncImage(
                     modifier = Modifier
                         .size(128.dp)
-                        .padding(bottom = 8.dp),
+                        .padding(8.dp)
+                    ,
                     model = photo.photoUrl,
                     contentDescription = "",
                     contentScale = ContentScale.Fit

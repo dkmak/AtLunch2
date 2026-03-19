@@ -4,6 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -87,6 +92,14 @@ fun AtLunchApp() {
                     onBackClicked = {navBackStack.removeLastOrNull()}
                 )
             }
+        },
+        transitionSpec = {
+            slideInHorizontally() togetherWith
+                    scaleOut()
+        },
+        popTransitionSpec = {
+            scaleIn() togetherWith
+                    slideOutHorizontally()
         }
     )
 }
