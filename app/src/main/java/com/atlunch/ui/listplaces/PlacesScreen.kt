@@ -279,19 +279,23 @@ fun PlacesMapContent(
             contentAlignment = Alignment.Center
         ) {
             val location = LatLng(userLocation.latitude, userLocation.longitude)
-            val locationMarkerState = rememberMarkerState(position = location)
             val cameraPositionState = rememberCameraPositionState {
-                position = CameraPosition.fromLatLngZoom(location, 18f)
+                position = CameraPosition.fromLatLngZoom(location, 15f)
             }
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState
             ) {
-                Marker(
-                    state = locationMarkerState,
-                    title = "location",
-                    snippet = "Marker in my location"
-                )
+                placePreviews.filter { preview -> preview.location != null }.forEach {preview ->
+                    val (previewLat, previewLong) = preview.location!!
+                    Marker(
+                        state = rememberMarkerState(
+                            position = LatLng(previewLat, previewLong)
+                        ),
+                        title = preview.restaurantName,
+                        snippet = preview.shortFormattedAddress
+                    )
+                }
             }
         }
     }
