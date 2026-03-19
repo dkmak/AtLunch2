@@ -281,7 +281,7 @@ fun PlacesMapContent(
             val location = LatLng(userLocation.latitude, userLocation.longitude)
             val locationMarkerState = rememberMarkerState(position = location)
             val cameraPositionState = rememberCameraPositionState {
-                position = CameraPosition.fromLatLngZoom(location, 10f)
+                position = CameraPosition.fromLatLngZoom(location, 18f)
             }
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
