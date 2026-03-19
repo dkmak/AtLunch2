@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -102,7 +103,7 @@ fun PlaceDetailsScreen(
 fun DisplayPlacePhotos(
     photos: List<Photo>,
     modifier: Modifier = Modifier
-){
+) {
     LazyVerticalGrid(
         modifier = modifier,
         columns = GridCells.Fixed(2),
@@ -124,6 +125,9 @@ fun PictureItem(photo: Photo) {
         border = BorderStroke(
             width = 2.dp,
             color = Color.DarkGray
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column {
@@ -159,7 +163,8 @@ fun DisplayPlaceDetails(
             placeDetails.restaurantName,
             style = MaterialTheme.typography.titleLarge
         )
-        Text(placeDetails.formattedAddress,
+        Text(
+            placeDetails.formattedAddress,
             style = MaterialTheme.typography.titleMedium
         )
         Text(placeDetails.nationalPhoneNumber)
