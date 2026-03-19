@@ -1,6 +1,8 @@
 package com.atlunch.data.network
 
+import com.atlunch.data.dto.PhotoMediaDTO
 import com.atlunch.data.dto.PlaceDetailsDTO
+import com.atlunch.data.dto.PhotoResourceDTO
 import com.atlunch.data.dto.PlacePreviewDTO
 import kotlinx.serialization.Serializable
 import retrofit2.http.Body
@@ -8,6 +10,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 import javax.inject.Inject
 
 class PlacesApiClient @Inject constructor(
@@ -43,12 +46,22 @@ class PlacesApiClient @Inject constructor(
         )
     }
 
+    suspend fun getPhotos(name: String): PhotoMediaDTO {
+        return placesApiService.getPhotoMedia(
+            name = "$name/media",
+            key = API_KEY,
+            maxHeightPx = 400,
+            maxWidthPx = 400,
+            skipHttpRedirect = true
+        )
+    }
+
     companion object {
         const val API_KEY = "REMOVED_GOOGLE_PLACES_KEY"
         const val SEARCH_RESULTS_FIELD_MASK =
             "places.displayName,places.id,places.rating,places.userRatingCount,places.shortFormattedAddress,places.iconMaskBaseUri"
         const val GET_DETAILS_FIELD_MASK =
-            "displayName,id,rating,userRatingCount,formattedAddress,nationalPhoneNumber"
+            "displayName,id,rating,userRatingCount,formattedAddress,nationalPhoneNumber,photos"
     }
 }
 
@@ -73,6 +86,15 @@ interface PlacesApiService {
         @Header("X-Goog-FieldMask") fieldMask: String,
         @Body request: SearchQueryRequest
     ): SearchResultsResponse
+
+    @GET("/v1/{name}")
+    suspend fun getPhotoMedia(
+        @Path(value = "name", encoded = true) name: String,
+        @Query("key") key: String,
+        @Query("maxHeightPx") maxHeightPx: Int? = null,
+        @Query("maxWidthPx") maxWidthPx: Int? = null,
+        @Query("skipHttpRedirect") skipHttpRedirect: Boolean = true
+    ): PhotoMediaDTO
 }
 
 
@@ -80,5 +102,4 @@ interface PlacesApiService {
 data class SearchResultsResponse(
     val places: List<PlacePreviewDTO> = emptyList()
 )
-
 

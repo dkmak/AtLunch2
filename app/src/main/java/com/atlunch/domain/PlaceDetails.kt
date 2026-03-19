@@ -8,5 +8,6 @@ data class PlaceDetails (
     val rating: Double,
     val userRatingCount: Int,
     val formattedAddress: String,
+    // val photos: List<Photo>,
     val nationalPhoneNumber: String
 )

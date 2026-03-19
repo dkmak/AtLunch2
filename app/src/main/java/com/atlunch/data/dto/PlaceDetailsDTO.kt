@@ -9,5 +9,6 @@ data class PlaceDetailsDTO(
     val rating: Double,
     val userRatingCount: Int,
     val formattedAddress: String,
+    val photos: List<PhotoResourceDTO> = emptyList(),
     val nationalPhoneNumber: String? = null
 )
