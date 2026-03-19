@@ -1,12 +1,6 @@
 package com.atlunch.ui.placedetails
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,20 +11,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,11 +38,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.atlunch.R
-import com.atlunch.data.dto.PlaceDetailsDTO
 import com.atlunch.domain.Photo
 import com.atlunch.domain.PlaceDetails
 import com.atlunch.ui.theme.AtLunchTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceDetailsScreen(
     placeId: String,
@@ -57,7 +53,28 @@ fun PlaceDetailsScreen(
         viewModel.loadDetails(placeId)
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = {},
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                ),
+                navigationIcon = {
+                    IconButton(onClick = {
+                        onBackClicked()
+                        viewModel.onBackClicked()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -86,7 +103,10 @@ fun PlaceDetailsScreen(
                 }
 
                 is DetailsUiState.Success -> {
-                    DisplayPlacePhotos(state.photos)
+                    DisplayPlacePhotos(
+                        state.photos,
+                        restaurantName = state.placeDetails.restaurantName
+                    )
                     DisplayPlaceDetails(
                         placeDetails = state.placeDetails,
                         modifier = Modifier
@@ -102,6 +122,7 @@ fun PlaceDetailsScreen(
 @Composable
 fun DisplayPlacePhotos(
     photos: List<Photo>,
+    restaurantName: String,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
@@ -111,13 +132,16 @@ fun DisplayPlacePhotos(
         items(
             photos
         ) { picture ->
-            PictureItem(picture)
+            PictureItem(picture, restaurantName)
         }
     }
 }
 
 @Composable
-fun PictureItem(photo: Photo) {
+fun PictureItem(
+    photo: Photo,
+    restaurantName: String
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -138,10 +162,9 @@ fun PictureItem(photo: Photo) {
                 AsyncImage(
                     modifier = Modifier
                         .size(128.dp)
-                        .padding(8.dp)
-                    ,
+                        .padding(8.dp),
                     model = photo.photoUrl,
-                    contentDescription = "",
+                    contentDescription = "Photo of {$restaurantName}",
                     contentScale = ContentScale.Fit
                 )
             }

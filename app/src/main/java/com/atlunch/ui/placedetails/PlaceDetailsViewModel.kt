@@ -49,4 +49,8 @@ class PlaceDetailsViewModel @Inject constructor(
             is PlaceDetailsResult.DetailsError.Unknown -> DetailsUiState.Failure(this.toUserMessage())
         }
     }
+
+    fun onBackClicked(){
+        _uiState.update { DetailsUiState.Loading }
+    }
 }
