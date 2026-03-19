@@ -16,6 +16,9 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -31,12 +34,12 @@ class PlacesRepositoryImpl @Inject constructor(
         long: Double
     ): Flow<PlacesResult> = flow<PlacesResult> {
         val request = SearchNearbyRequest(
-            includedTypes = listOf("restaurant"), // hard coded
-            maxResultCount = 20, // hard coded
+            includedTypes = listOf("restaurant"),
+            maxResultCount = MAX_RESULTS, // hard coded
             locationRestriction = LocationRestriction(
                 circle = Circle(
                     center = LatLng(40.728480, -73.982142), // TODO this is for Westville
-                    radius = 1000.0
+                    radius = MAX_RADIUS
                 )
             )
         )
@@ -52,10 +55,22 @@ class PlacesRepositoryImpl @Inject constructor(
 
     override fun getPlaceDetails(id: String): Flow<PlaceDetailsResult> = flow<PlaceDetailsResult> {
         val detailsResponse = apiClient.getPlaceDetails(id = id)
-        val photos = detailsResponse.photos.take(8)
+
+
+        // TODO this is one-by-one
+/*        val photos = detailsResponse.photos.take(MAX_PHOTOS)
         val photosDomain = photos.map { photoResource ->
             val photoResourceResponse = apiClient.getPhotos(photoResource.name)
             photoResourceResponse.toDomain()
+        }*/
+        
+        val photoResources = detailsResponse.photos.take(MAX_PHOTOS)
+        val photosDomain = coroutineScope {
+            photoResources.map { photoResource ->
+                async {
+                    apiClient.getPhotos(photoResource.name).toDomain()
+                }
+            }.awaitAll()
         }
         emit(PlaceDetailsResult.DetailsSuccess(
             placeDetails = detailsResponse.toDomain(),
@@ -72,11 +87,11 @@ class PlacesRepositoryImpl @Inject constructor(
         val request = SearchQueryRequest(
             textQuery = query,
             includedType = "restaurant", // hard coded
-            pageSize = 20, // hard coded, might be token if there are more results
+            pageSize = MAX_RESULTS, // hard coded, might be token if there are more results
             locationBias = LocationBias(
                 circle = Circle(
                     center = LatLng(40.728480, -73.982142), // TODO this is for Westville
-                    radius = 500.0
+                    radius = MAX_RADIUS
                 )
             )
         )
@@ -88,6 +103,12 @@ class PlacesRepositoryImpl @Inject constructor(
             throw throwable
         }
         emit(throwable.toPlacesDomainError())
+    }
+
+    companion object {
+        const val MAX_PHOTOS = 8
+        const val MAX_RESULTS = 20
+        const val MAX_RADIUS = 1000.0
     }
 }
 

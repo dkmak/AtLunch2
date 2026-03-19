@@ -45,6 +45,8 @@ class ListViewModel @Inject constructor(
              }.onStart {
                  _uiState.update { ListPlacesUiState.Loading }
              }.launchIn(viewModelScope)
+        } else {
+            loadPlacesNearby()
         }
     }
 

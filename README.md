@@ -14,55 +14,45 @@ the restaurant
 
 ### Setup Instructions
 #### Prerequisites
-- Android Studio:
-- Java/JDK Version:
-- •Android SDK
-    - Compile SDK:  
-    - Minimum SDK:  
-- Gradle Version: 
-
-#### Open & Run Project
-1. Unzip the project
-2. Open Android Studio
-3. Select "Open" and choose the root project directory
-4. Let Gradle sync complete
-5. run unit tests with `./gradlew clean testDebugUnitTest`
+- Android Studio: Latest stable version recommended
+- Java/JDK Version: JDK 11
+- Android SDK
+    - Compile SDK: 36
+    - Target SDK: 36
+    - Minimum SDK: 24
+- Gradle Version: 8.13
+- Android Gradle Plugin (AGP): 8.13.1
+- Kotlin: 2.0.21
 
 ## Technical Details
-
-
 
 ### Architecture
 **MVVM** architecture
 - Clear separation of concerns between UI, domain, and data layers
 
 ### UI
-- **Jetpack Compose**
-- Proper loading, error, and empty states
+- **Jetpack Compose** - Nav3, Coil 
 
 ### Networking
-- Integrate with [API](**insert api here**)
+- Integrate with [Google Places API](https://developers.google.com/maps/documentation/places/web-service/overview)
 - Handle network errors gracefully.
 - Proper error messages for the user.
 
-### Modularization
-- Implement features and other architectural components in separate modules.
-- Maintain proper dependency direction
-- Keep modules focused and single-purpose.
-
 ### Testing
-- Includes unit tests for ViewModels and Repositories
-
-### Build Configuration
-- Debug and release build types are configured
-- ProGuard/R8 is enabled for release builds
-
+- run unit tests with `./gradlew clean testDebugUnitTest`
 ---
 
 ## API Reference
-**Base URL:** `insert base url`
+**Base URL:** `https://places.googleapis.com/`
 
-| Endpoint                     | Description | Example |
-|------------------------------|---------|--------|
-| `ex1`                        | | N/A |
-| `ex2`                        | |  |
+**Common headers**
+- `X-Goog-Api-Key: <API_KEY>`
+- `X-Goog-FieldMask: <field mask for the endpoint>`
+
+| Endpoint | Description |
+|------------------------------|---------|
+| `POST /v1/places:searchNearby` | Returns nearby restaurant results for the list screen. | 
+| `POST /v1/places:searchText` | Searches restaurants by free-text query. | 
+| `GET /v1/places/{id}` | Fetches the selected restaurant's detail page data. |
+| `GET /v1/{photoName}/media` | Fetches photo media metadata for a place photo.|
+

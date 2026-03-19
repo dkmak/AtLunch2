@@ -2,7 +2,6 @@ package com.atlunch.data.network
 
 import com.atlunch.data.dto.PhotoMediaDTO
 import com.atlunch.data.dto.PlaceDetailsDTO
-import com.atlunch.data.dto.PhotoResourceDTO
 import com.atlunch.data.dto.PlacePreviewDTO
 import kotlinx.serialization.Serializable
 import retrofit2.http.Body
@@ -20,7 +19,7 @@ class PlacesApiClient @Inject constructor(
         request: SearchNearbyRequest
     ): SearchResultsResponse {
         return placesApiService.searchNearby(
-            apiKey = API_KEY, // TODO HIDE THIS?
+            apiKey = API_KEY,
             fieldMask = SEARCH_RESULTS_FIELD_MASK,
             request = request
         )
