@@ -1,4 +1,4 @@
-package com.atlunch.data.network
+package com.atlunch.data
 
 import android.content.Context
 import com.google.android.gms.location.FusedLocationProviderClient
