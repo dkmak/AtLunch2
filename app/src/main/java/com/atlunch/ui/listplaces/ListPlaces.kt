@@ -102,20 +102,20 @@ fun PlacePreviewListItem(
                         )
 
                         Text(
-                            text = placePreview.rating.toString(),
+                            text = (placePreview.rating ?: 0.0).toString(),
                             modifier = Modifier.padding(start = 6.dp),
                             style = MaterialTheme.typography.bodyMedium
                         )
 
                         Text(
-                            text = "• (${placePreview.userRatingCount} reviews)",
+                            text = "• (${placePreview.userRatingCount ?: 0} reviews)",
                             modifier = Modifier.padding(start = 6.dp),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
 
                     Text(
-                        text = placePreview.shortFormattedAddress,
+                        text = placePreview.shortFormattedAddress ?: "Address not available.",
                         style = MaterialTheme.typography.bodyMedium,
                         overflow = TextOverflow.Visible
                     )
