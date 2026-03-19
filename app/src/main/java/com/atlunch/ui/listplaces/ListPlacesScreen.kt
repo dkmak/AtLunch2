@@ -68,9 +68,6 @@ fun ListPlacesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var textFieldValue by rememberSaveable { mutableStateOf("") }
-    // TODO: This needs to be stored as a state
-    var isPermissionGranted by rememberSaveable { mutableStateOf<Boolean>(false) }
-    var locationPermissionMessage by rememberSaveable { mutableStateOf<String?>(null) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -80,15 +77,11 @@ fun ListPlacesScreen(
     ) { permissions ->
         val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
             permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-        if (granted) {
-            isPermissionGranted = true
-        } else {
-            isPermissionGranted = false
-        }
+        viewModel.onLocationPermissionChanged(granted)
     }
 
-    LaunchedEffect(isPermissionGranted) {
-        if (!isPermissionGranted) {
+    LaunchedEffect(Unit) {
+        if (textFieldValue.isEmpty()) {
             val hasLocationPermission = ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -98,19 +91,25 @@ fun ListPlacesScreen(
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
 
-            if (!hasLocationPermission) {
+            viewModel.onLocationPermissionChanged(hasLocationPermission)
+
+            if (hasLocationPermission) {
+                viewModel.search(textFieldValue)
+            } else {
                 locationPermissionLauncher.launch(
                     arrayOf(
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION
                     )
                 )
-            } else {
-                // locationPermissionMessage =
-                    "Location permission already granted. Nearby restaurant search can be wired up next."
             }
-            //
         } else {
+            viewModel.search(textFieldValue)
+        }
+    }
+
+    LaunchedEffect(uiState.isLocationPermissionEnabled) {
+        if (uiState.isLocationPermissionEnabled) {
             viewModel.search(textFieldValue)
         }
     }
@@ -135,60 +134,57 @@ fun ListPlacesScreen(
                 .padding(innerPadding)
                 .fillMaxWidth()
         ) {
-/*
-            locationPermissionMessage?.let { message ->
+            if (!uiState.isLocationPermissionEnabled) {
                 Text(
-                    text = message,
+                    text = "Location permission denied. Please enable location services.",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     style = MaterialTheme.typography.bodyMedium
                 )
-            }
-*/
-
-            when (val state = uiState) {
-                is ListPlacesUiState.Failure -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        Text(text = state.message)
-                    }
-                }
-
-                // TODO - DENY USER LOCATION ACCESS
-                ListPlacesUiState.Loading -> {
-                    if (textFieldValue.isNotEmpty() || locationPermissionMessage == null) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                }
-
-                is ListPlacesUiState.Success -> {
-                    if (state.placesPreviews.isEmpty()) {
+            } else {
+                when (val state = uiState) {
+                    is ListPlacesUiState.Failure -> {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)
                         ) {
-                            Text("No results found.")
+                            Text(text = state.message)
                         }
-                    } else {
-                        DisplayPlacesList(
-                            placePreviews = state.placesPreviews,
-                            onPlaceClicked = onPlacePreviewClicked,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                        )
+                    }
+
+                    is ListPlacesUiState.Loading -> {
+                        if (textFieldValue.isNotEmpty() || state.isLocationPermissionEnabled) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+
+                    is ListPlacesUiState.Success -> {
+                        if (state.placesPreviews.isEmpty()) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                Text("No results found.")
+                            }
+                        } else {
+                            DisplayPlacesList(
+                                placePreviews = state.placesPreviews,
+                                onPlaceClicked = onPlacePreviewClicked,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                            )
+                        }
                     }
                 }
             }
