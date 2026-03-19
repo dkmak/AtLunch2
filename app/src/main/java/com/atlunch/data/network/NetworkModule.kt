@@ -12,6 +12,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Singleton
 import okhttp3.logging.HttpLoggingInterceptor
 import com.atlunch.BuildConfig
+import com.google.android.gms.location.FusedLocationProviderClient
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -52,13 +53,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): PlacesApiService{
+    fun providePlacesApiService(retrofit: Retrofit): PlacesApiService{
         return retrofit.create(PlacesApiService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideApiClient(placesApiService: PlacesApiService): PlacesApiClient{
+    fun providePlacesApiClient(placesApiService: PlacesApiService): PlacesApiClient{
         return PlacesApiClient(placesApiService)
     }
 

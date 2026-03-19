@@ -67,6 +67,7 @@ fun ListPlacesScreen(
     onPlacePreviewClicked: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     var textFieldValue by rememberSaveable { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current

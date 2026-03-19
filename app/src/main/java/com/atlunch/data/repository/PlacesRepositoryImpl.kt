@@ -1,4 +1,4 @@
-package com.atlunch.data
+package com.atlunch.data.repository
 
 import com.atlunch.data.dto.toDomain
 import com.atlunch.data.network.Circle
@@ -8,6 +8,8 @@ import com.atlunch.data.network.LocationRestriction
 import com.atlunch.data.network.PlacesApiClient
 import com.atlunch.data.network.SearchNearbyRequest
 import com.atlunch.data.network.SearchQueryRequest
+import com.atlunch.data.toPlaceDetailsDomainError
+import com.atlunch.data.toPlacesDomainError
 import com.atlunch.domain.PlaceDetailsResult
 import com.atlunch.domain.PlacesRepository
 import com.atlunch.domain.PlacesResult
@@ -38,7 +40,7 @@ class PlacesRepositoryImpl @Inject constructor(
             maxResultCount = MAX_RESULTS,
             locationRestriction = LocationRestriction(
                 circle = Circle(
-                    center = LatLng(40.728480, -73.982142), // TODO this is for Westville
+                    center = LatLng(lat, long),
                     radius = MAX_RADIUS
                 )
             )
@@ -83,7 +85,9 @@ class PlacesRepositoryImpl @Inject constructor(
         emit(throwable.toPlaceDetailsDomainError())
     }
 
-    override fun searchQuery(query: String): Flow<PlacesResult> = flow<PlacesResult> {
+    override fun searchQuery(
+        query: String
+    ): Flow<PlacesResult> = flow<PlacesResult> {
         val request = SearchQueryRequest(
             textQuery = query,
             includedType = INCLUDED_TYPE, // hard coded

@@ -2,6 +2,8 @@ package com.atlunch.ui.listplaces
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.atlunch.domain.LocationRepository
+import com.atlunch.domain.LocationResult
 import com.atlunch.domain.PlacePreview
 import com.atlunch.domain.PlacesRepository
 import com.atlunch.domain.PlacesResult
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed interface ListPlacesUiState {
@@ -35,44 +38,68 @@ sealed interface ListPlacesUiState {
 
 @HiltViewModel
 class ListViewModel @Inject constructor(
-    private val repository: PlacesRepository
+    private val locationRepository: LocationRepository,
+    private val placesRepository: PlacesRepository
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow<ListPlacesUiState>(
         ListPlacesUiState.Loading(isLocationPermissionEnabled = false)
     )
     val uiState = _uiState.asStateFlow()
 
-    fun search(query: String){
-        if (query.isNotEmpty()){
-         repository.searchQuery(query)
-             .onEach { result ->
-                 _uiState.update { currentState ->
-                     result.toUiState(
-                         isLocationPermissionEnabled = currentState.isLocationPermissionEnabled
-                     )
-                 }
-             }.onStart {
-                 _uiState.update { currentState ->
-                     ListPlacesUiState.Loading(
-                         isLocationPermissionEnabled = currentState.isLocationPermissionEnabled
-                     )
-                 }
-             }.launchIn(viewModelScope)
+    fun search(query: String) {
+        if (query.isNotEmpty()) {
+            placesRepository.searchQuery(query)
+                .onEach { result ->
+                    _uiState.update { currentState ->
+                        result.toUiState(
+                            isLocationPermissionEnabled = currentState.isLocationPermissionEnabled
+                        )
+                    }
+                }.onStart {
+                    _uiState.update { currentState ->
+                        ListPlacesUiState.Loading(
+                            isLocationPermissionEnabled = currentState.isLocationPermissionEnabled
+                        )
+                    }
+                }.launchIn(viewModelScope)
         } else {
             loadPlacesNearby()
         }
     }
 
     private fun loadPlacesNearby() {
-        repository.searchNearby(0.0, 0.0) // TODO placeholders
-            .onEach { result ->
-                _uiState.update { currentState ->
-                    result.toUiState(
-                        isLocationPermissionEnabled = currentState.isLocationPermissionEnabled
-                    )
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                ListPlacesUiState.Loading(
+                    isLocationPermissionEnabled = currentState.isLocationPermissionEnabled
+                )
+            }
+
+            when (val locationResult = locationRepository.getCurrentLocation()) {
+                is LocationResult.LocationSuccess -> {
+                    val (latitude, longitude) = locationResult.userLocation
+                    placesRepository.searchNearby(latitude, longitude)
+                        .onEach { result ->
+                            _uiState.update { currentState ->
+                                result.toUiState(
+                                    isLocationPermissionEnabled = currentState.isLocationPermissionEnabled
+                                )
+                            }
+                        }.launchIn(viewModelScope)
                 }
-            }.launchIn(viewModelScope)
+
+                is LocationResult.LocationError.Unknown -> {
+                    _uiState.update { currentState ->
+                        ListPlacesUiState.Failure(
+                            message = locationResult.toUserMessage(),
+                            currentState.isLocationPermissionEnabled
+                        )
+                    }
+                }
+            }
+        }
+
+
     }
 
     fun onLocationPermissionChanged(isEnabled: Boolean) {
@@ -93,19 +120,22 @@ class ListViewModel @Inject constructor(
     private fun PlacesResult.toUiState(
         isLocationPermissionEnabled: Boolean
     ): ListPlacesUiState { // low level exceptions don't reach the high level abstractions like presentation layer
-        return when(this){
+        return when (this) {
             is PlacesResult.PlacesSuccess -> ListPlacesUiState.Success(
                 placesPreviews = this.places,
                 isLocationPermissionEnabled = isLocationPermissionEnabled
             )
+
             is PlacesResult.PlacesError.Backend -> ListPlacesUiState.Failure(
                 message = this.toUserMessage(),
                 isLocationPermissionEnabled = isLocationPermissionEnabled
             )
+
             is PlacesResult.PlacesError.Network -> ListPlacesUiState.Failure(
                 message = this.toUserMessage(),
                 isLocationPermissionEnabled = isLocationPermissionEnabled
             )
+
             is PlacesResult.PlacesError.Unknown -> ListPlacesUiState.Failure(
                 message = this.toUserMessage(),
                 isLocationPermissionEnabled = isLocationPermissionEnabled
