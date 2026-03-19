@@ -36,7 +36,7 @@ class PlacesRepositoryImpl @Inject constructor(
             locationRestriction = LocationRestriction(
                 circle = Circle(
                     center = LatLng(40.728480, -73.982142), // TODO this is for Westville
-                    radius = 500.0
+                    radius = 1000.0
                 )
             )
         )
