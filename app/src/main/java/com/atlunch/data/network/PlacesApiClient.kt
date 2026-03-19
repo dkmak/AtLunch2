@@ -58,7 +58,7 @@ class PlacesApiClient @Inject constructor(
     companion object {
         const val API_KEY = "REMOVED_GOOGLE_PLACES_KEY"
         const val SEARCH_RESULTS_FIELD_MASK =
-            "places.displayName,places.id,places.rating,places.userRatingCount,places.shortFormattedAddress,places.iconMaskBaseUri"
+            "places.displayName,places.id,places.rating,places.userRatingCount,places.shortFormattedAddress,places.iconMaskBaseUri,places.location"
         const val GET_DETAILS_FIELD_MASK =
             "displayName,id,rating,userRatingCount,formattedAddress,nationalPhoneNumber,photos"
     }

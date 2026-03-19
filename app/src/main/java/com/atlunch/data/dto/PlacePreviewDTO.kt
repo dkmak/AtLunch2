@@ -1,5 +1,6 @@
 package com.atlunch.data.dto
 
+import com.atlunch.data.network.LatLngDTO
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -7,9 +8,10 @@ import kotlinx.serialization.Serializable
 data class PlacePreviewDTO(
     val displayName: DisplayName,
     val id: String,
-    val rating: Double?,
-    val userRatingCount: Int?,
-    val shortFormattedAddress: String?,
+    val rating: Double? = null,
+    val userRatingCount: Int? = null,
+    val shortFormattedAddress: String? = null,
+    @SerialName("location") val placeLocation: LatLngDTO? = null,
     @SerialName("iconMaskBaseUri") val iconBaseUri: String
 )
 

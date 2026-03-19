@@ -1,6 +1,6 @@
 package com.atlunch.domain
 
-data class UserLocation(
+data class Location(
     val latitude: Double,
     val longitude: Double
 )

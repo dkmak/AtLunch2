@@ -3,7 +3,7 @@ package com.atlunch.data.repository
 import android.annotation.SuppressLint
 import com.atlunch.domain.LocationRepository
 import com.atlunch.domain.LocationResult
-import com.atlunch.domain.UserLocation
+import com.atlunch.domain.Location
 import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
@@ -32,7 +32,7 @@ class LocationRepositoryImpl @Inject constructor(
                 LocationResult.LocationError.Unknown
             } else {
                 LocationResult.LocationSuccess(
-                    userLocation = UserLocation(
+                    location = Location(
                         latitude = location.latitude,
                         longitude = location.longitude
                     )

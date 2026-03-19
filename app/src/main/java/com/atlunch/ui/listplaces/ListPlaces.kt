@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.atlunch.R
+import com.atlunch.domain.Location
 import com.atlunch.domain.PlacePreview
 import com.atlunch.ui.theme.AtLunchTheme
 
@@ -136,6 +137,7 @@ fun PlacePreviewListItemPreview() {
                 rating = 4.7,
                 userRatingCount = 128,
                 shortFormattedAddress = "123 Main St",
+                location = Location(0.0, 0.0),
                 iconBaseUri = ""
             ),
             onPlaceClicked = {},
@@ -156,6 +158,7 @@ fun DisplayPlacesListPreview() {
                     rating = 4.7,
                     userRatingCount = 128,
                     shortFormattedAddress = "123 Main St",
+                    location = Location(0.0, 0.0),
                     iconBaseUri = ""
                 ),
                 PlacePreview(
@@ -164,6 +167,7 @@ fun DisplayPlacesListPreview() {
                     rating = 4.5,
                     userRatingCount = 84,
                     shortFormattedAddress = "456 Elm St",
+                    location = Location(0.0, 0.0),
                     iconBaseUri = ""
                 ),
                 PlacePreview(
@@ -172,6 +176,7 @@ fun DisplayPlacesListPreview() {
                     rating = 4.3,
                     userRatingCount = 201,
                     shortFormattedAddress = "789 Oak Ave",
+                    location = Location(0.0, 0.0),
                     iconBaseUri = ""
                 )
             ),

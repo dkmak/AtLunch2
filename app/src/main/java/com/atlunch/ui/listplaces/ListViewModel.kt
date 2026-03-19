@@ -7,7 +7,7 @@ import com.atlunch.domain.LocationResult
 import com.atlunch.domain.PlacePreview
 import com.atlunch.domain.PlacesRepository
 import com.atlunch.domain.PlacesResult
-import com.atlunch.domain.UserLocation
+import com.atlunch.domain.Location
 import com.atlunch.ui.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +22,7 @@ import javax.inject.Inject
 data class ListPlacesUiState(
     val isLocationPermissionEnabled: Boolean = false,
     val dataState: DataState = DataState.Loading,
-    val userLocation: UserLocation? = null
+    val location: Location? = null
 ) {
     sealed interface DataState {
         data class Success(val placesPreviews: List<PlacePreview>) : DataState
@@ -40,7 +40,7 @@ class ListViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun search(query: String) {
-        val userLocation = uiState.value.userLocation ?: run {
+        val userLocation = uiState.value.location ?: run {
             _uiState.update { currentState ->
                 currentState.copy(
                     dataState = ListPlacesUiState.DataState.Failure(
@@ -68,7 +68,7 @@ class ListViewModel @Inject constructor(
     }
 
     fun loadPlacesNearby() {
-        val userLocation = uiState.value.userLocation ?: run {
+        val userLocation = uiState.value.location ?: run {
             _uiState.update { currentState ->
                 currentState.copy(
                     dataState = ListPlacesUiState.DataState.Failure(
@@ -98,7 +98,7 @@ class ListViewModel @Inject constructor(
             when (val locationResult = locationRepository.getCurrentLocation()) {
                 is LocationResult.LocationSuccess -> {
                     _uiState.update { currentState ->
-                        currentState.copy(userLocation = locationResult.userLocation)
+                        currentState.copy(location = locationResult.location)
                     }
                     loadPlacesNearby()
                 }
@@ -106,7 +106,7 @@ class ListViewModel @Inject constructor(
                 is LocationResult.LocationError.Unknown -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            userLocation = null,
+                            location = null,
                             dataState = ListPlacesUiState.DataState.Failure(
                                 message = locationResult.toUserMessage()
                             )
@@ -121,7 +121,7 @@ class ListViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 isLocationPermissionEnabled = isEnabled,
-                userLocation = if (isEnabled) currentState.userLocation else null
+                location = if (isEnabled) currentState.location else null
             )
         }
         if (isEnabled) {

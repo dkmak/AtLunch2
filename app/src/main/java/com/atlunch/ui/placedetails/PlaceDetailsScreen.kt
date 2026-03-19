@@ -188,10 +188,10 @@ fun DisplayPlaceDetails(
             style = MaterialTheme.typography.titleLarge
         )
         Text(
-            placeDetails.formattedAddress,
+            placeDetails.formattedAddress ?: "Address not available.",
             style = MaterialTheme.typography.titleMedium
         )
-        Text(placeDetails.nationalPhoneNumber)
+        Text(placeDetails.nationalPhoneNumber?:"")
         Row(
             modifier = Modifier.padding(top = 6.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -203,13 +203,13 @@ fun DisplayPlaceDetails(
             )
 
             Text(
-                text = placeDetails.rating.toString(),
+                text = (placeDetails.rating ?: 0.0).toString(),
                 modifier = Modifier.padding(start = 6.dp),
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Text(
-                text = "• (${placeDetails.userRatingCount} reviews)",
+                text = "• (${placeDetails.userRatingCount ?: 0} reviews)",
                 modifier = Modifier.padding(start = 6.dp),
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -229,6 +229,24 @@ fun DisplayPlaceDetailsPreview() {
                 userRatingCount = 128,
                 formattedAddress = "123 Main St, New York, NY 10001",
                 nationalPhoneNumber = "(212) 555-1234"
+            ),
+            modifier = Modifier.padding(8.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DisplayPlaceDefaultsPreview() {
+    AtLunchTheme {
+        DisplayPlaceDetails(
+            placeDetails = PlaceDetails(
+                restaurantName = "Joe's Pizza",
+                id = "preview-place-id",
+                rating = null,
+                userRatingCount = null,
+                formattedAddress = null,
+                nationalPhoneNumber = null
             ),
             modifier = Modifier.padding(8.dp)
         )

@@ -48,7 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.atlunch.R
 import com.atlunch.domain.PlacePreview
-import com.atlunch.domain.UserLocation
+import com.atlunch.domain.Location
 import com.atlunch.ui.theme.AtLunchTheme
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -188,7 +188,7 @@ fun PlacesScreen(
                             if (isMapView) {
                                 PlacesMapContent(
                                     placePreviews = state.placesPreviews,
-                                    userLocation = uiState.userLocation,
+                                    userLocation = uiState.location,
                                     onPlaceClicked = onPlacePreviewClicked,
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -269,7 +269,7 @@ fun SearchPlacesTopBarPreview() {
 @Composable
 fun PlacesMapContent(
     placePreviews: List<PlacePreview>,
-    userLocation: UserLocation?,
+    userLocation: Location?,
     onPlaceClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {

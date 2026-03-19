@@ -1,7 +1,5 @@
 package com.atlunch.domain
 
-import com.atlunch.domain.PlaceDetailsResult.DetailsError
-
 sealed class PlacesResult {
     data class PlacesSuccess(val places: List<PlacePreview>): PlacesResult()
     sealed class PlacesError: PlacesResult() {
@@ -25,7 +23,7 @@ sealed class PlaceDetailsResult {
 
 sealed class LocationResult {
     data class LocationSuccess(
-        val userLocation: UserLocation
+        val location: Location
     ) : LocationResult()
 
     sealed class LocationError : LocationResult() {

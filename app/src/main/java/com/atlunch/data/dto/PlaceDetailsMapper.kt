@@ -10,6 +10,6 @@ fun PlaceDetailsDTO.toDomain(): PlaceDetails {
         rating = this.rating,
         userRatingCount = this.userRatingCount,
         formattedAddress = this.formattedAddress,
-        nationalPhoneNumber = this.nationalPhoneNumber.orEmpty()
+        nationalPhoneNumber = this.nationalPhoneNumber
     )
 }

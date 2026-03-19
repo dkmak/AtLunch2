@@ -16,12 +16,12 @@ data class LocationRestriction(
 
 @Serializable
 data class Circle(
-    val center: LatLng,
+    val center: LatLngDTO,
     val radius: Double
 )
 
 @Serializable
-data class LatLng(
+data class LatLngDTO(
     val latitude: Double,
     val longitude: Double
 )

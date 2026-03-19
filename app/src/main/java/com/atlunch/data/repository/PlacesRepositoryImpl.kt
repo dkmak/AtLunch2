@@ -2,7 +2,7 @@ package com.atlunch.data.repository
 
 import com.atlunch.data.dto.toDomain
 import com.atlunch.data.network.Circle
-import com.atlunch.data.network.LatLng
+import com.atlunch.data.network.LatLngDTO
 import com.atlunch.data.network.LocationBias
 import com.atlunch.data.network.LocationRestriction
 import com.atlunch.data.network.PlacesApiClient
@@ -40,7 +40,7 @@ class PlacesRepositoryImpl @Inject constructor(
             maxResultCount = MAX_RESULTS,
             locationRestriction = LocationRestriction(
                 circle = Circle(
-                    center = LatLng(lat, long),
+                    center = LatLngDTO(lat, long),
                     radius = MAX_RADIUS
                 )
             )
@@ -96,7 +96,7 @@ class PlacesRepositoryImpl @Inject constructor(
             pageSize = MAX_RESULTS,
             locationBias = LocationBias(
                 circle = Circle(
-                    center = LatLng(lat, long),
+                    center = LatLngDTO(lat, long),
                     radius = MAX_RADIUS
                 )
             )

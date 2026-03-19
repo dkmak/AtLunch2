@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 data class PlaceDetailsDTO(
     val displayName: DisplayName,
     val id: String,
-    val rating: Double,
-    val userRatingCount: Int,
-    val formattedAddress: String,
+    val rating: Double?,
+    val userRatingCount: Int?,
+    val formattedAddress: String?,
     val photos: List<PhotoResourceDTO> = emptyList(),
     val nationalPhoneNumber: String? = null
 )
