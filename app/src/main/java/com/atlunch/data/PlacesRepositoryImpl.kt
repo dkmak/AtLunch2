@@ -52,11 +52,15 @@ class PlacesRepositoryImpl @Inject constructor(
 
     override fun getPlaceDetails(id: String): Flow<PlaceDetailsResult> = flow<PlaceDetailsResult> {
         val detailsResponse = apiClient.getPlaceDetails(id = id)
-        val photos = detailsResponse.photos.take(4)
-        photos.forEach { photoResource ->
-            apiClient.getPhotos(photoResource.name)
+        val photos = detailsResponse.photos.take(8)
+        val photosDomain = photos.map { photoResource ->
+            val photoResourceResponse = apiClient.getPhotos(photoResource.name)
+            photoResourceResponse.toDomain()
         }
-        emit(PlaceDetailsResult.DetailsSuccess(detailsResponse.toDomain()))
+        emit(PlaceDetailsResult.DetailsSuccess(
+            placeDetails = detailsResponse.toDomain(),
+            photos = photosDomain
+        ))
     }. catch { throwable ->
         if (throwable is CancellationException){
             throw throwable

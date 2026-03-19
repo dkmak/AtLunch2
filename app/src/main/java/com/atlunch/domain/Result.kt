@@ -10,7 +10,10 @@ sealed class PlacesResult {
 }
 
 sealed class PlaceDetailsResult {
-    data class DetailsSuccess(val placeDetails: PlaceDetails): PlaceDetailsResult()
+    data class DetailsSuccess(
+        val placeDetails: PlaceDetails,
+        val photos: List<Photo>
+    ): PlaceDetailsResult()
     sealed class DetailsError: PlaceDetailsResult() {
         data object Network : DetailsError()
         data object Backend : DetailsError()

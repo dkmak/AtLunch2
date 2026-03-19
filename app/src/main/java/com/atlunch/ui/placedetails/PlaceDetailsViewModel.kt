@@ -2,6 +2,7 @@ package com.atlunch.ui.placedetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.atlunch.domain.Photo
 import com.atlunch.domain.PlaceDetails
 import com.atlunch.domain.PlaceDetailsResult
 import com.atlunch.domain.PlacesRepository
@@ -15,7 +16,10 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 sealed interface DetailsUiState{
-    data class Success(val placeDetails: PlaceDetails): DetailsUiState
+    data class Success(
+        val placeDetails: PlaceDetails,
+        val photos: List<Photo>,
+    ): DetailsUiState
     data class Failure(val message: String): DetailsUiState
     data object Loading: DetailsUiState
 }
@@ -36,7 +40,10 @@ class PlaceDetailsViewModel @Inject constructor(
 
     private fun PlaceDetailsResult.toUiState(): DetailsUiState{
         return when (this){
-            is PlaceDetailsResult.DetailsSuccess -> DetailsUiState.Success(this.placeDetails)
+            is PlaceDetailsResult.DetailsSuccess -> DetailsUiState.Success(
+                placeDetails = this.placeDetails,
+                photos = this.photos
+            )
             is PlaceDetailsResult.DetailsError.Backend -> DetailsUiState.Failure(this.toUserMessage())
             is PlaceDetailsResult.DetailsError.Network -> DetailsUiState.Failure(this.toUserMessage())
             is PlaceDetailsResult.DetailsError.Unknown -> DetailsUiState.Failure(this.toUserMessage())

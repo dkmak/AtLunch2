@@ -1,5 +1,6 @@
 package com.atlunch.data.dto
 
+import com.atlunch.domain.Photo
 import com.atlunch.domain.PlaceDetails
 
 fun PlaceDetailsDTO.toDomain(): PlaceDetails {
