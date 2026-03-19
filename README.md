@@ -15,7 +15,7 @@ the restaurant
 ### Setup Instructions
 #### Prerequisites
 - Android Studio: Latest stable version recommended
-- Java/JDK Version: JDK 11
+- Java/JDK Version: JDK 17
 - Android SDK
     - Compile SDK: 36
     - Target SDK: 36
