@@ -1,11 +1,8 @@
 package com.atlunch.ui.listplaces
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,9 +18,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,48 +58,35 @@ fun ListPlacesScreen(
     LaunchedEffect(Unit) {
         viewModel.loadPlacesNearby()
     }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var textFieldValue by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            SearchPlacesTopBar(
+                query = textFieldValue,
+                onQueryChange = { newValue -> textFieldValue = newValue },
+                onSearch = {
+                    keyboardController?.hide()
+                    viewModel.search(textFieldValue)
+                    focusManager.clearFocus()
+                }
+            )
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxWidth()
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                OutlinedTextField(
-                    value = textFieldValue,
-                    onValueChange = { newValue ->
-                        textFieldValue = newValue
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Search restaurants") },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                            viewModel.search(textFieldValue)
-                            focusManager.clearFocus()
-                        }
-                    ),
-                    shape = RoundedCornerShape(35.dp)
-                )
-            }
-
             when (val state = uiState) {
                 is ListPlacesUiState.Failure -> {
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
@@ -109,11 +96,11 @@ fun ListPlacesScreen(
                 }
 
                 ListPlacesUiState.Loading -> {
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
-                        horizontalArrangement = Arrangement.Center
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CircularProgressIndicator()
                     }
@@ -121,7 +108,7 @@ fun ListPlacesScreen(
 
                 is ListPlacesUiState.Success -> {
                     if (state.placesPreviews.isEmpty()) {
-                        Row(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)
@@ -141,6 +128,49 @@ fun ListPlacesScreen(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchPlacesTopBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        modifier = modifier,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background
+        ),
+        title = {
+            OutlinedTextField(
+                value = query,
+                onValueChange = onQueryChange,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Search restaurants") },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = { onSearch() }
+                ),
+                shape = RoundedCornerShape(35.dp)
+            )
+        }
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SearchPlacesTopBarPreview() {
+    AtLunchTheme {
+        SearchPlacesTopBar(
+            query = "Sushi",
+            onQueryChange = {},
+            onSearch = {}
+        )
     }
 }
 
@@ -280,4 +310,3 @@ fun DisplayPlacesListPreview() {
         )
     }
 }
-
