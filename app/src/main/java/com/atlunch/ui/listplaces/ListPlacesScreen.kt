@@ -1,5 +1,10 @@
 package com.atlunch.ui.listplaces
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -62,14 +68,49 @@ fun ListPlacesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var textFieldValue by rememberSaveable { mutableStateOf("") }
+    // TODO: This needs to be stored as a state
+    var isPermissionGranted by rememberSaveable { mutableStateOf<Boolean>(false) }
+    var locationPermissionMessage by rememberSaveable { mutableStateOf<String?>(null) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
-    // TODO
-    LaunchedEffect(Unit) {
-        if (textFieldValue.isEmpty()){
-            viewModel.loadPlacesNearby()
-        }else {
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            isPermissionGranted = true
+        } else {
+            isPermissionGranted = false
+        }
+    }
+
+    LaunchedEffect(isPermissionGranted) {
+        if (!isPermissionGranted) {
+            val hasLocationPermission = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+
+            if (!hasLocationPermission) {
+                locationPermissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
+            } else {
+                // locationPermissionMessage =
+                    "Location permission already granted. Nearby restaurant search can be wired up next."
+            }
+            //
+        } else {
             viewModel.search(textFieldValue)
         }
     }
@@ -94,6 +135,18 @@ fun ListPlacesScreen(
                 .padding(innerPadding)
                 .fillMaxWidth()
         ) {
+/*
+            locationPermissionMessage?.let { message ->
+                Text(
+                    text = message,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+*/
+
             when (val state = uiState) {
                 is ListPlacesUiState.Failure -> {
                     Column(
@@ -105,14 +158,17 @@ fun ListPlacesScreen(
                     }
                 }
 
+                // TODO - DENY USER LOCATION ACCESS
                 ListPlacesUiState.Loading -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator()
+                    if (textFieldValue.isNotEmpty() || locationPermissionMessage == null) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
 

@@ -82,4 +82,7 @@ dependencies {
     // This is the Retrofit converter for serialization
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)
+
+    // location
+    implementation(libs.play.services.location)
 }
