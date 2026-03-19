@@ -72,7 +72,7 @@ class LocationRepositoryImpl @Inject constructor(
                     )
                 )
             }
-        } catch (_: Exception) {
+        } catch (e : Exception) {
             LocationResult.LocationError.Unknown
         }
     }

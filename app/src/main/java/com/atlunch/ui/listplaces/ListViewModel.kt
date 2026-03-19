@@ -98,8 +98,6 @@ class ListViewModel @Inject constructor(
                 }
             }
         }
-
-
     }
 
     fun onLocationPermissionChanged(isEnabled: Boolean) {
@@ -116,6 +114,8 @@ class ListViewModel @Inject constructor(
             }
         }
     }
+
+
 
     private fun PlacesResult.toUiState(
         isLocationPermissionEnabled: Boolean
