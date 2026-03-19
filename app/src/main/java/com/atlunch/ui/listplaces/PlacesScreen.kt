@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,11 +28,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.FabPosition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,20 +58,23 @@ import androidx.navigation3.runtime.NavKey
 import coil.compose.AsyncImage
 import com.atlunch.R
 import com.atlunch.domain.PlacePreview
+import com.atlunch.domain.UserLocation
 import com.atlunch.ui.theme.AtLunchTheme
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object ListDestination : NavKey
+data object PlaceDestination : NavKey
 
 @Composable
-fun ListPlacesScreen(
+fun PlacesScreen(
     viewModel: ListViewModel = hiltViewModel(),
     onPlacePreviewClicked: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var textFieldValue by rememberSaveable { mutableStateOf("") }
+    var isMapView by rememberSaveable { mutableStateOf(false) }
+
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -112,6 +118,19 @@ fun ListPlacesScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { isMapView = !isMapView },
+                modifier = Modifier.padding(bottom = 16.dp),
+                containerColor = MaterialTheme.colorScheme.secondary
+            ) {
+                Text(
+                    text = if (isMapView) "List" else "Map",
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        },
+        floatingActionButtonPosition = FabPosition.Center,
         topBar = {
             SearchPlacesTopBar(
                 query = textFieldValue,
@@ -150,15 +169,13 @@ fun ListPlacesScreen(
                     }
 
                     ListPlacesUiState.DataState.Loading -> {
-                        if (textFieldValue.isNotEmpty() || uiState.isLocationPermissionEnabled) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                CircularProgressIndicator()
-                            }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator()
                         }
                     }
 
@@ -172,13 +189,24 @@ fun ListPlacesScreen(
                                 Text("No results found.")
                             }
                         } else {
-                            DisplayPlacesList(
-                                placePreviews = state.placesPreviews,
-                                onPlaceClicked = onPlacePreviewClicked,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
-                            )
+                            if (isMapView) {
+                                PlacesMapContent(
+                                    placePreviews = state.placesPreviews,
+                                    userLocation = uiState.userLocation,
+                                    onPlaceClicked = onPlacePreviewClicked,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp)
+                                )
+                            } else {
+                                DisplayPlacesList(
+                                    placePreviews = state.placesPreviews,
+                                    onPlaceClicked = onPlacePreviewClicked,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -243,156 +271,19 @@ fun SearchPlacesTopBarPreview() {
 
 
 @Composable
-fun DisplayPlacesList(
+fun PlacesMapContent(
     placePreviews: List<PlacePreview>,
-    onPlaceClicked: (String) -> Unit,
-    modifier: Modifier
-) {
-    LazyColumn(
-        modifier = modifier.background(MaterialTheme.colorScheme.background)
-    ) {
-        items(
-            items = placePreviews,
-            key = { placePreview -> placePreview.id }
-        ) { preview ->
-            PlacePreviewListItem(
-                preview,
-                onPlaceClicked = onPlaceClicked,
-                modifier.padding(8.dp)
-            )
-        }
-    }
-
-}
-
-@Composable
-fun PlacePreviewListItem(
-    placePreview: PlacePreview,
+    userLocation: UserLocation,
     onPlaceClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier
+    Box(
+        modifier = modifier.background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onPlaceClicked(placePreview.id) },
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                AsyncImage(
-                    model = placePreview.iconBaseUri,
-                    contentDescription = "${placePreview.restaurantName} icon",
-                    modifier = Modifier
-                        .size(48.dp),
-                    contentScale = ContentScale.Fit
-                )
-
-                Column(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = placePreview.restaurantName,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    Row(
-                        modifier = Modifier.padding(top = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.star_filled),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary
-                        )
-
-                        Text(
-                            text = placePreview.rating.toString(),
-                            modifier = Modifier.padding(start = 6.dp),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        Text(
-                            text = "• (${placePreview.userRatingCount} reviews)",
-                            modifier = Modifier.padding(start = 6.dp),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-
-                    Text(
-                        text = placePreview.shortFormattedAddress,
-                        style = MaterialTheme.typography.bodyMedium,
-                        overflow = TextOverflow.Visible
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PlacePreviewListItemPreview() {
-    AtLunchTheme {
-        PlacePreviewListItem(
-            placePreview = PlacePreview(
-                restaurantName = "Joe's Pizza",
-                id = "preview-place-id",
-                rating = 4.7,
-                userRatingCount = 128,
-                shortFormattedAddress = "123 Main St",
-                iconBaseUri = ""
-            ),
-            onPlaceClicked = {},
-            modifier = Modifier.padding(8.dp)
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DisplayPlacesListPreview() {
-    AtLunchTheme {
-        DisplayPlacesList(
-            placePreviews = listOf(
-                PlacePreview(
-                    restaurantName = "Joe's Pizza",
-                    id = "preview-place-1",
-                    rating = 4.7,
-                    userRatingCount = 128,
-                    shortFormattedAddress = "123 Main St",
-                    iconBaseUri = ""
-                ),
-                PlacePreview(
-                    restaurantName = "Sushi Corner",
-                    id = "preview-place-2",
-                    rating = 4.5,
-                    userRatingCount = 84,
-                    shortFormattedAddress = "456 Elm St",
-                    iconBaseUri = ""
-                ),
-                PlacePreview(
-                    restaurantName = "Burger House",
-                    id = "preview-place-3",
-                    rating = 4.3,
-                    userRatingCount = 201,
-                    shortFormattedAddress = "789 Oak Ave",
-                    iconBaseUri = ""
-                )
-            ),
-            onPlaceClicked = {},
-            modifier = Modifier
-                .padding(8.dp)
+        Text(
+            text = "Map view coming soon",
+            style = MaterialTheme.typography.bodyLarge
         )
     }
 }

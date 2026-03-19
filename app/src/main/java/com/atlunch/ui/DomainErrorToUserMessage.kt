@@ -8,9 +8,8 @@ fun PlacesResult.PlacesError.toUserMessage(): String =
     when (this) {
         is PlacesResult.PlacesError.Network ->
             "Please check your internet connection and try again."
-        is PlacesResult.PlacesError.Backend -> { // TODO
-            ""
-        }
+        is PlacesResult.PlacesError.Backend ->
+            "We're having trouble reaching the Google API servers right now. Please try again in a moment."
         is PlacesResult.PlacesError.Unknown ->
             "An unknown error occurred."
     }
@@ -19,9 +18,8 @@ fun PlaceDetailsResult.DetailsError.toUserMessage(): String =
     when (this) {
         is PlaceDetailsResult.DetailsError.Network ->
             "Please check your internet connection and try again."
-        is PlaceDetailsResult.DetailsError.Backend -> { // TODO
-            ""
-        }
+        is PlaceDetailsResult.DetailsError.Backend ->
+            "We're having trouble reaching Google API servers right now. Please try again in a moment."
         is PlaceDetailsResult.DetailsError.Unknown ->
             "An unknown error occurred."
     }

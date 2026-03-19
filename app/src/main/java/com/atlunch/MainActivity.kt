@@ -12,8 +12,8 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.atlunch.ui.listplaces.ListDestination
-import com.atlunch.ui.listplaces.ListPlacesScreen
+import com.atlunch.ui.listplaces.PlaceDestination
+import com.atlunch.ui.listplaces.PlacesScreen
 import com.atlunch.ui.placedetails.PlaceDetailsScreen
 import com.atlunch.ui.theme.AtLunchTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,12 +40,12 @@ data class DetailsDestination(
 
 @Composable
 fun AtLunchApp() {
-    val navBackStack = rememberNavBackStack(ListDestination)
+    val navBackStack = rememberNavBackStack(PlaceDestination)
     NavDisplay(
         backStack = navBackStack,
         entryProvider = entryProvider {
-            entry<ListDestination> {
-                ListPlacesScreen(
+            entry<PlaceDestination> {
+                PlacesScreen(
                     onPlacePreviewClicked = {id ->navBackStack.add(DetailsDestination(placeId = id))}
                 )
             }

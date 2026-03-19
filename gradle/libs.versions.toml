@@ -23,7 +23,7 @@ kotlinxSerializationJson = "1.7.1"
 appcompat = "1.7.1"
 material = "1.13.0"
 playServicesLocation = "21.3.0"
-mapsCompose = "8.2.2"
+mapsCompose = "6.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
