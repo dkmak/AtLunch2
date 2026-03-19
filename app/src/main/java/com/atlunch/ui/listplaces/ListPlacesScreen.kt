@@ -144,8 +144,8 @@ fun ListPlacesScreen(
                     style = MaterialTheme.typography.bodyMedium
                 )
             } else {
-                when (val state = uiState) {
-                    is ListPlacesUiState.Failure -> {
+                when (val state = uiState.dataState) {
+                    is ListPlacesUiState.DataState.Failure -> {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -155,8 +155,8 @@ fun ListPlacesScreen(
                         }
                     }
 
-                    is ListPlacesUiState.Loading -> {
-                        if (textFieldValue.isNotEmpty() || state.isLocationPermissionEnabled) {
+                    ListPlacesUiState.DataState.Loading -> {
+                        if (textFieldValue.isNotEmpty() || uiState.isLocationPermissionEnabled) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -168,7 +168,7 @@ fun ListPlacesScreen(
                         }
                     }
 
-                    is ListPlacesUiState.Success -> {
+                    is ListPlacesUiState.DataState.Success -> {
                         if (state.placesPreviews.isEmpty()) {
                             Column(
                                 modifier = Modifier
