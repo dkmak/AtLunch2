@@ -86,15 +86,17 @@ class PlacesRepositoryImpl @Inject constructor(
     }
 
     override fun searchQuery(
-        query: String
+        query: String,
+        lat: Double,
+        long: Double
     ): Flow<PlacesResult> = flow<PlacesResult> {
         val request = SearchQueryRequest(
             textQuery = query,
-            includedType = INCLUDED_TYPE, // hard coded
-            pageSize = MAX_RESULTS, // hard coded, might be token if there are more results
+            includedType = INCLUDED_TYPE,
+            pageSize = MAX_RESULTS,
             locationBias = LocationBias(
                 circle = Circle(
-                    center = LatLng(40.728480, -73.982142), // TODO this is for Westville
+                    center = LatLng(lat, long),
                     radius = MAX_RADIUS
                 )
             )
@@ -103,7 +105,7 @@ class PlacesRepositoryImpl @Inject constructor(
         val result = response.places.map { placePreviewDTO -> placePreviewDTO.toDomain() }
         emit(PlacesResult.PlacesSuccess(result))
     }.catch { throwable ->
-        if (throwable is CancellationException){
+        if (throwable is CancellationException){ // TODO
             throw throwable
         }
         emit(throwable.toPlacesDomainError())

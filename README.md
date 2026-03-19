@@ -1,12 +1,12 @@
 # **At Lunch** - Darryl Mak
 
 **Required Features**
-- [ ] The app will use the Google Places API for its data source
-- [ ] The app will prompt the user for permission to access their current location
-- [ ] Upon launch, the app will execute a search that displays nearby restaurants 
-- [ ] A search feature will be included that allows the user to search for restaurants 
+- [x] The app will use the Google Places API for its data source
+- [x] The app will prompt the user for permission to access their current location
+- [x] Upon launch, the app will execute a search that displays nearby restaurants 
+- [x] A search feature will be included that allows the user to search for restaurants 
 - [ ] The user can choose to display the search results as a list, or as pins on a map
-- [ ] The user can select a search result to present a restaurant detail page with basic information about
+- [x] The user can select a search result to present a restaurant detail page with basic information about
 the restaurant
 
 (insert visuals, video)
@@ -31,7 +31,7 @@ the restaurant
 - Clear separation of concerns between UI, domain, and data layers
 
 ### UI
-- **Jetpack Compose** - Nav3, Coil 
+- **Jetpack Compose**
 
 ### Networking
 - Integrate with [Google Places API](https://developers.google.com/maps/documentation/places/web-service/overview)

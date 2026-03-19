@@ -22,7 +22,7 @@ import javax.inject.Inject
 data class ListPlacesUiState(
     val isLocationPermissionEnabled: Boolean = false,
     val dataState: DataState = DataState.Loading,
-    val userLocation: UserLocation? = null // we'll see if UI ever needs to know location
+    val userLocation: UserLocation? = null
 ) {
     sealed interface DataState {
         data class Success(val placesPreviews: List<PlacePreview>) : DataState
@@ -40,8 +40,19 @@ class ListViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun search(query: String) {
+        val userLocation = uiState.value.userLocation ?: run {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    dataState = ListPlacesUiState.DataState.Failure(
+                        message = "We couldn't determine your current location."
+                    )
+                )
+            }
+            return
+        }
+
         if (query.isNotEmpty()) {
-            placesRepository.searchQuery(query)
+            placesRepository.searchQuery(query, userLocation.latitude, userLocation.longitude)
                 .onEach { result ->
                     _uiState.update { currentState ->
                         currentState.copy(dataState = result.toDataState())
@@ -56,28 +67,46 @@ class ListViewModel @Inject constructor(
         }
     }
 
-    private fun loadPlacesNearby() {
-        viewModelScope.launch {
+    fun loadPlacesNearby() {
+        val userLocation = uiState.value.userLocation ?: run {
             _uiState.update { currentState ->
-                currentState.copy(dataState = ListPlacesUiState.DataState.Loading)
+                currentState.copy(
+                    dataState = ListPlacesUiState.DataState.Failure(
+                        message = "We couldn't determine your current location."
+                    )
+                )
             }
+            return
+        }
 
+        placesRepository.searchNearby(userLocation.latitude, userLocation.longitude)
+            .onStart {
+                _uiState.update { currentState ->
+                    currentState.copy(dataState = ListPlacesUiState.DataState.Loading)
+                }
+            }
+            .onEach { placesResult ->
+                _uiState.update { currentState ->
+                    currentState.copy(dataState = placesResult.toDataState())
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    fun updateUserLocation() {
+        viewModelScope.launch {
             when (val locationResult = locationRepository.getCurrentLocation()) {
                 is LocationResult.LocationSuccess -> {
-                    val (latitude, longitude) = locationResult.userLocation
-                    placesRepository.searchNearby(latitude, longitude)
-                        .onEach { placesResult ->
-                            _uiState.update { currentState ->
-                                currentState.copy(
-                                    dataState = placesResult.toDataState()
-                                )
-                            }
-                        }.launchIn(viewModelScope)
+                    _uiState.update { currentState ->
+                        currentState.copy(userLocation = locationResult.userLocation)
+                    }
+                    loadPlacesNearby()
                 }
 
                 is LocationResult.LocationError.Unknown -> {
                     _uiState.update { currentState ->
                         currentState.copy(
+                            userLocation = null,
                             dataState = ListPlacesUiState.DataState.Failure(
                                 message = locationResult.toUserMessage()
                             )
@@ -90,7 +119,13 @@ class ListViewModel @Inject constructor(
 
     fun onLocationPermissionChanged(isEnabled: Boolean) {
         _uiState.update { currentState ->
-            currentState.copy(isLocationPermissionEnabled = isEnabled)
+            currentState.copy(
+                isLocationPermissionEnabled = isEnabled,
+                userLocation = if (isEnabled) currentState.userLocation else null
+            )
+        }
+        if (isEnabled) {
+            updateUserLocation()
         }
     }
 
@@ -113,5 +148,4 @@ class ListViewModel @Inject constructor(
             )
         }
     }
-
 }

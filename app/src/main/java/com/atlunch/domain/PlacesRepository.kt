@@ -13,6 +13,8 @@ interface PlacesRepository {
     ): Flow<PlaceDetailsResult>
 
     fun searchQuery(
-        query: String
+        query: String,
+        lat: Double,
+        long: Double
     ): Flow<PlacesResult>
 }

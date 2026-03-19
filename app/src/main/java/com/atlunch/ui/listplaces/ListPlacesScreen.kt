@@ -109,12 +109,6 @@ fun ListPlacesScreen(
         }
     }
 
-    LaunchedEffect(uiState.isLocationPermissionEnabled) {
-        if (uiState.isLocationPermissionEnabled) {
-            viewModel.search(textFieldValue)
-        }
-    }
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
