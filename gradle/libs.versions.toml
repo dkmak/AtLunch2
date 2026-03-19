@@ -23,6 +23,7 @@ kotlinxSerializationJson = "1.7.1"
 appcompat = "1.7.1"
 material = "1.13.0"
 playServicesLocation = "21.3.0"
+mapsCompose = "8.2.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -79,6 +80,9 @@ okhttp-logging = { group="com.squareup.okhttp3", name = "logging-interceptor", v
 
 #location
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
+
+# maps
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

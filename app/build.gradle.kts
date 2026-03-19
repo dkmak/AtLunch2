@@ -66,6 +66,7 @@ dependencies {
 
     // compose
     implementation(libs.coil.compose)
+    implementation(libs.maps.compose)
 
     // dependency injection
     implementation(libs.androidx.hilt.navigation.compose)
