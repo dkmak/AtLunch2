@@ -8,6 +8,7 @@ fun PlacePreviewDTO.toDomain(): PlacePreview {
         id = this.id,
         rating = this.rating,
         userRatingCount = this.userRatingCount,
-        shortFormattedAddress = this.shortFormattedAddress
+        shortFormattedAddress = this.shortFormattedAddress,
+        iconBaseUri = "${this.iconBaseUri}.png"
     )
 }

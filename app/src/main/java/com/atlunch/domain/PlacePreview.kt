@@ -7,5 +7,6 @@ data class PlacePreview (
     val id: String,
     val rating: Double,
     val userRatingCount: Int,
-    val shortFormattedAddress: String
+    val shortFormattedAddress: String,
+    val iconBaseUri: String
 )

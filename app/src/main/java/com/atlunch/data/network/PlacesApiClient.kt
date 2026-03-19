@@ -13,8 +13,6 @@ import javax.inject.Inject
 class PlacesApiClient @Inject constructor(
     val placesApiService: PlacesApiService
 ) {
-
-
     suspend fun searchNearby(
         request: SearchNearbyRequest
     ): SearchResultsResponse {
@@ -39,7 +37,7 @@ class PlacesApiClient @Inject constructor(
         request: SearchQueryRequest
     ): SearchResultsResponse {
         return placesApiService.searchQuery(
-            apiKey = API_KEY, // TODO HIDE THIS?
+            apiKey = API_KEY,
             fieldMask = SEARCH_RESULTS_FIELD_MASK,
             request = request
         )
@@ -47,8 +45,8 @@ class PlacesApiClient @Inject constructor(
 
     companion object {
         const val API_KEY = "REMOVED_GOOGLE_PLACES_KEY"
-        const val SEARCH_RESULTS_FIELD_MASK = // TODO CHECK ON THIS
-            "places.displayName,places.id,places.rating,places.userRatingCount,places.shortFormattedAddress"
+        const val SEARCH_RESULTS_FIELD_MASK =
+            "places.displayName,places.id,places.rating,places.userRatingCount,places.shortFormattedAddress,places.iconMaskBaseUri"
         const val GET_DETAILS_FIELD_MASK =
             "displayName,id,rating,userRatingCount,formattedAddress,nationalPhoneNumber"
     }

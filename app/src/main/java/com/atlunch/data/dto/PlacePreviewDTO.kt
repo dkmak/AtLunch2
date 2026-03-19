@@ -9,7 +9,8 @@ data class PlacePreviewDTO(
     val id: String,
     val rating: Double,
     val userRatingCount: Int,
-    val shortFormattedAddress: String
+    val shortFormattedAddress: String,
+    @SerialName("iconMaskBaseUri") val iconBaseUri: String
 )
 
 @Serializable

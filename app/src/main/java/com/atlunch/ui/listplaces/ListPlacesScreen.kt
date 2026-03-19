@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -37,6 +38,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -47,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import coil.compose.AsyncImage
 import com.atlunch.R
 import com.atlunch.domain.PlacePreview
 import com.atlunch.ui.theme.AtLunchTheme
@@ -230,44 +234,59 @@ fun PlacePreviewListItem(
                 containerColor = MaterialTheme.colorScheme.surface
             )
         ) {
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = placePreview.restaurantName,
-                    style = MaterialTheme.typography.titleMedium
+                AsyncImage(
+                    model = placePreview.iconBaseUri,
+                    contentDescription = "${placePreview.restaurantName} icon",
+                    modifier = Modifier
+                        .size(48.dp),
+                    contentScale = ContentScale.Fit
                 )
 
-                Row(
-                    modifier = Modifier.padding(top = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .fillMaxWidth()
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.star_filled),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary
+                    Text(
+                        text = placePreview.restaurantName,
+                        style = MaterialTheme.typography.titleMedium
                     )
 
-                    Text(
-                        text = placePreview.rating.toString(),
-                        modifier = Modifier.padding(start = 6.dp),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Row(
+                        modifier = Modifier.padding(top = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.star_filled),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+
+                        Text(
+                            text = placePreview.rating.toString(),
+                            modifier = Modifier.padding(start = 6.dp),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Text(
+                            text = "• (${placePreview.userRatingCount} reviews)",
+                            modifier = Modifier.padding(start = 6.dp),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
 
                     Text(
-                        text = "• (${placePreview.userRatingCount} reviews)",
-                        modifier = Modifier.padding(start = 6.dp),
-                        style = MaterialTheme.typography.bodyMedium
+                        text = placePreview.shortFormattedAddress,
+                        style = MaterialTheme.typography.bodyMedium,
+                        overflow = TextOverflow.Visible
                     )
                 }
-
-                Text(
-                    text = placePreview.shortFormattedAddress,
-                    style = MaterialTheme.typography.bodyMedium,
-                    overflow = TextOverflow.Visible
-                )
             }
         }
     }
@@ -283,7 +302,8 @@ fun PlacePreviewListItemPreview() {
                 id = "preview-place-id",
                 rating = 4.7,
                 userRatingCount = 128,
-                shortFormattedAddress = "123 Main St"
+                shortFormattedAddress = "123 Main St",
+                iconBaseUri = ""
             ),
             onPlaceClicked = {},
             modifier = Modifier.padding(8.dp)
@@ -302,21 +322,24 @@ fun DisplayPlacesListPreview() {
                     id = "preview-place-1",
                     rating = 4.7,
                     userRatingCount = 128,
-                    shortFormattedAddress = "123 Main St"
+                    shortFormattedAddress = "123 Main St",
+                    iconBaseUri = ""
                 ),
                 PlacePreview(
                     restaurantName = "Sushi Corner",
                     id = "preview-place-2",
                     rating = 4.5,
                     userRatingCount = 84,
-                    shortFormattedAddress = "456 Elm St"
+                    shortFormattedAddress = "456 Elm St",
+                    iconBaseUri = ""
                 ),
                 PlacePreview(
                     restaurantName = "Burger House",
                     id = "preview-place-3",
                     rating = 4.3,
                     userRatingCount = 201,
-                    shortFormattedAddress = "789 Oak Ave"
+                    shortFormattedAddress = "789 Oak Ave",
+                    iconBaseUri = ""
                 )
             ),
             onPlaceClicked = {},
