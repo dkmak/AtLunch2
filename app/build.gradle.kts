@@ -83,6 +83,12 @@ dependencies {
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)
 
+    // room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+
     // location
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)

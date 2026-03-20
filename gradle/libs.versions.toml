@@ -11,7 +11,7 @@ composeBom = "2025.11.01"
 ###
 androidxLifecycle = "2.9.2"
 androidxNavigation3 ="1.0.1"
-androidxRoom = "2.7.2"
+androidxRoom = "2.8.4"
 coil = "2.5.0"
 coroutines = "1.10.2"
 hilt = "2.51.1"

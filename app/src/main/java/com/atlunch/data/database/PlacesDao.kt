@@ -1,0 +1,16 @@
+package com.atlunch.data.database
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+
+@Dao
+interface PlacesDao {
+    @Query("SELECT * FROM PlacePreviewEntity")
+    suspend fun getPlacePreviews(): List<PlacePreviewEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPlacePreviews(placePreviews: List<PlacePreviewEntity>)
+
+}
