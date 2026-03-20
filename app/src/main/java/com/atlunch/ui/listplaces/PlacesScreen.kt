@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -31,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,10 +52,12 @@ import com.atlunch.R
 import com.atlunch.domain.PlacePreview
 import com.atlunch.domain.Location
 import com.atlunch.ui.theme.AtLunchTheme
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.serialization.Serializable
@@ -273,6 +277,16 @@ fun PlacesMapContent(
     onPlaceClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var mapLoaded by remember { mutableStateOf(false) }
+
+    val markerIcon = remember(mapLoaded) {
+        if (mapLoaded) {
+            BitmapDescriptorFactory.fromResource(R.drawable.resting_pin)
+        } else {
+            null
+        }
+    }
+
     userLocation?.let{ location ->
         Box(
             modifier = modifier.background(MaterialTheme.colorScheme.background),
@@ -284,17 +298,23 @@ fun PlacesMapContent(
             }
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState
+                cameraPositionState = cameraPositionState,
+                onMapLoaded = { mapLoaded = true }
             ) {
                 placePreviews.filter { preview -> preview.location != null }.forEach {preview ->
                     val (previewLat, previewLong) = preview.location!!
-                    Marker(
+                    MarkerComposable(
                         state = rememberMarkerState(
                             position = LatLng(previewLat, previewLong)
                         ),
                         title = preview.restaurantName,
                         snippet = preview.shortFormattedAddress
-                    )
+                    ){
+                        Image(
+                            painter = painterResource(id = R.drawable.selected_pin),
+                            contentDescription = null,
+                        )
+                    }
                 }
             }
         }
