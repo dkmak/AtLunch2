@@ -2,6 +2,7 @@ package com.atlunch.data.repository
 
 import com.atlunch.data.database.PlacesDAO
 import com.atlunch.data.dto.toDomain
+import com.atlunch.data.dto.toEntity
 import com.atlunch.data.network.Circle
 import com.atlunch.data.network.LatLngDTO
 import com.atlunch.data.network.LocationBias
@@ -12,6 +13,7 @@ import com.atlunch.data.network.SearchQueryRequest
 import com.atlunch.data.toPlaceDetailsDomainError
 import com.atlunch.data.toPlacesDomainError
 import com.atlunch.domain.PlaceDetailsResult
+import com.atlunch.domain.PlacePreview
 import com.atlunch.domain.PlacesRepository
 import com.atlunch.domain.PlacesResult
 import dagger.Binds
@@ -36,7 +38,7 @@ class PlacesRepositoryImpl @Inject constructor(
     override fun searchNearby(
         lat: Double,
         long: Double
-    ): Flow<PlacesResult> = flow<PlacesResult> {
+    ): Flow<PlacesResult> = flow {
         val request = SearchNearbyRequest(
             includedTypes = listOf(INCLUDED_TYPE),
             maxResultCount = MAX_RESULTS,
@@ -47,15 +49,32 @@ class PlacesRepositoryImpl @Inject constructor(
                 )
             )
         )
-        val response = apiClient.searchNearby(request)
-        val result = response.places.map { placePreviewDTO -> placePreviewDTO.toDomain() }
-        emit(PlacesResult.PlacesSuccess(result))
-    }.catch { throwable ->
-        if (throwable is CancellationException){
-            throw throwable
+
+        try {
+            val response = apiClient.searchNearby(request)
+            placesDAO.clearPlacePreviews()
+            placesDAO.insertPlacePreviews(response.places.map { it.toEntity() })
+        } catch (throwable: Throwable) {
+            if (throwable is CancellationException) throw throwable
+
+            val cachedPlaces = getCachedNearbyPlaces()
+            emit(
+                if (cachedPlaces.isNotEmpty()) {
+                    PlacesResult.PlacesSuccess(cachedPlaces)
+                } else {
+                    throwable.toPlacesDomainError()
+                }
+            )
+            return@flow
         }
-        emit(throwable.toPlacesDomainError())
+
+        emit(PlacesResult.PlacesSuccess(getCachedNearbyPlaces()))
     }
+
+    private suspend fun getCachedNearbyPlaces(): List<PlacePreview> {
+        return placesDAO.getPlacePreviews().map { it.toDomain() }
+    }
+
 
     override fun getPlaceDetails(id: String): Flow<PlaceDetailsResult> = flow<PlaceDetailsResult> {
         val detailsResponse = apiClient.getPlaceDetails(id = id)

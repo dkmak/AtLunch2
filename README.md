@@ -13,9 +13,9 @@ At Lunch is an Android app for finding nearby restaurants using the Google Place
 **Non-Functional Requirements**
 - [x] Jetpack Compose UI with distinct list and detail screens
 - [x] Kotlin Coroutines and Flow
-- [ ] Local database and/or Network call to retrieve data that is populated to some portion of the UI
+- [x] Local database and/or Network call to retrieve data that is populated to some portion of the UI
 - [x] (Optional) Dependency Injection
-- [ ] (Optional)
+- [ ] (Optional) Unit Tests
 
 (insert visuals, video)
 

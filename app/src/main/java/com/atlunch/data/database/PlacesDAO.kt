@@ -10,7 +10,9 @@ interface PlacesDAO {
     @Query("SELECT * FROM PlacePreviewEntity")
     suspend fun getPlacePreviews(): List<PlacePreviewEntity>
 
+    @Query("DELETE FROM PlacePreviewEntity")
+    suspend fun clearPlacePreviews()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlacePreviews(placePreviews: List<PlacePreviewEntity>)
-
 }
