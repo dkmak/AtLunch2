@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,11 +52,9 @@ import com.atlunch.R
 import com.atlunch.domain.PlacePreview
 import com.atlunch.domain.Location
 import com.atlunch.ui.theme.AtLunchTheme
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
@@ -268,8 +266,11 @@ fun SearchPlacesTopBarPreview() {
 fun PlacesMapContent(
     placePreviews: List<PlacePreview>,
     userLocation: Location?,
+    onPlaceClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var selectedPlaceId by rememberSaveable { mutableStateOf<String?>(null) }
+
     userLocation?.let{ location ->
         Box(
             modifier = modifier.background(MaterialTheme.colorScheme.background),
@@ -285,16 +286,31 @@ fun PlacesMapContent(
             ) {
                 placePreviews.filter { preview -> preview.location != null }.forEach {preview ->
                     val (previewLat, previewLong) = preview.location!!
+                    val isSelected = selectedPlaceId == preview.id
                     MarkerComposable(
+                        keys = arrayOf(preview.id, isSelected),
                         state = rememberMarkerState(
                             position = LatLng(previewLat, previewLong)
                         ),
                         title = preview.restaurantName,
-                        snippet = preview.shortFormattedAddress
+                        snippet = preview.shortFormattedAddress,
+                        onClick = {
+                            selectedPlaceId = preview.id
+                            false
+                        }
                     ){
                         Image(
-                            painter = painterResource(id = R.drawable.resting_pin),
+                            painter = painterResource(
+                                id = if (isSelected) {
+                                    R.drawable.selected_pin
+                                } else {
+                                    R.drawable.resting_pin
+                                }
+                            ),
                             contentDescription = null,
+                            modifier = Modifier.clickable {
+                                selectedPlaceId = preview.id
+                            }
                         )
                     }
                 }
