@@ -80,7 +80,6 @@ dependencies {
     implementation(libs.okhttp.logging)
 
     implementation(libs.retrofit)
-    // This is the Retrofit converter for serialization
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)
 

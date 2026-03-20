@@ -58,14 +58,6 @@ class PlacesRepositoryImpl @Inject constructor(
     override fun getPlaceDetails(id: String): Flow<PlaceDetailsResult> = flow<PlaceDetailsResult> {
         val detailsResponse = apiClient.getPlaceDetails(id = id)
 
-
-        // TODO this is one-by-one
-/*        val photos = detailsResponse.photos.take(MAX_PHOTOS)
-        val photosDomain = photos.map { photoResource ->
-            val photoResourceResponse = apiClient.getPhotos(photoResource.name)
-            photoResourceResponse.toDomain()
-        }*/
-
         val photoResources = detailsResponse.photos.take(MAX_PHOTOS)
         val photosDomain = coroutineScope {
             photoResources.map { photoResource ->
@@ -105,7 +97,7 @@ class PlacesRepositoryImpl @Inject constructor(
         val result = response.places.map { placePreviewDTO -> placePreviewDTO.toDomain() }
         emit(PlacesResult.PlacesSuccess(result))
     }.catch { throwable ->
-        if (throwable is CancellationException){ // TODO
+        if (throwable is CancellationException){
             throw throwable
         }
         emit(throwable.toPlacesDomainError())
