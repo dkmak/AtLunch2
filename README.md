@@ -3,16 +3,17 @@
 At Lunch is an Android app for finding nearby restaurants using the Google Places API. On launch, the app requests location access, fetches nearby restaurant results, and lets the user explore them as either a scrollable list or on a map. Tapping a restaurant opens a detail screen with additional information such as address, phone number, rating, and photos when available.
 
 **Required Features**
-- [x] The app uses the Google Places API as its primary data source
-- [x] The app prompts the user for permission to access their current location
-- [x] Upon launch, the app executes a nearby search for restaurants
-- [x] A search feature is included for free-text restaurant lookups
-- [x] The user can switch between list and map result presentations
-- [x] The user can select a restaurant to open a detail screen with basic information
+- [x] The app will use the Google Places API for its data source
+- [x] The app will prompt the user for permission to access their current location
+- [x] Upon launch, the app will execute a search that displays nearby restaurants
+- [x] A search feature will be included that allows the user to search for restaurants
+- [x] The user can choose to display the search results as a list, or as pins on a map
+- [x] The user can select a search result to present a restaurant detail page with basic information about
+  the restaurant
 
 **Non-Functional Requirements**
-- [x] Jetpack Compose UI with distinct list and detail screens
-- [x] Kotlin Coroutines and Flow
+- [x] Jetpack Compose for UI, comprising at least two distinct screens (e.g. list/detail)
+- [x] Kotlin Flows and Coroutines - Modern android development practices (Jetpack, Clean Architecture)
 - [x] Local database and/or Network call to retrieve data that is populated to some portion of the UI
 - [x] (Optional) Dependency Injection
 - [ ] (Optional) Unit Tests
@@ -56,6 +57,11 @@ At Lunch is an Android app for finding nearby restaurants using the Google Place
 - Retrofit and Kotlinx Serialization are used for HTTP and JSON parsing.
 - Google field masks are explicitly defined for search and detail requests so the app only requests the fields it needs.
 - Network, backend, and unknown failures are mapped into user-facing error messages in the UI layer.
+
+### Data Persistence
+- Room is used to cache nearby place preview results locally.
+- The repository clears and refreshes cached nearby results on successful nearby searches, then emits the database-backed models to the UI layer.
+- Separate mapper extensions translate between API DTOs, Room entities, and domain models to keep data-layer responsibilities explicit.
 
 ### Testing
 - [ ] You can run the current test suite with `./gradlew clean testDebugUnitTest`.
