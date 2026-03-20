@@ -49,13 +49,14 @@ fun MapPlaces(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState
             ) {
-                placePreviews.filter { preview -> preview.location != null }.forEach { preview ->
-                    val (previewLat, previewLong) = preview.location!!
+                placePreviews.mapNotNull { preview ->
+                    preview.location?.let { location -> preview to location }
+                }.forEach { (preview, location) ->
                     val isSelected = selectedPlaceId == preview.id
                     MarkerComposable(
                         keys = arrayOf(preview.id, isSelected),
                         state = rememberMarkerState(
-                            position = LatLng(previewLat, previewLong)
+                            position = LatLng(location.latitude, location.longitude)
                         ),
                         title = preview.restaurantName,
                         snippet = preview.shortFormattedAddress,
