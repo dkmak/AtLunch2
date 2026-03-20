@@ -85,7 +85,7 @@ dependencies {
     // Images and maps
     implementation(libs.coil.compose)
     implementation(libs.maps.compose)
-    
+
     // Networking
     implementation(platform(libs.retrofit.bom))
     implementation(platform(libs.okhttp.bom))
