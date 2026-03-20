@@ -6,8 +6,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,7 +22,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -49,15 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.atlunch.R
-import com.atlunch.domain.PlacePreview
-import com.atlunch.domain.Location
 import com.atlunch.ui.theme.AtLunchTheme
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MarkerComposable
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -188,7 +177,7 @@ fun PlacesScreen(
                             }
                         } else {
                             if (isMapView) {
-                                PlacesMapContent(
+                                MapPlaces(
                                     placePreviews = state.placesPreviews,
                                     userLocation = uiState.location,
                                     onPlaceClicked = onPlacePreviewClicked,
@@ -197,7 +186,7 @@ fun PlacesScreen(
                                         .padding(8.dp)
                                 )
                             } else {
-                                DisplayPlacesList(
+                                ListPlaces(
                                     placePreviews = state.placesPreviews,
                                     onPlaceClicked = onPlacePreviewClicked,
                                     modifier = Modifier
@@ -268,60 +257,3 @@ fun SearchPlacesTopBarPreview() {
 }
 
 
-@Composable
-fun PlacesMapContent(
-    placePreviews: List<PlacePreview>,
-    userLocation: Location?,
-    onPlaceClicked: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var selectedPlaceId by rememberSaveable { mutableStateOf<String?>(null) }
-
-    userLocation?.let{ location ->
-        Box(
-            modifier = modifier.background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
-        ) {
-            val location = LatLng(userLocation.latitude, userLocation.longitude)
-            val cameraPositionState = rememberCameraPositionState {
-                position = CameraPosition.fromLatLngZoom(location, 15f)
-            }
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState,
-                onMapLoaded = { mapLoaded = true }
-            ) {
-                placePreviews.filter { preview -> preview.location != null }.forEach {preview ->
-                    val (previewLat, previewLong) = preview.location!!
-                    val isSelected = selectedPlaceId == preview.id
-                    MarkerComposable(
-                        keys = arrayOf(preview.id, isSelected),
-                        state = rememberMarkerState(
-                            position = LatLng(previewLat, previewLong)
-                        ),
-                        title = preview.restaurantName,
-                        snippet = preview.shortFormattedAddress,
-                        onClick = {
-                            selectedPlaceId = preview.id
-                            false
-                        }
-                    ){
-                        Image(
-                            painter = painterResource(
-                                id = if (isSelected) {
-                                    R.drawable.selected_pin
-                                } else {
-                                    R.drawable.resting_pin
-                                }
-                            ),
-                            contentDescription = null,
-                            modifier = Modifier.clickable {
-                                selectedPlaceId = preview.id
-                            }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}

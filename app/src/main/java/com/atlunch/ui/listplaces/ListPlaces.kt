@@ -29,7 +29,7 @@ import com.atlunch.domain.PlacePreview
 import com.atlunch.ui.theme.AtLunchTheme
 
 @Composable
-fun DisplayPlacesList(
+fun ListPlaces(
     placePreviews: List<PlacePreview>,
     onPlaceClicked: (String) -> Unit,
     modifier: Modifier
@@ -148,9 +148,9 @@ fun PlacePreviewListItemPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun DisplayPlacesListPreview() {
+fun ListPlacesPreview() {
     AtLunchTheme {
-        DisplayPlacesList(
+        ListPlaces(
             placePreviews = listOf(
                 PlacePreview(
                     restaurantName = "Joe's Pizza",

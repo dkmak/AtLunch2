@@ -19,7 +19,7 @@ fun PlaceDetailsResult.DetailsError.toUserMessage(): String =
         is PlaceDetailsResult.DetailsError.Network ->
             "Please check your internet connection and try again."
         is PlaceDetailsResult.DetailsError.Backend ->
-            "We're having trouble reaching Google API servers right now. Please try again in a moment."
+            "We're having trouble reaching the Google API servers right now. Please try again in a moment."
         is PlaceDetailsResult.DetailsError.Unknown ->
             "An unknown error occurred."
     }

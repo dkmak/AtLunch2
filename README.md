@@ -5,9 +5,18 @@
 - [x] The app will prompt the user for permission to access their current location
 - [x] Upon launch, the app will execute a search that displays nearby restaurants 
 - [x] A search feature will be included that allows the user to search for restaurants 
-- [ ] The user can choose to display the search results as a list, or as pins on a map
+- [x] The user can choose to display the search results as a list, or as pins on a map
 - [x] The user can select a search result to present a restaurant detail page with basic information about
 the restaurant
+
+**Non-Functional Requirements **
+- [x] Jetpack Compose for UI, comprising at least two distinct screens (e.g. list/detail)
+- [x] Kotlin Flows and Coroutines - Modern android development practices (Jetpack, Clean Architecture)
+- [x] Upon launch, the app will execute a search that displays nearby restaurants
+- [ ] Local database and/or Network call to retrieve data that is populated to some portion of the UI
+- [x] Dependency Injection
+- [ ] Unit Tests
+
 
 (insert visuals, video)
 
