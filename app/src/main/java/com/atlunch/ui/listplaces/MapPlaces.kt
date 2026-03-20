@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +36,7 @@ fun MapPlaces(
 ) {
     var selectedPlaceId by rememberSaveable { mutableStateOf<String?>(null) }
 
-    userLocation?.let{ location ->
+    userLocation?.let { location ->
         Box(
             modifier = modifier.background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center
@@ -48,7 +49,7 @@ fun MapPlaces(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState
             ) {
-                placePreviews.filter { preview -> preview.location != null }.forEach {preview ->
+                placePreviews.filter { preview -> preview.location != null }.forEach { preview ->
                     val (previewLat, previewLong) = preview.location!!
                     val isSelected = selectedPlaceId == preview.id
                     MarkerComposable(
@@ -62,7 +63,7 @@ fun MapPlaces(
                             selectedPlaceId = preview.id
                             true
                         }
-                    ){
+                    ) {
                         Image(
                             painter = painterResource(
                                 id = if (isSelected) {
@@ -80,12 +81,17 @@ fun MapPlaces(
                 }
             }
 
-            selectedPlaceId?.let { placeId ->
-                PlacePreviewListItem(
-                    placePreview = placePreviews.find{ preview -> preview.id == placeId}!!,
-                    onPlaceClicked = onPlaceClicked,
-                    modifier = Modifier.padding(16.dp)
-                )
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+            ) {
+                selectedPlaceId?.let { placeId ->
+                    PlacePreviewListItem(
+                        placePreview = placePreviews.find { preview -> preview.id == placeId }!!,
+                        onPlaceClicked = onPlaceClicked,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
             }
         }
     }
