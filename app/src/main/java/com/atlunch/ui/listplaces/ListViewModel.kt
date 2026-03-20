@@ -10,6 +10,7 @@ import com.atlunch.domain.PlacesResult
 import com.atlunch.domain.Location
 import com.atlunch.ui.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -40,67 +41,32 @@ class ListViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun search(query: String) {
-        val userLocation = uiState.value.location ?: run {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    dataState = ListPlacesUiState.DataState.Failure(
-                        message = "We couldn't determine your current location."
-                    )
-                )
-            }
-            return
-        }
-
-        if (query.isNotEmpty()) {
-            placesRepository.searchQuery(query, userLocation.latitude, userLocation.longitude)
-                .onEach { result ->
-                    _uiState.update { currentState ->
-                        currentState.copy(dataState = result.toDataState())
-                    }
-                }.onStart {
-                    _uiState.update { currentState ->
-                        currentState.copy(dataState = ListPlacesUiState.DataState.Loading)
-                    }
-                }.launchIn(viewModelScope)
-        } else {
-            loadPlacesNearby()
-        }
-    }
-
-    fun loadPlacesNearby() {
-        val userLocation = uiState.value.location ?: run {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    dataState = ListPlacesUiState.DataState.Failure(
-                        message = "We couldn't determine your current location."
-                    )
-                )
-            }
-            return
-        }
-
-        placesRepository.searchNearby(userLocation.latitude, userLocation.longitude)
-            .onStart {
-                _uiState.update { currentState ->
-                    currentState.copy(dataState = ListPlacesUiState.DataState.Loading)
-                }
-            }
-            .onEach { placesResult ->
-                _uiState.update { currentState ->
-                    currentState.copy(dataState = placesResult.toDataState())
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    fun updateUserLocation() {
         viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(dataState = ListPlacesUiState.DataState.Loading)
+            }
+
             when (val locationResult = locationRepository.getCurrentLocation()) {
                 is LocationResult.LocationSuccess -> {
+                    val userLocation = locationResult.location
                     _uiState.update { currentState ->
-                        currentState.copy(location = locationResult.location)
+                        currentState.copy(location = userLocation)
                     }
-                    loadPlacesNearby()
+
+                    val placesFlow = if (query.isNotBlank()) {
+                        placesRepository.searchQuery(
+                            query,
+                            userLocation.latitude,
+                            userLocation.longitude
+                        )
+                    } else {
+                        placesRepository.searchNearby(
+                            userLocation.latitude,
+                            userLocation.longitude
+                        )
+                    }
+
+                    placesFlow.renderPlacesState()
                 }
 
                 is LocationResult.LocationError.Unknown -> {
@@ -125,8 +91,16 @@ class ListViewModel @Inject constructor(
             )
         }
         if (isEnabled) {
-            updateUserLocation()
+            search("")
         }
+    }
+
+    private fun Flow<PlacesResult>.renderPlacesState() {
+        onEach { placesResult ->
+            _uiState.update { currentState ->
+                currentState.copy(dataState = placesResult.toDataState())
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun PlacesResult.toDataState(): ListPlacesUiState.DataState {
