@@ -70,35 +70,31 @@ fun PlacesScreen(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
         viewModel.onLocationPermissionChanged(granted)
     }
 
     LaunchedEffect(Unit) {
-        if (textFieldValue.isEmpty()) {
-            val hasLocationPermission = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED ||
+        val hasLocationPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(
                     context,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
 
-            viewModel.onLocationPermissionChanged(hasLocationPermission)
+        viewModel.onLocationPermissionChanged(hasLocationPermission)
 
-            if (hasLocationPermission) {
-                viewModel.search(textFieldValue)
-            } else {
-                locationPermissionLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    )
-                )
-            }
-        } else {
+        if (hasLocationPermission) {
             viewModel.search(textFieldValue)
+        } else {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
         }
     }
 

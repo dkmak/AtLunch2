@@ -2,12 +2,12 @@ package com.atlunch.ui.listplaces
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.atlunch.domain.Location
 import com.atlunch.domain.LocationRepository
 import com.atlunch.domain.LocationResult
 import com.atlunch.domain.PlacePreview
 import com.atlunch.domain.PlacesRepository
 import com.atlunch.domain.PlacesResult
-import com.atlunch.domain.Location
 import com.atlunch.ui.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,25 +34,59 @@ data class ListPlacesUiState(
 @HiltViewModel
 class ListViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
-    private val placesRepository: PlacesRepository
+    private val placesRepository: PlacesRepository,
+    // private val backgroundDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ListPlacesUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun search(query: String) {
-        val userLocation = uiState.value.location ?: run {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    dataState = ListPlacesUiState.DataState.Failure(
-                        message = "We couldn't determine your current location."
-                    )
-                )
-            }
-            return
+    fun onLocationPermissionChanged(isEnabled: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isLocationPermissionEnabled = isEnabled,
+                location = if (isEnabled) currentState.location else null
+            )
         }
+        if (isEnabled) {
+            updateUserLocation()
+        }
+    }
 
+    fun search(query: String) {
+            viewModelScope.launch {
+                when (val userLocation = uiState.value.location?:getCurrentLocation()) {
+                    is Location -> {
+                        performSearch(query = query, location = userLocation)
+                    }
+                    is LocationResult.LocationError.Unknown -> {
+                        _uiState.update { currentState ->
+                            currentState.copy(
+                                dataState = ListPlacesUiState.DataState.Failure(
+                                    "We couldn't find your location."
+                                )
+                            )
+                        }
+                    }
+                    is LocationResult.LocationSuccess -> {
+                        val location = userLocation.location
+                        _uiState.update { currentState ->
+                            currentState.copy(
+                                location = location
+                            )
+                        }
+                        performSearch(query = query, location = location)
+                    }
+                }
+            }
+    }
+
+    private fun performSearch(query: String, location: Location){
         if (query.isNotEmpty()) {
-            placesRepository.searchQuery(query, userLocation.latitude, userLocation.longitude)
+            placesRepository.searchQuery(
+                query,
+                location.latitude,
+                location.longitude
+            )
                 .onEach { result ->
                     _uiState.update { currentState ->
                         currentState.copy(dataState = result.toDataState())
@@ -63,22 +97,11 @@ class ListViewModel @Inject constructor(
                     }
                 }.launchIn(viewModelScope)
         } else {
-            loadPlacesNearby()
+            loadPlacesNearby(userLocation = location)
         }
     }
 
-    fun loadPlacesNearby() {
-        val userLocation = uiState.value.location ?: run {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    dataState = ListPlacesUiState.DataState.Failure(
-                        message = "We couldn't determine your current location."
-                    )
-                )
-            }
-            return
-        }
-
+    private fun loadPlacesNearby(userLocation: Location) {
         placesRepository.searchNearby(userLocation.latitude, userLocation.longitude)
             .onStart {
                 _uiState.update { currentState ->
@@ -93,14 +116,15 @@ class ListViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun updateUserLocation() {
+    private fun updateUserLocation() {
         viewModelScope.launch {
             when (val locationResult = locationRepository.getCurrentLocation()) {
                 is LocationResult.LocationSuccess -> {
+                    val location = locationResult.location
                     _uiState.update { currentState ->
                         currentState.copy(location = locationResult.location)
                     }
-                    loadPlacesNearby()
+                    loadPlacesNearby(location)
                 }
 
                 is LocationResult.LocationError.Unknown -> {
@@ -117,17 +141,8 @@ class ListViewModel @Inject constructor(
         }
     }
 
-    fun onLocationPermissionChanged(isEnabled: Boolean) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                isLocationPermissionEnabled = isEnabled,
-                location = if (isEnabled) currentState.location else null
-            )
-        }
-        if (isEnabled) {
-            updateUserLocation()
-        }
-    }
+    // private suspend fun getCurrentLocation() = withContext(backgroundDispatcher){ locationRepository.getCurrentLocation() }
+    private suspend fun getCurrentLocation() = locationRepository.getCurrentLocation()
 
     private fun PlacesResult.toDataState(): ListPlacesUiState.DataState {
         return when (this) {

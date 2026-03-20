@@ -72,11 +72,11 @@ class PlacesRepositoryImpl @Inject constructor(
                 async {
                     apiClient.getPhotos(photoResource.name).toDomain()
                 }
-            }.awaitAll()
+            }
         }
         emit(PlaceDetailsResult.DetailsSuccess(
             placeDetails = detailsResponse.toDomain(),
-            photos = photosDomain
+            photos = photosDomain.awaitAll()
         ))
     }. catch { throwable ->
         if (throwable is CancellationException){
