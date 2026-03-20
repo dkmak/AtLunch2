@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface PlacesDao {
+interface PlacesDAO {
     @Query("SELECT * FROM PlacePreviewEntity")
     suspend fun getPlacePreviews(): List<PlacePreviewEntity>
 

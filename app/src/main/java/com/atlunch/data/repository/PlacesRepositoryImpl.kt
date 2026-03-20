@@ -1,5 +1,6 @@
 package com.atlunch.data.repository
 
+import com.atlunch.data.database.PlacesDAO
 import com.atlunch.data.dto.toDomain
 import com.atlunch.data.network.Circle
 import com.atlunch.data.network.LatLngDTO
@@ -28,7 +29,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 class PlacesRepositoryImpl @Inject constructor(
-    private val apiClient: PlacesApiClient
+    private val apiClient: PlacesApiClient,
+    private val placesDAO: PlacesDAO
 ) : PlacesRepository {
 
     override fun searchNearby(

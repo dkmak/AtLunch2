@@ -25,7 +25,7 @@ class DatabaseModule {
     }
 
     @Provides
-    fun providePlacePreviewDAO(appDatabase: PlacesDatabase): PlacesDao = appDatabase.placeDao()
+    fun providePlacePreviewDAO(appDatabase: PlacesDatabase): PlacesDAO = appDatabase.placeDAO()
 
 
 }
