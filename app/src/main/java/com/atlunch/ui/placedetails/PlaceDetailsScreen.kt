@@ -1,7 +1,14 @@
 package com.atlunch.ui.placedetails
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +35,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -192,7 +202,7 @@ fun DisplayPlaceDetails(
             placeDetails.formattedAddress ?: "Address not available.",
             style = MaterialTheme.typography.titleMedium
         )
-        Text(placeDetails.nationalPhoneNumber?:"")
+        Text(placeDetails.nationalPhoneNumber ?: "")
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(bottom = 6.dp)
@@ -216,8 +226,29 @@ fun DisplayPlaceDetails(
             )
         }
 
+        HoursItem(
+            placeDetails.openingHours
+        )
+    }
+}
+
+@Composable
+fun HoursItem(
+    openingHours: List<String>?,
+    modifier: Modifier = Modifier
+) {
+    var isExpanded by remember { mutableStateOf(true) }
+
+    Box(
+        modifier = Modifier.clickable { isExpanded = !isExpanded }
+    ){
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .fillMaxWidth()
+
+                .padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Text(
                 text = "Hours",
@@ -226,21 +257,34 @@ fun DisplayPlaceDetails(
             )
             Icon(
                 imageVector = Icons.Filled.ArrowDropDown,
-                contentDescription = "Expand hours"
+                contentDescription = if (isExpanded) "Collapse hours" else "Expand hours"
             )
         }
-        placeDetails.openingHours?.forEach { openHoursString ->
-            Text(
-                text = openHoursString,
-                modifier = Modifier.padding(start = 6.dp),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }?: run {
-            Text(
-                text = "opening hours unavailable",
-                modifier = Modifier.padding(start = 6.dp),
-                style = MaterialTheme.typography.bodyMedium
-            )
+        AnimatedVisibility(
+            visible = isExpanded,
+            enter = fadeIn() + slideInVertically { fullHeight -> -fullHeight / 2 },
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { fullHeight -> -fullHeight / 2 })
+        ) {
+            Column(
+                modifier = modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                openingHours?.forEach { openHoursString ->
+                    Text(
+                        text = openHoursString,
+                        modifier = Modifier.padding(start = 6.dp),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                } ?: run {
+                    Text(
+                        text = "Opening hours unavailable",
+                        modifier = Modifier.padding(start = 6.dp),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
         }
     }
 }
