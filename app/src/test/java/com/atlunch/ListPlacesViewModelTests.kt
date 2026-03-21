@@ -620,18 +620,198 @@ class ListPlacesViewModelTests {
     }
 
     @Test
-    fun `search updates uiState to Failure when query search returns a network error`() {
+    fun `search updates uiState to Failure when nearby search returns a network error`() = runTest {
+        val expectedLocation = BaseLocation
+        val expectedNearbyPlaces = listOf(BasePlacePreview)
 
+        placesRepository = FakePlacesRepository().apply {
+            nearbyResult = PlacesResult.PlacesSuccess(expectedNearbyPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationSuccess(expectedLocation)
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.uiState.test {
+            listPlacesViewModel.onLocationPermissionChanged(true)
+            advanceUntilIdle()
+
+            val initialState = awaitItem()
+            val permissionEnabledState = awaitItem()
+            val locationLoadedState = awaitItem()
+            val initialNearbySuccessState = awaitItem()
+
+            assertThat(initialNearbySuccessState).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedNearbyPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            placesRepository.nearbyResult = PlacesResult.PlacesError.Network
+
+            listPlacesViewModel.search("")
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Failure(
+                        "Please check your internet connection and try again."
+                    ),
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(placesRepository.lastSearchQuery).isNull()
+            assertThat(placesRepository.lastNearbyLat).isEqualTo(expectedLocation.latitude)
+            assertThat(placesRepository.lastNearbyLong).isEqualTo(expectedLocation.longitude)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun `search updates uiState to Failure when nearby search returns a backend error`() {
+    fun `search updates uiState to Failure when nearby search returns a backend error`() = runTest {
+        val expectedLocation = BaseLocation
+        val expectedNearbyPlaces = listOf(BasePlacePreview)
 
+        placesRepository = FakePlacesRepository().apply {
+            nearbyResult = PlacesResult.PlacesSuccess(expectedNearbyPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationSuccess(expectedLocation)
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.uiState.test {
+            listPlacesViewModel.onLocationPermissionChanged(true)
+            advanceUntilIdle()
+
+            val initialState = awaitItem()
+            val permissionEnabledState = awaitItem()
+            val locationLoadedState = awaitItem()
+            val initialNearbySuccessState = awaitItem()
+
+            assertThat(initialNearbySuccessState).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedNearbyPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            placesRepository.nearbyResult = PlacesResult.PlacesError.Backend
+
+            listPlacesViewModel.search("")
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Failure(
+                        "We're having trouble reaching the Google API servers right now. Please try again in a moment."
+                    ),
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(placesRepository.lastSearchQuery).isNull()
+            assertThat(placesRepository.lastNearbyLat).isEqualTo(expectedLocation.latitude)
+            assertThat(placesRepository.lastNearbyLong).isEqualTo(expectedLocation.longitude)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun `search updates uiState to Failure when nearby search returns a unknown error`() {
+    fun `search updates uiState to Failure when nearby search returns a unknown error`() = runTest {
+        val expectedLocation = BaseLocation
+        val expectedNearbyPlaces = listOf(BasePlacePreview)
 
+        placesRepository = FakePlacesRepository().apply {
+            nearbyResult = PlacesResult.PlacesSuccess(expectedNearbyPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationSuccess(expectedLocation)
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.uiState.test {
+            listPlacesViewModel.onLocationPermissionChanged(true)
+            advanceUntilIdle()
+
+            val initialState = awaitItem()
+            val permissionEnabledState = awaitItem()
+            val locationLoadedState = awaitItem()
+            val initialNearbySuccessState = awaitItem()
+
+            assertThat(initialNearbySuccessState).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedNearbyPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            placesRepository.nearbyResult = PlacesResult.PlacesError.Unknown
+
+            listPlacesViewModel.search("")
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Failure(
+                        "An unknown error occurred."
+                    ),
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(placesRepository.lastSearchQuery).isNull()
+            assertThat(placesRepository.lastNearbyLat).isEqualTo(expectedLocation.latitude)
+            assertThat(placesRepository.lastNearbyLong).isEqualTo(expectedLocation.longitude)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     companion object {
