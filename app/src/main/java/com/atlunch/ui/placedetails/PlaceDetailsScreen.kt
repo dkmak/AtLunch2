@@ -1,14 +1,15 @@
 package com.atlunch.ui.placedetails
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -239,14 +240,18 @@ fun HoursItem(
 ) {
     var isExpanded by remember { mutableStateOf(true) }
 
-    Box(
-        modifier = Modifier.clickable { isExpanded = !isExpanded }
-    ){
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
+                indication = null,
+                interactionSource =  null,
+            ) { isExpanded = !isExpanded }
+            .padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-
-                .padding(vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -255,6 +260,7 @@ fun HoursItem(
                 modifier = Modifier.padding(start = 6.dp),
                 style = MaterialTheme.typography.titleSmall
             )
+
             Icon(
                 imageVector = Icons.Filled.ArrowDropDown,
                 contentDescription = if (isExpanded) "Collapse hours" else "Expand hours"
@@ -262,12 +268,12 @@ fun HoursItem(
         }
         AnimatedVisibility(
             visible = isExpanded,
-            enter = fadeIn() + slideInVertically { fullHeight -> -fullHeight / 2 },
-            exit = fadeOut() + slideOutVertically(targetOffsetY = { fullHeight -> -fullHeight / 2 })
+            enter = expandVertically(expandFrom = Alignment.Top),
+            exit = shrinkVertically(shrinkTowards = Alignment.Top)
         ) {
             Column(
-                modifier = modifier
-                    .fillMaxWidth(),
+                modifier = Modifier
+                .fillMaxWidth(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
