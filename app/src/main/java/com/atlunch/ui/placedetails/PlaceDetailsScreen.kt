@@ -41,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -261,9 +262,15 @@ fun HoursItem(
                 style = MaterialTheme.typography.titleSmall
             )
 
+            val rotation by animateFloatAsState(
+                targetValue = if (isExpanded) 0f else 180f,
+                label = "HoursArrowRotation"
+            )
+
             Icon(
                 imageVector = Icons.Filled.ArrowDropDown,
-                contentDescription = if (isExpanded) "Collapse hours" else "Expand hours"
+                contentDescription = if (isExpanded) "Collapse hours" else "Expand hours",
+                modifier = Modifier.rotate(rotation)
             )
         }
         AnimatedVisibility(
