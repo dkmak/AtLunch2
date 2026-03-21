@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -215,11 +216,17 @@ fun DisplayPlaceDetails(
             )
         }
 
-        Row{
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 text = "Hours",
                 modifier = Modifier.padding(start = 6.dp),
                 style = MaterialTheme.typography.titleSmall
+            )
+            Icon(
+                imageVector = Icons.Filled.ArrowDropDown,
+                contentDescription = "Expand hours"
             )
         }
         placeDetails.openingHours?.forEach { openHoursString ->
@@ -230,7 +237,7 @@ fun DisplayPlaceDetails(
             )
         }?: run {
             Text(
-                text = "opening Hours unavailable",
+                text = "opening hours unavailable",
                 modifier = Modifier.padding(start = 6.dp),
                 style = MaterialTheme.typography.bodyMedium
             )

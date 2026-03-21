@@ -81,7 +81,7 @@ class ListPlacesViewModel @Inject constructor(
     }
 
     private fun performSearch(query: String, location: Location){
-        if (query.isNotEmpty()) {
+        if (query.isNotBlank()) {
             placesRepository.searchQuery(
                 query,
                 location.latitude,
