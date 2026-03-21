@@ -39,7 +39,7 @@ class ListPlacesViewModelTests {
     @Test
     fun `onLocationPermissionChanged requests location and loads nearby places when permission is enabled`() = runTest {
         val expectedLocation = BaseLocation
-        val expectedPlaces = listOf(BaseExamplePlacePreview)
+        val expectedPlaces = listOf(BasePlacePreview)
 
         placesRepository = FakePlacesRepository().apply {
             nearbyResult = PlacesResult.PlacesSuccess(expectedPlaces)
@@ -83,6 +83,9 @@ class ListPlacesViewModelTests {
                     location = expectedLocation
                 )
             )
+            assertThat(locationRepository.getCurrentLocationCallCount).isEqualTo(1)
+            assertThat(placesRepository.lastNearbyLat).isEqualTo(expectedLocation.latitude)
+            assertThat(placesRepository.lastNearbyLong).isEqualTo(expectedLocation.longitude)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -90,7 +93,7 @@ class ListPlacesViewModelTests {
     @Test
     fun `onLocationPermissionChanged clears stored location and does not request location when permission is disabled`() = runTest {
         val expectedLocation = BaseLocation
-        val expectedPlaces = listOf(BaseExamplePlacePreview)
+        val expectedPlaces = listOf(BasePlacePreview)
 
         placesRepository = FakePlacesRepository().apply {
             nearbyResult = PlacesResult.PlacesSuccess(expectedPlaces)
@@ -154,11 +157,7 @@ class ListPlacesViewModelTests {
 
     @Test
     fun `onLocationPermissionChanged updates uiState to Failure when location lookup fails`() = runTest {
-        val expectedPlaces = listOf(BaseExamplePlacePreview)
-
-        placesRepository = FakePlacesRepository().apply {
-            nearbyResult = PlacesResult.PlacesSuccess(expectedPlaces)
-        }
+        placesRepository = FakePlacesRepository()
 
         locationRepository = FakeLocationRepository().apply {
             locationResult = LocationResult.LocationError.Unknown
@@ -197,7 +196,7 @@ class ListPlacesViewModelTests {
     @Test
     fun `search loads nearby places when query is blank and location is already available`() = runTest {
         val expectedLocation = BaseLocation
-        val expectedPlaces = listOf(BaseExamplePlacePreview)
+        val expectedPlaces = listOf(BasePlacePreview)
 
         placesRepository = FakePlacesRepository().apply {
             nearbyResult = PlacesResult.PlacesSuccess(expectedPlaces)
@@ -216,9 +215,12 @@ class ListPlacesViewModelTests {
             listPlacesViewModel.onLocationPermissionChanged(true)
             advanceUntilIdle()
 
-            skipItems(3)
+            val initialState = awaitItem()
+            val permissionEnabledState = awaitItem()
+            val locationLoadedState = awaitItem()
+            val initialNearbySuccessState = awaitItem()
 
-            assertThat(awaitItem()).isEqualTo(
+            assertThat(initialNearbySuccessState).isEqualTo(
                 ListPlacesUiState(
                     isLocationPermissionEnabled = true,
                     dataState = ListPlacesUiState.DataState.Success(expectedPlaces),
@@ -248,22 +250,165 @@ class ListPlacesViewModelTests {
             assertThat(placesRepository.lastNearbyLat).isEqualTo(expectedLocation.latitude)
             assertThat(placesRepository.lastNearbyLong).isEqualTo(expectedLocation.longitude)
             assertThat(placesRepository.lastSearchQuery).isNull()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `search requests query results when query is not blank and location is already available`() {
+    fun `search requests query results when query is not blank and location is available`() = runTest {
+        val expectedLocation = BaseLocation
+        val expectedPlaces = listOf(BasePlacePreview)
+        val expectSearchPlaces = listOf(
+            PlacePreview(
+                restaurantName = "Cafe From Search Query",
+                id = "123",
+                rating = 4.5,
+                userRatingCount = 100,
+                shortFormattedAddress = "123 Main St",
+                location = BaseLocation,
+                iconBaseUri = "https://example.com/icon.png"
+            )
+        )
 
+        placesRepository = FakePlacesRepository().apply {
+            nearbyResult = PlacesResult.PlacesSuccess(expectedPlaces)
+            queryResult  = PlacesResult.PlacesSuccess(expectSearchPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationSuccess(expectedLocation)
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.uiState.test{
+            listPlacesViewModel.onLocationPermissionChanged(true)
+            advanceUntilIdle()
+
+            val initialState = awaitItem()
+            val permissionEnabledState = awaitItem()
+            val locationLoadedState = awaitItem()
+            val initialNearbySuccessState = awaitItem()
+
+            assertThat(initialNearbySuccessState).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            listPlacesViewModel.search("query")
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectSearchPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(placesRepository.lastNearbyLat).isEqualTo(expectedLocation.latitude)
+            assertThat(placesRepository.lastNearbyLong).isEqualTo(expectedLocation.longitude)
+            assertThat(placesRepository.lastSearchQuery).isEqualTo("query")
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun `search updates location and then requests query results when cached location is missing and location lookup succeeds`() {
+    fun `search updates location and then requests query results when cached location is missing and location lookup succeeds`() = runTest {
+        val expectedLocation = BaseLocation
+        val expectedPlaces = listOf(BasePlacePreview)
 
+        placesRepository = FakePlacesRepository().apply {
+            queryResult = PlacesResult.PlacesSuccess(expectedPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationSuccess(expectedLocation)
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
+
+            listPlacesViewModel.search("query")
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = false,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = false,
+                    dataState = ListPlacesUiState.DataState.Success(expectedPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(locationRepository.getCurrentLocationCallCount).isEqualTo(1)
+            assertThat(placesRepository.lastSearchQuery).isEqualTo("query")
+            assertThat(placesRepository.lastNearbyLat).isEqualTo(expectedLocation.latitude)
+            assertThat(placesRepository.lastNearbyLong).isEqualTo(expectedLocation.longitude)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun `search updates uiState to Failure when cached location is missing and location lookup fails`() {
+    fun `search updates uiState to Failure when cached location is missing and location lookup fails`() = runTest {
+        val expectedPlaces = listOf(BasePlacePreview)
 
+        placesRepository = FakePlacesRepository().apply {
+            queryResult = PlacesResult.PlacesSuccess(expectedPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationError.Unknown
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
+
+            listPlacesViewModel.search("query")
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = false,
+                    dataState = ListPlacesUiState.DataState.Failure("We couldn't determine your current location."),
+                    location = null
+                )
+            )
+            assertThat(locationRepository.getCurrentLocationCallCount).isEqualTo(1)
+            assertThat(placesRepository.lastSearchQuery).isEqualTo(null)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -296,7 +441,7 @@ class ListPlacesViewModelTests {
             latitude = 100.0,
             longitude = -100.0
         )
-        val BaseExamplePlacePreview = PlacePreview(
+        val BasePlacePreview = PlacePreview(
             restaurantName = "Cafe",
             id = "123",
             rating = 4.5,

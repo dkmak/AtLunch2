@@ -62,7 +62,7 @@ class ListPlacesViewModel @Inject constructor(
                         _uiState.update { currentState ->
                             currentState.copy(
                                 dataState = ListPlacesUiState.DataState.Failure(
-                                    "We couldn't find your location."
+                                    userLocation.toUserMessage()
                                 )
                             )
                         }
