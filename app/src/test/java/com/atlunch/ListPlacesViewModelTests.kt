@@ -36,7 +36,6 @@ class ListPlacesViewModelTests {
         Dispatchers.resetMain()
     }
 
-
     @Test
     fun `onLocationPermissionChanged requests location and loads nearby places when permission is enabled`() = runTest {
         val expectedLocation = BaseLocation
@@ -136,6 +135,8 @@ class ListPlacesViewModelTests {
                 )
             )
 
+            assertThat(locationRepository.getCurrentLocationCallCount).isEqualTo(1)
+
             listPlacesViewModel.onLocationPermissionChanged(false)
             advanceUntilIdle()
 
@@ -146,17 +147,108 @@ class ListPlacesViewModelTests {
                     location = null
                 )
             )
+            assertThat(locationRepository.getCurrentLocationCallCount).isEqualTo(1)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `onLocationPermissionChanged updates uiState to Failure when location lookup fails`() {
+    fun `onLocationPermissionChanged updates uiState to Failure when location lookup fails`() = runTest {
+        val expectedPlaces = listOf(BaseExamplePlacePreview)
 
+        placesRepository = FakePlacesRepository().apply {
+            nearbyResult = PlacesResult.PlacesSuccess(expectedPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationError.Unknown
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
+
+            listPlacesViewModel.onLocationPermissionChanged(true)
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = null
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Failure("We couldn't determine your current location."),
+                    location = null
+                )
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun `search loads nearby places when query is blank and location is already available`() {
+    fun `search loads nearby places when query is blank and location is already available`() = runTest {
+        val expectedLocation = BaseLocation
+        val expectedPlaces = listOf(BaseExamplePlacePreview)
 
+        placesRepository = FakePlacesRepository().apply {
+            nearbyResult = PlacesResult.PlacesSuccess(expectedPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationSuccess(expectedLocation)
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.uiState.test{
+            listPlacesViewModel.onLocationPermissionChanged(true)
+            advanceUntilIdle()
+
+            skipItems(3)
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            listPlacesViewModel.search("")
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(placesRepository.lastNearbyLat).isEqualTo(expectedLocation.latitude)
+            assertThat(placesRepository.lastNearbyLong).isEqualTo(expectedLocation.longitude)
+            assertThat(placesRepository.lastSearchQuery).isNull()
+        }
     }
 
     @Test
