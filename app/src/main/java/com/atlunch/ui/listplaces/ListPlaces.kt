@@ -79,7 +79,9 @@ fun PlacePreviewListItem(
                     contentDescription = "${placePreview.restaurantName} icon",
                     modifier = Modifier
                         .size(48.dp),
-                    contentScale = ContentScale.Fit
+                    contentScale = ContentScale.Fit,
+                    placeholder = painterResource(R.drawable.selected_pin),
+                    error = painterResource(R.drawable.selected_pin)
                 )
 
                 Column(

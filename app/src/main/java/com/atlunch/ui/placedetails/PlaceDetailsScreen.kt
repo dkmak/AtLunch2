@@ -4,9 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -178,7 +176,9 @@ fun PictureItem(
                         .padding(8.dp),
                     model = photo.photoUrl,
                     contentDescription = "Photo of {$restaurantName}",
-                    contentScale = ContentScale.Fit
+                    contentScale = ContentScale.Fit,
+                    placeholder = painterResource(R.drawable.star_filled),
+                    error = painterResource(R.drawable.star_filled)
                 )
             }
         }
@@ -302,6 +302,17 @@ fun HoursItem(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun DisplayPlacePhotosPreview() {
+    AtLunchTheme {
+        DisplayPlacePhotos(
+            photos = List(6) { Photo(photoUrl = "") },
+            restaurantName = "Preview Restaurant"
+        )
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -324,8 +335,7 @@ fun DisplayPlaceDetailsPreview() {
                     "Saturday: 8:30AM–4:00PM, 5:30–10:00PM",
                     "Sunday: 8:30AM–4:00PM"
                 )
-            ),
-            modifier = Modifier.padding(8.dp)
+            )
         )
     }
 }
@@ -343,8 +353,7 @@ fun DisplayPlaceDefaultsPreview() {
                 formattedAddress = null,
                 nationalPhoneNumber = null,
                 openingHours = null
-            ),
-            modifier = Modifier.padding(8.dp)
+            )
         )
     }
 }
