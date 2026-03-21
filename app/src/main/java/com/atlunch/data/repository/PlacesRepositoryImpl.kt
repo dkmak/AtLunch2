@@ -125,7 +125,7 @@ class PlacesRepositoryImpl @Inject constructor(
     }
 
     companion object {
-        const val MAX_PHOTOS = 8
+        const val MAX_PHOTOS = 6
         const val MAX_RESULTS = 20
         const val MAX_RADIUS = 1000.0
         const val INCLUDED_TYPE = "restaurant"

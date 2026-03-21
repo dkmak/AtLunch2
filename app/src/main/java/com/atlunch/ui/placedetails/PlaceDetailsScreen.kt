@@ -193,8 +193,8 @@ fun DisplayPlaceDetails(
         )
         Text(placeDetails.nationalPhoneNumber?:"")
         Row(
-            modifier = Modifier.padding(top = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(bottom = 6.dp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.star_filled),
@@ -214,8 +214,30 @@ fun DisplayPlaceDetails(
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+
+        Row{
+            Text(
+                text = "Hours",
+                modifier = Modifier.padding(start = 6.dp),
+                style = MaterialTheme.typography.titleSmall
+            )
+        }
+        placeDetails.openingHours?.forEach { openHoursString ->
+            Text(
+                text = openHoursString,
+                modifier = Modifier.padding(start = 6.dp),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }?: run {
+            Text(
+                text = "opening Hours unavailable",
+                modifier = Modifier.padding(start = 6.dp),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -228,7 +250,16 @@ fun DisplayPlaceDetailsPreview() {
                 rating = 4.7,
                 userRatingCount = 128,
                 formattedAddress = "123 Main St, New York, NY 10001",
-                nationalPhoneNumber = "(212) 555-1234"
+                nationalPhoneNumber = "(212) 555-1234",
+                openingHours = listOf(
+                    "Monday: 8:30AM–3:30PM",
+                    "Tuesday: 8:30AM–3:30PM",
+                    "Wednesday: 8:30AM–3:30PM, 5:30–10:00PM",
+                    "Thursday: 8:30AM–3:30PM, 5:30–10:00PM",
+                    "Friday: 8:30AM–3:30PM, 5:30–10:00PM",
+                    "Saturday: 8:30AM–4:00PM, 5:30–10:00PM",
+                    "Sunday: 8:30AM–4:00PM"
+                )
             ),
             modifier = Modifier.padding(8.dp)
         )
@@ -246,7 +277,8 @@ fun DisplayPlaceDefaultsPreview() {
                 rating = null,
                 userRatingCount = null,
                 formattedAddress = null,
-                nationalPhoneNumber = null
+                nationalPhoneNumber = null,
+                openingHours = null
             ),
             modifier = Modifier.padding(8.dp)
         )

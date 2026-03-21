@@ -10,6 +10,7 @@ fun PlaceDetailsDTO.toDomain(): PlaceDetails {
         rating = this.rating,
         userRatingCount = this.userRatingCount,
         formattedAddress = this.formattedAddress,
-        nationalPhoneNumber = this.nationalPhoneNumber
+        nationalPhoneNumber = this.nationalPhoneNumber,
+        openingHours = this.openingHours?.weekdayDescriptions
     )
 }

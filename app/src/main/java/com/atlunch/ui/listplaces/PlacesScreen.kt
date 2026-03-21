@@ -54,7 +54,7 @@ data object PlaceDestination : NavKey
 
 @Composable
 fun PlacesScreen(
-    viewModel: ListViewModel = hiltViewModel(),
+    viewModel: ListPlacesViewModel = hiltViewModel(),
     onPlacePreviewClicked: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

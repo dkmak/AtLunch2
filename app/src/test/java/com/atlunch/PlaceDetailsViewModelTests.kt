@@ -139,58 +139,61 @@ class PlaceDetailsViewModelTests {
     }
 
     @Test
-    fun `loadDetails updates uiState to Failure when repository returns a network error`()  = runTest {
-        repository = FakePlacesRepository().apply {
-            placeDetailsResult = PlaceDetailsResult.DetailsError.Network
+    fun `loadDetails updates uiState to Failure when repository returns a network error`() =
+        runTest {
+            repository = FakePlacesRepository().apply {
+                placeDetailsResult = PlaceDetailsResult.DetailsError.Network
+            }
+            placeDetailsViewModel = PlaceDetailsViewModel(repository)
+
+            placeDetailsViewModel.uiState.test {
+                assertThat(awaitItem()).isEqualTo(DetailsUiState.Loading)
+
+                placeDetailsViewModel.loadDetails(id = "")
+                testDispatcher.scheduler.advanceUntilIdle()
+
+                assertThat(awaitItem()).isEqualTo(DetailsUiState.Failure("Please check your internet connection and try again."))
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-        placeDetailsViewModel = PlaceDetailsViewModel(repository)
-
-        placeDetailsViewModel.uiState.test {
-            assertThat(awaitItem()).isEqualTo(DetailsUiState.Loading)
-
-            placeDetailsViewModel.loadDetails(id = "")
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            assertThat(awaitItem()).isEqualTo(DetailsUiState.Failure("Please check your internet connection and try again."))
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
 
     @Test
-    fun `loadDetails updates uiState to Failure when repository returns a backend error`() = runTest {
-        val fakePlacesRepository = FakePlacesRepository().apply {
-            placeDetailsResult = PlaceDetailsResult.DetailsError.Backend
+    fun `loadDetails updates uiState to Failure when repository returns a backend error`() =
+        runTest {
+            val fakePlacesRepository = FakePlacesRepository().apply {
+                placeDetailsResult = PlaceDetailsResult.DetailsError.Backend
+            }
+            placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository)
+
+            placeDetailsViewModel.uiState.test {
+                assertThat(awaitItem()).isEqualTo(DetailsUiState.Loading)
+
+                placeDetailsViewModel.loadDetails("")
+                testDispatcher.scheduler.advanceUntilIdle()
+
+                assertThat(awaitItem()).isEqualTo(DetailsUiState.Failure("We're having trouble reaching the Google API servers right now. Please try again in a moment."))
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-        placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository)
-
-        placeDetailsViewModel.uiState.test {
-            assertThat(awaitItem()).isEqualTo(DetailsUiState.Loading)
-
-            placeDetailsViewModel.loadDetails("")
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            assertThat(awaitItem()).isEqualTo(DetailsUiState.Failure("We're having trouble reaching the Google API servers right now. Please try again in a moment."))
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
 
     @Test
-    fun `loadDetails updates uiState to Failure when repository returns an unknown error`()  = runTest {
-        val fakePlacesRepository = FakePlacesRepository().apply {
-            placeDetailsResult = PlaceDetailsResult.DetailsError.Unknown
+    fun `loadDetails updates uiState to Failure when repository returns an unknown error`() =
+        runTest {
+            val fakePlacesRepository = FakePlacesRepository().apply {
+                placeDetailsResult = PlaceDetailsResult.DetailsError.Unknown
+            }
+            placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository)
+
+            placeDetailsViewModel.uiState.test {
+                assertThat(awaitItem()).isEqualTo(DetailsUiState.Loading)
+
+                placeDetailsViewModel.loadDetails("")
+                testDispatcher.scheduler.advanceUntilIdle()
+
+                assertThat(awaitItem()).isEqualTo(DetailsUiState.Failure("An unknown error occurred."))
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-        placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository)
-
-        placeDetailsViewModel.uiState.test {
-            assertThat(awaitItem()).isEqualTo(DetailsUiState.Loading)
-
-            placeDetailsViewModel.loadDetails("")
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            assertThat(awaitItem()).isEqualTo(DetailsUiState.Failure("An unknown error occurred."))
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
 
     @Test
     fun `onBackClicked resets uiState to Loading`() = runTest {
@@ -225,7 +228,16 @@ class PlaceDetailsViewModelTests {
             rating = 4.5,
             userRatingCount = 100,
             formattedAddress = "123 Main St",
-            nationalPhoneNumber = "555-1234"
+            nationalPhoneNumber = "555-1234",
+            openingHours = listOf(
+                "Monday: 8:30AM–3:30PM",
+                "Tuesday: 8:30AM–3:30PM",
+                "Wednesday: 8:30AM–3:30PM, 5:30–10:00PM",
+                "Thursday: 8:30AM–3:30PM, 5:30–10:00PM",
+                "Friday: 8:30AM–3:30PM, 5:30–10:00PM",
+                "Saturday: 8:30AM–4:00PM, 5:30–10:00PM",
+                "Sunday: 8:30AM–4:00PM"
+            )
         )
 
         val BaseExamplePhotos = listOf(

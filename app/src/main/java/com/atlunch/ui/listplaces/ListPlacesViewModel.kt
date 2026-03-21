@@ -32,7 +32,7 @@ data class ListPlacesUiState(
 }
 
 @HiltViewModel
-class ListViewModel @Inject constructor(
+class ListPlacesViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val placesRepository: PlacesRepository,
     // private val backgroundDispatcher: CoroutineDispatcher = Dispatchers.IO
