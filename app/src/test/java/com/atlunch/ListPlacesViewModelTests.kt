@@ -412,18 +412,211 @@ class ListPlacesViewModelTests {
     }
 
     @Test
-    fun `search updates uiState to Success with one nearby place when blank query returns a single result`() {
+    fun `search updates uiState to Success with one place when query returns a single result`() = runTest {
+        val expectedLocation = BaseLocation
+        val expectedPlaces = listOf(BasePlacePreview)
 
+        placesRepository = FakePlacesRepository().apply {
+            nearbyResult = PlacesResult.PlacesSuccess(expectedPlaces)
+            queryResult = PlacesResult.PlacesSuccess(expectedPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationSuccess(expectedLocation)
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.uiState.test {
+            listPlacesViewModel.onLocationPermissionChanged(true)
+            advanceUntilIdle()
+
+            val initialState = awaitItem()
+            val permissionEnabledState = awaitItem()
+            val locationLoadedState = awaitItem()
+            val initialNearbySuccessState = awaitItem()
+
+            assertThat(initialNearbySuccessState).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            listPlacesViewModel.search("query")
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(placesRepository.lastNearbyLat).isEqualTo(expectedLocation.latitude)
+            assertThat(placesRepository.lastNearbyLong).isEqualTo(expectedLocation.longitude)
+            assertThat(placesRepository.lastSearchQuery).isEqualTo("query")
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun `search updates uiState to Success with all nearby places when blank query returns many results`() {
+    fun `search updates uiState to Success with all queried places when query returns many results`() = runTest {
+        val expectedLocation = BaseLocation
+        val expectedNearbyPlaces = listOf(BasePlacePreview)
+        val expectedQueryPlaces = listOf(
+            BasePlacePreview,
+            PlacePreview(
+                restaurantName = "Bistro",
+                id = "456",
+                rating = 4.1,
+                userRatingCount = 58,
+                shortFormattedAddress = "456 Oak St",
+                location = BaseLocation,
+                iconBaseUri = "https://example.com/bistro.png"
+            ),
+            PlacePreview(
+                restaurantName = "Deli",
+                id = "789",
+                rating = 3.9,
+                userRatingCount = 25,
+                shortFormattedAddress = "789 Pine St",
+                location = BaseLocation,
+                iconBaseUri = "https://example.com/deli.png"
+            )
+        )
 
+        placesRepository = FakePlacesRepository().apply {
+            nearbyResult = PlacesResult.PlacesSuccess(expectedNearbyPlaces)
+            queryResult = PlacesResult.PlacesSuccess(expectedQueryPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationSuccess(expectedLocation)
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.uiState.test {
+            listPlacesViewModel.onLocationPermissionChanged(true)
+            advanceUntilIdle()
+
+            val initialState = awaitItem()
+            val permissionEnabledState = awaitItem()
+            val locationLoadedState = awaitItem()
+            val initialNearbySuccessState = awaitItem()
+
+            assertThat(initialNearbySuccessState).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedNearbyPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            listPlacesViewModel.search("query")
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedQueryPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(placesRepository.lastNearbyLat).isEqualTo(expectedLocation.latitude)
+            assertThat(placesRepository.lastNearbyLong).isEqualTo(expectedLocation.longitude)
+            assertThat(placesRepository.lastSearchQuery).isEqualTo("query")
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun `search updates uiState to Success with an empty list when blank query returns no places`() {
+    fun `search updates uiState to Success with an empty list when query returns no places`() = runTest {
+        val expectedLocation = BaseLocation
+        val expectedNearbyPlaces = listOf(BasePlacePreview)
+        val expectedQueryPlaces = emptyList<PlacePreview>()
 
+        placesRepository = FakePlacesRepository().apply {
+            nearbyResult = PlacesResult.PlacesSuccess(expectedNearbyPlaces)
+            queryResult = PlacesResult.PlacesSuccess(expectedQueryPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationSuccess(expectedLocation)
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.uiState.test {
+            listPlacesViewModel.onLocationPermissionChanged(true)
+            advanceUntilIdle()
+
+            val initialState = awaitItem()
+            val permissionEnabledState = awaitItem()
+            val locationLoadedState = awaitItem()
+            val initialNearbySuccessState = awaitItem()
+
+            assertThat(initialNearbySuccessState).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedNearbyPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            listPlacesViewModel.search("query")
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Success(expectedQueryPlaces),
+                    location = expectedLocation
+                )
+            )
+
+            assertThat(placesRepository.lastNearbyLat).isEqualTo(expectedLocation.latitude)
+            assertThat(placesRepository.lastNearbyLong).isEqualTo(expectedLocation.longitude)
+            assertThat(placesRepository.lastSearchQuery).isEqualTo("query")
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -433,6 +626,11 @@ class ListPlacesViewModelTests {
 
     @Test
     fun `search updates uiState to Failure when nearby search returns a backend error`() {
+
+    }
+
+    @Test
+    fun `search updates uiState to Failure when nearby search returns a unknown error`() {
 
     }
 
