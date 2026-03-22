@@ -86,9 +86,7 @@ fun PlacesScreen(
 
         viewModel.onLocationPermissionChanged(hasLocationPermission)
 
-        if (hasLocationPermission) {
-            viewModel.search(textFieldValue)
-        } else {
+        if (!hasLocationPermission) {
             locationPermissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -251,5 +249,4 @@ fun SearchPlacesTopBarPreview() {
         )
     }
 }
-
 
