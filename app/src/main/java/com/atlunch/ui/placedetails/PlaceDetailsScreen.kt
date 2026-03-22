@@ -177,7 +177,6 @@ fun PictureItem(
                     model = photo.photoUrl,
                     contentDescription = "Photo of {$restaurantName}",
                     contentScale = ContentScale.Fit,
-                    placeholder = painterResource(R.drawable.star_filled),
                     error = painterResource(R.drawable.star_filled)
                 )
             }

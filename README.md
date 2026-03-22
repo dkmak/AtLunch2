@@ -16,7 +16,7 @@ At Lunch is an Android app for finding nearby restaurants using the Google Place
 - [x] Kotlin Flows and Coroutines - Modern android development practices (Jetpack, Clean Architecture)
 - [x] Local database and/or Network call to retrieve data that is populated to some portion of the UI
 - [x] (Optional) Dependency Injection
-- [ ] (Optional) Unit Tests
+- [x] (Optional) Unit Tests
 
 (insert visuals, video)
 
@@ -64,7 +64,7 @@ At Lunch is an Android app for finding nearby restaurants using the Google Place
 - Separate mapper extensions translate between API DTOs, Room entities, and domain models to keep data-layer responsibilities explicit.
 
 ### Testing
-- [ ] You can run the current test suite with `./gradlew clean testDebugUnitTest`.
+- You can run the current test suite with `./gradlew clean testDebugUnitTest`.
 
 ---
 
