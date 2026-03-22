@@ -50,11 +50,15 @@ class ListPlacesViewModel @Inject constructor(
                 location = if (isEnabled) currentState.location else null
             )
         }
-        if (isEnabled) {
-            updateUserLocation()
-        } else {
+        if (!isEnabled) {
             activeSearchJob?.cancel()
             activeSearchJob = null
+        }
+    }
+
+    fun loadInitialNearbyPlaces() {
+        if (uiState.value.isLocationPermissionEnabled) {
+            updateUserLocation()
         }
     }
 

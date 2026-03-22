@@ -37,7 +37,7 @@ class ListPlacesViewModelTests {
     }
 
     @Test
-    fun `onLocationPermissionChanged requests location and loads nearby places when permission is enabled`() = runTest {
+    fun `loadInitialNearbyPlaces requests location and loads nearby places when permission is enabled`() = runTest {
         val expectedLocation = BaseLocation
         val expectedPlaces = listOf(BasePlacePreview)
 
@@ -58,8 +58,6 @@ class ListPlacesViewModelTests {
             assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
 
             listPlacesViewModel.onLocationPermissionChanged(true)
-            advanceUntilIdle()
-
             assertThat(awaitItem()).isEqualTo(
                 ListPlacesUiState(
                     isLocationPermissionEnabled = true,
@@ -67,6 +65,9 @@ class ListPlacesViewModelTests {
                     location = null
                 )
             )
+
+            listPlacesViewModel.loadInitialNearbyPlaces()
+            advanceUntilIdle()
 
             assertThat(awaitItem()).isEqualTo(
                 ListPlacesUiState(
@@ -112,8 +113,6 @@ class ListPlacesViewModelTests {
             assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
 
             listPlacesViewModel.onLocationPermissionChanged(true)
-            advanceUntilIdle()
-
             assertThat(awaitItem()).isEqualTo(
                 ListPlacesUiState(
                     isLocationPermissionEnabled = true,
@@ -121,6 +120,9 @@ class ListPlacesViewModelTests {
                     location = null
                 )
             )
+
+            listPlacesViewModel.loadInitialNearbyPlaces()
+            advanceUntilIdle()
 
             assertThat(awaitItem()).isEqualTo(
                 ListPlacesUiState(
@@ -156,7 +158,7 @@ class ListPlacesViewModelTests {
     }
 
     @Test
-    fun `onLocationPermissionChanged updates uiState to Failure when location lookup fails`() = runTest {
+    fun `loadInitialNearbyPlaces updates uiState to Failure when location lookup fails`() = runTest {
         placesRepository = FakePlacesRepository()
 
         locationRepository = FakeLocationRepository().apply {
@@ -172,8 +174,6 @@ class ListPlacesViewModelTests {
             assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
 
             listPlacesViewModel.onLocationPermissionChanged(true)
-            advanceUntilIdle()
-
             assertThat(awaitItem()).isEqualTo(
                 ListPlacesUiState(
                     isLocationPermissionEnabled = true,
@@ -181,6 +181,9 @@ class ListPlacesViewModelTests {
                     location = null
                 )
             )
+
+            listPlacesViewModel.loadInitialNearbyPlaces()
+            advanceUntilIdle()
 
             assertThat(awaitItem()).isEqualTo(
                 ListPlacesUiState(
@@ -212,11 +215,19 @@ class ListPlacesViewModelTests {
         )
 
         listPlacesViewModel.uiState.test{
+            assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
+
             listPlacesViewModel.onLocationPermissionChanged(true)
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = null
+                )
+            )
+            listPlacesViewModel.loadInitialNearbyPlaces()
             advanceUntilIdle()
 
-            val initialState = awaitItem()
-            val permissionEnabledState = awaitItem()
             val locationLoadedState = awaitItem()
             val initialNearbySuccessState = awaitItem()
 
@@ -285,11 +296,19 @@ class ListPlacesViewModelTests {
         )
 
         listPlacesViewModel.uiState.test{
+            assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
+
             listPlacesViewModel.onLocationPermissionChanged(true)
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = null
+                )
+            )
+            listPlacesViewModel.loadInitialNearbyPlaces()
             advanceUntilIdle()
 
-            val initialState = awaitItem()
-            val permissionEnabledState = awaitItem()
             val locationLoadedState = awaitItem()
             val initialNearbySuccessState = awaitItem()
 
@@ -431,11 +450,19 @@ class ListPlacesViewModelTests {
         )
 
         listPlacesViewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
+
             listPlacesViewModel.onLocationPermissionChanged(true)
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = null
+                )
+            )
+            listPlacesViewModel.loadInitialNearbyPlaces()
             advanceUntilIdle()
 
-            val initialState = awaitItem()
-            val permissionEnabledState = awaitItem()
             val locationLoadedState = awaitItem()
             val initialNearbySuccessState = awaitItem()
 
@@ -514,11 +541,19 @@ class ListPlacesViewModelTests {
         )
 
         listPlacesViewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
+
             listPlacesViewModel.onLocationPermissionChanged(true)
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = null
+                )
+            )
+            listPlacesViewModel.loadInitialNearbyPlaces()
             advanceUntilIdle()
 
-            val initialState = awaitItem()
-            val permissionEnabledState = awaitItem()
             val locationLoadedState = awaitItem()
             val initialNearbySuccessState = awaitItem()
 
@@ -577,11 +612,19 @@ class ListPlacesViewModelTests {
         )
 
         listPlacesViewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
+
             listPlacesViewModel.onLocationPermissionChanged(true)
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = null
+                )
+            )
+            listPlacesViewModel.loadInitialNearbyPlaces()
             advanceUntilIdle()
 
-            val initialState = awaitItem()
-            val permissionEnabledState = awaitItem()
             val locationLoadedState = awaitItem()
             val initialNearbySuccessState = awaitItem()
 
@@ -638,11 +681,19 @@ class ListPlacesViewModelTests {
         )
 
         listPlacesViewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
+
             listPlacesViewModel.onLocationPermissionChanged(true)
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = null
+                )
+            )
+            listPlacesViewModel.loadInitialNearbyPlaces()
             advanceUntilIdle()
 
-            val initialState = awaitItem()
-            val permissionEnabledState = awaitItem()
             val locationLoadedState = awaitItem()
             val initialNearbySuccessState = awaitItem()
 
@@ -703,11 +754,19 @@ class ListPlacesViewModelTests {
         )
 
         listPlacesViewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
+
             listPlacesViewModel.onLocationPermissionChanged(true)
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = null
+                )
+            )
+            listPlacesViewModel.loadInitialNearbyPlaces()
             advanceUntilIdle()
 
-            val initialState = awaitItem()
-            val permissionEnabledState = awaitItem()
             val locationLoadedState = awaitItem()
             val initialNearbySuccessState = awaitItem()
 
@@ -768,11 +827,19 @@ class ListPlacesViewModelTests {
         )
 
         listPlacesViewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
+
             listPlacesViewModel.onLocationPermissionChanged(true)
+            assertThat(awaitItem()).isEqualTo(
+                ListPlacesUiState(
+                    isLocationPermissionEnabled = true,
+                    dataState = ListPlacesUiState.DataState.Loading,
+                    location = null
+                )
+            )
+            listPlacesViewModel.loadInitialNearbyPlaces()
             advanceUntilIdle()
 
-            val initialState = awaitItem()
-            val permissionEnabledState = awaitItem()
             val locationLoadedState = awaitItem()
             val initialNearbySuccessState = awaitItem()
 

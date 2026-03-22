@@ -86,7 +86,9 @@ fun PlacesScreen(
 
         viewModel.onLocationPermissionChanged(hasLocationPermission)
 
-        if (!hasLocationPermission) {
+        if (hasLocationPermission) {
+            viewModel.loadInitialNearbyPlaces()
+        } else {
             locationPermissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -249,4 +251,3 @@ fun SearchPlacesTopBarPreview() {
         )
     }
 }
-
