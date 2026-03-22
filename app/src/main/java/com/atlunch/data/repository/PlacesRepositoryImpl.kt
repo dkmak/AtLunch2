@@ -1,5 +1,6 @@
 package com.atlunch.data.repository
 
+import com.atlunch.data.IoDispatcher
 import com.atlunch.data.database.PlacesDAO
 import com.atlunch.data.dto.toDomain
 import com.atlunch.data.dto.toEntity
@@ -21,18 +22,21 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 import javax.inject.Singleton
 
 class PlacesRepositoryImpl @Inject constructor(
     private val apiClient: PlacesApiClient,
-    private val placesDAO: PlacesDAO
+    private val placesDAO: PlacesDAO,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : PlacesRepository {
 
     override fun searchNearby(
@@ -69,7 +73,7 @@ class PlacesRepositoryImpl @Inject constructor(
         }
 
         emit(PlacesResult.PlacesSuccess(getCachedNearbyPlaces()))
-    }
+    }.flowOn(ioDispatcher)
 
     private suspend fun getCachedNearbyPlaces(): List<PlacePreview> {
         return placesDAO.getPlacePreviews().map { it.toDomain() }
@@ -96,7 +100,7 @@ class PlacesRepositoryImpl @Inject constructor(
             throw throwable
         }
         emit(throwable.toPlaceDetailsDomainError())
-    }
+    }.flowOn(ioDispatcher)
 
     override fun searchQuery(
         query: String,
@@ -122,7 +126,7 @@ class PlacesRepositoryImpl @Inject constructor(
             throw throwable
         }
         emit(throwable.toPlacesDomainError())
-    }
+    }.flowOn(ioDispatcher)
 
     companion object {
         const val MAX_PHOTOS = 6

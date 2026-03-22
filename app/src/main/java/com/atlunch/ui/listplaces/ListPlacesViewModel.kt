@@ -10,6 +10,7 @@ import com.atlunch.domain.PlacesRepository
 import com.atlunch.domain.PlacesResult
 import com.atlunch.ui.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -34,11 +35,11 @@ data class ListPlacesUiState(
 @HiltViewModel
 class ListPlacesViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
-    private val placesRepository: PlacesRepository,
-    // private val backgroundDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val placesRepository: PlacesRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ListPlacesUiState())
     val uiState = _uiState.asStateFlow()
+    private var activeSearchJob: Job? = null
 
     fun onLocationPermissionChanged(isEnabled: Boolean) {
         _uiState.update { currentState ->
@@ -49,6 +50,9 @@ class ListPlacesViewModel @Inject constructor(
         }
         if (isEnabled) {
             updateUserLocation()
+        } else {
+            activeSearchJob?.cancel()
+            activeSearchJob = null
         }
     }
 
@@ -82,7 +86,8 @@ class ListPlacesViewModel @Inject constructor(
 
     private fun performSearch(query: String, location: Location){
         if (query.isNotBlank()) {
-            placesRepository.searchQuery(
+            activeSearchJob?.cancel()
+            activeSearchJob = placesRepository.searchQuery(
                 query,
                 location.latitude,
                 location.longitude
@@ -102,7 +107,8 @@ class ListPlacesViewModel @Inject constructor(
     }
 
     private fun loadPlacesNearby(userLocation: Location) {
-        placesRepository.searchNearby(userLocation.latitude, userLocation.longitude)
+        activeSearchJob?.cancel()
+        activeSearchJob = placesRepository.searchNearby(userLocation.latitude, userLocation.longitude)
             .onStart {
                 _uiState.update { currentState ->
                     currentState.copy(dataState = ListPlacesUiState.DataState.Loading)
@@ -141,7 +147,6 @@ class ListPlacesViewModel @Inject constructor(
         }
     }
 
-    // private suspend fun getCurrentLocation() = withContext(backgroundDispatcher){ locationRepository.getCurrentLocation() }
     private suspend fun getCurrentLocation() = locationRepository.getCurrentLocation()
 
     private fun PlacesResult.toDataState(): ListPlacesUiState.DataState {

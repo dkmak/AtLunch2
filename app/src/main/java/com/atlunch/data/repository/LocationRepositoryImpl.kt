@@ -1,6 +1,7 @@
 package com.atlunch.data.repository
 
 import android.annotation.SuppressLint
+import com.atlunch.data.IoDispatcher
 import com.atlunch.domain.LocationRepository
 import com.atlunch.domain.LocationResult
 import com.atlunch.domain.Location
@@ -11,17 +12,20 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 class LocationRepositoryImpl @Inject constructor(
-    private val fusedLocationClient: FusedLocationProviderClient
+    private val fusedLocationClient: FusedLocationProviderClient,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : LocationRepository {
 
     @SuppressLint("MissingPermission")
-    override suspend fun getCurrentLocation(): LocationResult {
-        return try {
+    override suspend fun getCurrentLocation(): LocationResult = withContext(ioDispatcher) {
+        return@withContext try {
             val request = CurrentLocationRequest.Builder()
                 .setPriority(PRIORITY_BALANCED_POWER_ACCURACY)
                 .build()
