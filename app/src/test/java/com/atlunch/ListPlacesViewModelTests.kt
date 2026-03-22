@@ -92,6 +92,34 @@ class ListPlacesViewModelTests {
     }
 
     @Test
+    fun `loadInitialNearbyPlaces only loads once while permission remains enabled`() = runTest {
+        val expectedLocation = BaseLocation
+        val expectedPlaces = listOf(BasePlacePreview)
+
+        placesRepository = FakePlacesRepository().apply {
+            nearbyResult = PlacesResult.PlacesSuccess(expectedPlaces)
+        }
+
+        locationRepository = FakeLocationRepository().apply {
+            locationResult = LocationResult.LocationSuccess(expectedLocation)
+        }
+
+        listPlacesViewModel = ListPlacesViewModel(
+            locationRepository = locationRepository,
+            placesRepository = placesRepository
+        )
+
+        listPlacesViewModel.onLocationPermissionChanged(true)
+        listPlacesViewModel.loadInitialNearbyPlaces()
+        advanceUntilIdle()
+
+        listPlacesViewModel.loadInitialNearbyPlaces()
+        advanceUntilIdle()
+
+        assertThat(locationRepository.getCurrentLocationCallCount).isEqualTo(1)
+    }
+
+    @Test
     fun `onLocationPermissionChanged clears stored location and does not request location when permission is disabled`() = runTest {
         val expectedLocation = BaseLocation
         val expectedPlaces = listOf(BasePlacePreview)

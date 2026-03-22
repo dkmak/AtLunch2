@@ -40,6 +40,7 @@ class ListPlacesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ListPlacesUiState())
     val uiState = _uiState.asStateFlow()
     private var activeSearchJob: Job? = null
+    private var hasLoadedInitialNearbyPlaces = false
 
     fun onLocationPermissionChanged(isEnabled: Boolean) {
         if (uiState.value.isLocationPermissionEnabled == isEnabled) return
@@ -53,11 +54,15 @@ class ListPlacesViewModel @Inject constructor(
         if (!isEnabled) {
             activeSearchJob?.cancel()
             activeSearchJob = null
+            hasLoadedInitialNearbyPlaces = false
         }
     }
 
     fun loadInitialNearbyPlaces() {
+        if (hasLoadedInitialNearbyPlaces) return
+
         if (uiState.value.isLocationPermissionEnabled) {
+            hasLoadedInitialNearbyPlaces = true
             updateUserLocation()
         }
     }
