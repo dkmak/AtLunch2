@@ -42,6 +42,8 @@ class ListPlacesViewModel @Inject constructor(
     private var activeSearchJob: Job? = null
 
     fun onLocationPermissionChanged(isEnabled: Boolean) {
+        if (uiState.value.isLocationPermissionEnabled == isEnabled) return
+        
         _uiState.update { currentState ->
             currentState.copy(
                 isLocationPermissionEnabled = isEnabled,
