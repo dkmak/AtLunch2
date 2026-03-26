@@ -47,8 +47,16 @@ information such as address, phone number, rating, and photos when available.
 1. Open the project root in Android Studio.
 2. Let Gradle sync complete.
 3. Confirm Android Studio is using JDK 17 for Gradle.
-4. Build and run the `app` configuration on an emulator or physical Android device.
-5. Accept location permission when prompted so the app can perform nearby restaurant searches.
+4. Add your Google API keys to your local, untracked `local.properties` file:
+
+```properties
+GOOGLE_PLACES_API_KEY=your_places_api_key
+GOOGLE_MAPS_API_KEY=your_maps_sdk_api_key
+```
+
+5. Build and run the `app` configuration on an emulator or physical Android device.
+6. Accept location permission when prompted so the app can perform nearby restaurant searches.
+
 
 ## Technical Details
 
