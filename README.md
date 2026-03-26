@@ -5,26 +5,23 @@ the app requests location access, fetches nearby restaurant results, and lets th
 as either a scrollable list or on a map. Tapping a restaurant opens a detail screen with additional
 information such as address, phone number, rating, and photos when available.
 
-**Required Features**
+**Features**
+-  The app uses the Google Places API for its data source
+- The app will prompt the user for permission to access their current location
+- Upon launch, the app will execute a search that displays nearby restaurants
+- A search feature will be included that allows the user to search for restaurants
+- The user can choose to display the search results as a list, or as pins on a map
+- The user can select a search result to present a restaurant detail page with basic information
+  about the restaurant
 
-- [x] The app will use the Google Places API for its data source
-- [x] The app will prompt the user for permission to access their current location
-- [x] Upon launch, the app will execute a search that displays nearby restaurants
-- [x] A search feature will be included that allows the user to search for restaurants
-- [x] The user can choose to display the search results as a list, or as pins on a map
-- [x] The user can select a search result to present a restaurant detail page with basic information
-  about
-  the restaurant
-
-**Non-Functional Requirements**
-
-- [x] Jetpack Compose for UI, comprising at least two distinct screens (e.g. list/detail)
-- [x] Kotlin Flows and Coroutines - Modern android development practices (Jetpack, Clean
+**Non-Functional Features**
+- Jetpack Compose for UI, comprising two distinct screens (e.g. list/detail)
+- Kotlin Flows and Coroutines - Modern android development practices (Jetpack, Clean
   Architecture)
-- [x] Local database and/or Network call to retrieve data that is populated to some portion of the
+- Local database and/or Network call to retrieve data that is populated to some portion of the
   UI (See *Data Persistence* for details)
-- [x] (Optional) Dependency Injection
-- [x] (Optional) Unit Tests
+- Dependency Injection using Hilt
+- (Optional) Unit Tests
 
 | Video | List | Map | Details |
 |-------|------|---- |---------|
