@@ -213,7 +213,7 @@ fun SearchPlacesTopBar(
             .padding(16.dp)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.logo_lockup),
+            painter = painterResource(id = R.drawable.at_lunch),
             contentDescription = "AtLunch",
             modifier = Modifier.fillMaxWidth()
         )
