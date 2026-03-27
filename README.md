@@ -21,7 +21,7 @@ information such as address, phone number, rating, and photos when available.
 - Local database and/or Network call to retrieve data that is populated to some portion of the
   UI (See *Data Persistence* for details)
 - Dependency Injection using Hilt
-- (Optional) Unit Tests
+- Unit Tests
 
 | Video | List | Map | Details |
 |-------|------|---- |---------|
