@@ -101,7 +101,7 @@ fun PlacePreviewListItem(
                         Icon(
                             painter = painterResource(id = R.drawable.star_filled),
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary
+                            tint = MaterialTheme.colorScheme.tertiary
                         )
 
                         Text(
