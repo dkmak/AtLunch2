@@ -60,21 +60,14 @@ GOOGLE_MAPS_API_KEY=your_maps_sdk_api_key
 
 ## Technical Details
 
-### Architecture
+### Client Architecture
+<img width="800" alt="AtLunch_Diagram" src="https://github.com/user-attachments/assets/f1c9c0a5-bcc4-4832-b573-abb7c42f0387" />
 
-- The app follows an **MVVM** structure with separate UI, domain, data, and networking
+- The app uses a clean architecture with separate UI, domain, data
   responsibilities.
-- Hilt is used to wire repositories, networking, and Android entry points.
+- Hilt is used for dependency injection.
 
-### UI
-
-- The UI is built with **Jetpack Compose** and Material 3.
-- Navigation is handled with Navigation 3 and a simple back stack between the places screen and the
-  details screen.
-- The list screen supports loading, error, empty, list, and map states.
-- The details screen renders place metadata and photo content returned by the Places API.
-
-### Networking
+### Data Layer: Networking
 
 - The app integrates with
   the [Google Places API](https://developers.google.com/maps/documentation/places/web-service/overview).
@@ -83,26 +76,11 @@ GOOGLE_MAPS_API_KEY=your_maps_sdk_api_key
   the fields it needs.
 - Network, backend, and unknown failures are mapped into user-facing error messages in the UI layer.
 
-### Data Persistence
-
-- Room is used to cache nearby place preview results locally.
-- The repository clears and refreshes cached nearby results on successful nearby searches, then
-  emits the database-backed models to the UI layer.
-- Separate mapper extensions translate between API DTOs, Room entities, and domain models to keep
-  data-layer responsibilities explicit.
-
-### Testing
-
-- You can run the current test suite with `./gradlew clean testDebugUnitTest`.
-
----
-
-## API Reference
+#### API Reference
 
 **Base URL:** `https://places.googleapis.com/`
 
 **Common headers**
-
 - `X-Goog-Api-Key: <API_KEY>`
 - `X-Goog-FieldMask: <field mask for the endpoint>`
 
@@ -112,3 +90,21 @@ GOOGLE_MAPS_API_KEY=your_maps_sdk_api_key
 | `POST /v1/places:searchText`   | Searches restaurants by a user-entered text query.               |
 | `GET /v1/places/{id}`          | Fetches details for the selected restaurant.                     |
 | `GET /v1/{photoName}/media`    | Fetches photo media metadata for a place photo resource.         |
+
+### Data Layer: Data Persistence
+
+- Room is used to cache nearby place preview results locally.
+- If the connection is the lost, the user will still see locally cached nearby restaurant data.
+- Successful results from network are cached by the network and emitted by the UI.
+
+### UI
+- The presentation layer follows an **MVVM** structure.
+- The UI is built with **Jetpack Compose** and Material 3.
+- Navigation is handled with Navigation 3 and a simple back stack between the places screen and the
+  details screen.
+- The list screen supports loading, error, empty, list, and map states.
+- The details screen renders place metadata and photo content returned by the Places API.
+- Map overlays are provided using the Google Maps Compose SDK
+
+### Testing
+- You can run the current test suite with `./gradlew clean testDebugUnitTest`.
