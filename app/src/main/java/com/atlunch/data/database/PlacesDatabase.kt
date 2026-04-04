@@ -4,8 +4,11 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [PlacePreviewEntity::class],
-    version = 1,
+    entities = [
+        PlacePreviewEntity::class,
+        FavoritesEntity::class
+    ],
+    version = 2,
     exportSchema = true
 )
 abstract class PlacesDatabase: RoomDatabase() {

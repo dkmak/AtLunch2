@@ -1,5 +1,6 @@
 package com.atlunch.ui
 
+import com.atlunch.domain.FavoriteResult
 import com.atlunch.domain.LocationResult
 import com.atlunch.domain.PlaceDetailsResult
 import com.atlunch.domain.PlacesResult
@@ -27,4 +28,10 @@ fun PlaceDetailsResult.DetailsError.toUserMessage(): String =
 fun LocationResult.LocationError.toUserMessage(): String =
     when (this) {
         LocationResult.LocationError.Unknown -> "We couldn't determine your current location."
+    }
+
+
+fun FavoriteResult.FavoriteError.toUserMessage(): String =
+    when (this) {
+        FavoriteResult.FavoriteError.DatabaseError -> "An error occurred, this item was not added to Favorites"
     }

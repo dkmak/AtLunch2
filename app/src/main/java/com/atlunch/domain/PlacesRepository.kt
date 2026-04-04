@@ -17,4 +17,13 @@ interface PlacesRepository {
         lat: Double,
         long: Double
     ): Flow<PlacesResult>
+
+
+    fun addFavorite(
+        id: String
+    ): Flow<FavoriteResult>
+
+    fun removeFavorite(
+        id: String
+    ): Flow<FavoriteResult>
 }

@@ -2,6 +2,7 @@ package com.atlunch.ui.placedetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.atlunch.domain.FavoriteResult
 import com.atlunch.domain.Photo
 import com.atlunch.domain.PlaceDetails
 import com.atlunch.domain.PlaceDetailsResult
@@ -15,13 +16,15 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-sealed interface DetailsUiState{
+sealed interface DetailsUiState {
     data class Success(
         val placeDetails: PlaceDetails,
         val photos: List<Photo>,
-    ): DetailsUiState
-    data class Failure(val message: String): DetailsUiState
-    data object Loading: DetailsUiState
+        val isFavorite: Boolean,
+    ) : DetailsUiState
+
+    data class Failure(val message: String) : DetailsUiState
+    data object Loading : DetailsUiState
 }
 
 @HiltViewModel
@@ -38,11 +41,58 @@ class PlaceDetailsViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun PlaceDetailsResult.toUiState(): DetailsUiState{
-        return when (this){
+
+    fun addFavorite() {
+        val curr = uiState.value as? DetailsUiState.Success
+        curr?.placeDetails?.id.let { placeDetailsId ->
+            placeDetailsId?.let{ id ->
+                repository.addFavorite(id).onEach { result ->
+                    _uiState.update { prev ->
+                        when (result) {
+                            is FavoriteResult.FavoriteError -> {
+                                DetailsUiState.Failure(message = result.toUserMessage())
+                            }
+                            is FavoriteResult.FavoriteSuccess -> {
+                                curr?.copy(
+                                    isFavorite = result.isFavorite
+                                ) ?: DetailsUiState.Failure(message = FavoriteResult.FavoriteError.DatabaseError.toUserMessage())
+                            }
+                        }
+                    }
+                }.launchIn(viewModelScope)
+            }
+        }
+    }
+
+    fun removeFavorites() {
+        val curr = uiState.value as? DetailsUiState.Success
+        curr?.placeDetails?.id.let { placeDetailsId ->
+            placeDetailsId?.let { id ->
+                repository.removeFavorite(id).onEach { result ->
+                    _uiState.update { prev ->
+                        when (result) {
+                            is FavoriteResult.FavoriteError -> {
+                                DetailsUiState.Failure(message = result.toUserMessage())
+                            }
+
+                            is FavoriteResult.FavoriteSuccess -> {
+                                curr?.copy(
+                                    isFavorite = result.isFavorite
+                                ) ?: DetailsUiState.Failure(message = FavoriteResult.FavoriteError.DatabaseError.toUserMessage())
+                            }
+                        }
+                    }
+                }.launchIn(viewModelScope)
+            }
+        }
+    }
+
+    private fun PlaceDetailsResult.toUiState(): DetailsUiState {
+        return when (this) {
             is PlaceDetailsResult.DetailsSuccess -> DetailsUiState.Success(
                 placeDetails = this.placeDetails,
-                photos = this.photos
+                photos = this.photos,
+                isFavorite = this.favorite
             )
             is PlaceDetailsResult.DetailsError.Backend -> DetailsUiState.Failure(this.toUserMessage())
             is PlaceDetailsResult.DetailsError.Network -> DetailsUiState.Failure(this.toUserMessage())
@@ -50,7 +100,7 @@ class PlaceDetailsViewModel @Inject constructor(
         }
     }
 
-    fun onBackClicked(){
+    fun onBackClicked() {
         _uiState.update { DetailsUiState.Loading }
     }
 }
