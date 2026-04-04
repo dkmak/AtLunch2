@@ -12,7 +12,8 @@ sealed class PlacesResult {
 sealed class PlaceDetailsResult {
     data class DetailsSuccess(
         val placeDetails: PlaceDetails,
-        val photos: List<Photo>
+        val photos: List<Photo>,
+        val favorite: Boolean
     ): PlaceDetailsResult()
     sealed class DetailsError: PlaceDetailsResult() {
         data object Network : DetailsError()
@@ -31,4 +32,13 @@ sealed class LocationResult {
     }
 }
 
+sealed class FavoriteResult {
+    data class FavoriteSuccess(
+        val isFavorite: Boolean
+    ): FavoriteResult()
+
+    sealed class FavoriteError() : FavoriteResult() {
+        data object DatabaseError : FavoriteError()
+    }
+}
 
