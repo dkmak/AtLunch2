@@ -88,15 +88,25 @@ fun PlaceDetailsScreen(
                 },
                 actions = {
                     val context = LocalContext.current
-                    IconButton(onClick =  {
+                    IconButton(onClick = {
                         val placeDetailsSuccess = uiState as? DetailsUiState.Success
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT,"Checkout out this place: ${placeDetailsSuccess?.placeDetails?.restaurantName}")
-                            type ="text/plain"
+                            type = "text/plain"
+                            
+                            putExtra(
+                                Intent.EXTRA_TEXT,
+                                placeDetailsSuccess?.placeDetails?.googleMapsUri?: "No Google Maps link found."
+                            )
+
+
+                            putExtra(
+                                Intent.EXTRA_TITLE,
+                                "Find it on Google Maps"
+                            )
                         }
 
-                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        val shareIntent = Intent.createChooser(sendIntent, "Share")
                         context.startActivity(shareIntent)
                     }) {
                         Icon(
@@ -268,7 +278,7 @@ fun HoursItem(
             .fillMaxWidth()
             .clickable(
                 indication = null,
-                interactionSource =  null,
+                interactionSource = null,
             ) { isExpanded = !isExpanded }
             .padding(vertical = 4.dp),
         verticalArrangement = Arrangement.Top,
@@ -302,7 +312,7 @@ fun HoursItem(
         ) {
             Column(
                 modifier = Modifier
-                .fillMaxWidth(),
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -345,6 +355,7 @@ fun DisplayPlaceDetailsPreview() {
                 restaurantName = "Joe's Pizza",
                 id = "preview-place-id",
                 rating = 4.7,
+                googleMapsUri = "",
                 userRatingCount = 128,
                 formattedAddress = "123 Main St, New York, NY 10001",
                 nationalPhoneNumber = "(212) 555-1234",
@@ -371,6 +382,7 @@ fun DisplayPlaceDefaultsPreview() {
                 restaurantName = "Joe's Pizza",
                 id = "preview-place-id",
                 rating = null,
+                googleMapsUri = "",
                 userRatingCount = null,
                 formattedAddress = null,
                 nationalPhoneNumber = null,
