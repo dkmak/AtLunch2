@@ -15,4 +15,13 @@ interface PlacesDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlacePreviews(placePreviews: List<PlacePreviewEntity>)
+
+    @Query("SELECT * FROM FavoritesEntity")
+    suspend fun getFavorites(): List<FavoritesEntity>
+
+    @Query("DELETE FROM FavoritesEntity WHERE ID = :id ")
+    suspend fun deleteFavorites(id: String)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertFavorite(favorite: FavoritesEntity)
 }

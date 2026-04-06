@@ -20,6 +20,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -152,6 +154,15 @@ fun PlaceDetailsScreen(
                     )
                     DisplayPlaceDetails(
                         placeDetails = state.placeDetails,
+                        favorite = state.isFavorite,
+                        onFavoriteClicked = {
+                            if (state.isFavorite) {
+                                viewModel.removeFavorites()
+                            } else {
+                                viewModel.addFavorite()
+                            }
+
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
@@ -219,7 +230,9 @@ fun PictureItem(
 @Composable
 fun DisplayPlaceDetails(
     placeDetails: PlaceDetails,
-    modifier: Modifier = Modifier
+    favorite: Boolean,
+    modifier: Modifier = Modifier,
+    onFavoriteClicked: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -239,7 +252,10 @@ fun DisplayPlaceDetails(
         Text(placeDetails.nationalPhoneNumber ?: "")
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 6.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 6.dp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.star_filled),
@@ -249,14 +265,19 @@ fun DisplayPlaceDetails(
 
             Text(
                 text = (placeDetails.rating ?: 0.0).toString(),
-                modifier = Modifier.padding(start = 6.dp),
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Text(
                 text = "• (${placeDetails.userRatingCount ?: 0} reviews)",
-                modifier = Modifier.padding(start = 6.dp),
                 style = MaterialTheme.typography.bodyMedium
+            )
+
+            Icon(
+                imageVector = if (favorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                contentDescription = "Favorites",
+                tint = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.clickable { onFavoriteClicked() }
             )
         }
 
@@ -368,7 +389,9 @@ fun DisplayPlaceDetailsPreview() {
                     "Saturday: 8:30AM–4:00PM, 5:30–10:00PM",
                     "Sunday: 8:30AM–4:00PM"
                 )
-            )
+            ),
+            favorite = false,
+            onFavoriteClicked = {}
         )
     }
 }
@@ -387,7 +410,10 @@ fun DisplayPlaceDefaultsPreview() {
                 formattedAddress = null,
                 nationalPhoneNumber = null,
                 openingHours = null
-            )
+
+            ),
+            favorite = false,
+            onFavoriteClicked = {}
         )
     }
 }

@@ -1,6 +1,7 @@
 package com.atlunch.data.repository
 
 import com.atlunch.data.IoDispatcher
+import com.atlunch.data.database.FavoritesEntity
 import com.atlunch.data.database.PlacesDAO
 import com.atlunch.data.dto.toDomain
 import com.atlunch.data.dto.toEntity
@@ -13,6 +14,7 @@ import com.atlunch.data.network.SearchNearbyRequest
 import com.atlunch.data.network.SearchQueryRequest
 import com.atlunch.data.toPlaceDetailsDomainError
 import com.atlunch.data.toPlacesDomainError
+import com.atlunch.domain.FavoriteResult
 import com.atlunch.domain.PlaceDetailsResult
 import com.atlunch.domain.PlacePreview
 import com.atlunch.domain.PlacesRepository
@@ -91,9 +93,15 @@ class PlacesRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+        val placeDetails = detailsResponse.toDomain()
+        // read the data, find if item in Favorites table
+        val isFavorite = placesDAO.getFavorites().find { it.id == placeDetails.id }
+
         emit(PlaceDetailsResult.DetailsSuccess(
             placeDetails = detailsResponse.toDomain(),
-            photos = photosDomain.awaitAll()
+            photos = photosDomain.awaitAll(),
+            favorite = isFavorite != null
         ))
     }. catch { throwable ->
         if (throwable is CancellationException){
@@ -127,6 +135,20 @@ class PlacesRepositoryImpl @Inject constructor(
         }
         emit(throwable.toPlacesDomainError())
     }.flowOn(ioDispatcher)
+
+    override fun addFavorite(id: String): Flow<FavoriteResult> = flow<FavoriteResult> {
+        placesDAO.insertFavorite(FavoritesEntity(id))
+        emit(FavoriteResult.FavoriteSuccess(isFavorite = true))
+    }.catch {
+        emit(FavoriteResult.FavoriteError.DatabaseError)
+    }
+
+    override fun removeFavorite(id: String): Flow<FavoriteResult> = flow<FavoriteResult>{
+        placesDAO.deleteFavorites(id)
+        emit(FavoriteResult.FavoriteSuccess(isFavorite = false))
+    }.catch {
+        emit(FavoriteResult.FavoriteError.DatabaseError)
+    }
 
     companion object {
         const val MAX_PHOTOS = 6

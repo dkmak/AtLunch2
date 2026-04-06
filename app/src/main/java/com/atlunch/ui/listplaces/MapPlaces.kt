@@ -35,6 +35,9 @@ fun MapPlaces(
     modifier: Modifier = Modifier
 ) {
     var selectedPlaceId by rememberSaveable { mutableStateOf<String?>(null) }
+    val selectedPlacePreview = selectedPlaceId?.let { placeId ->
+        placePreviews.firstOrNull { preview -> preview.id == placeId }
+    }
 
     userLocation?.let { location ->
         Box(
@@ -86,9 +89,9 @@ fun MapPlaces(
                 modifier = Modifier
                     .align(Alignment.Center)
             ) {
-                selectedPlaceId?.let { placeId ->
+                selectedPlacePreview?.let { placePreview ->
                     PlacePreviewListItem(
-                        placePreview = placePreviews.find { preview -> preview.id == placeId }!!,
+                        placePreview = placePreview,
                         onPlaceClicked = onPlaceClicked,
                         modifier = Modifier.padding(16.dp)
                     )

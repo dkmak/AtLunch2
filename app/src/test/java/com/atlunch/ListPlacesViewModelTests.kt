@@ -41,6 +41,7 @@ class ListPlacesViewModelTests {
         val expectedLocation = BaseLocation
         val expectedPlaces = listOf(BasePlacePreview)
 
+        // fill the mock with data
         placesRepository = FakePlacesRepository().apply {
             nearbyResult = PlacesResult.PlacesSuccess(expectedPlaces)
         }
@@ -49,11 +50,13 @@ class ListPlacesViewModelTests {
             locationResult = LocationResult.LocationSuccess(expectedLocation)
         }
 
+        // create the viewModel
         listPlacesViewModel = ListPlacesViewModel(
             locationRepository = locationRepository,
             placesRepository = placesRepository
         )
 
+        // assert the UiState
         listPlacesViewModel.uiState.test{
             assertThat(awaitItem()).isEqualTo(ListPlacesUiState())
 
