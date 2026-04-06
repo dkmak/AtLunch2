@@ -1,5 +1,6 @@
 package com.atlunch.ui.placedetails
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -83,6 +85,35 @@ fun PlaceDetailsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
+                        )
+                    }
+                },
+                actions = {
+                    val context = LocalContext.current
+                    IconButton(onClick = {
+                        val placeDetailsSuccess = uiState as? DetailsUiState.Success
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            type = "text/plain"
+                            
+                            putExtra(
+                                Intent.EXTRA_TEXT,
+                                placeDetailsSuccess?.placeDetails?.googleMapsUri?: "No Google Maps link found."
+                            )
+
+
+                            putExtra(
+                                Intent.EXTRA_TITLE,
+                                "Find it on Google Maps"
+                            )
+                        }
+
+                        val shareIntent = Intent.createChooser(sendIntent, "Share")
+                        context.startActivity(shareIntent)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share"
                         )
                     }
                 }
@@ -345,6 +376,7 @@ fun DisplayPlaceDetailsPreview() {
                 restaurantName = "Joe's Pizza",
                 id = "preview-place-id",
                 rating = 4.7,
+                googleMapsUri = "",
                 userRatingCount = 128,
                 formattedAddress = "123 Main St, New York, NY 10001",
                 nationalPhoneNumber = "(212) 555-1234",
@@ -373,6 +405,7 @@ fun DisplayPlaceDefaultsPreview() {
                 restaurantName = "Joe's Pizza",
                 id = "preview-place-id",
                 rating = null,
+                googleMapsUri = "",
                 userRatingCount = null,
                 formattedAddress = null,
                 nationalPhoneNumber = null,
