@@ -8,6 +8,7 @@ data class PlaceDetailsDTO(
     val displayName: DisplayName,
     val id: String,
     val rating: Double?,
+    val googleMapsUri: String?,
     val userRatingCount: Int?,
     val formattedAddress: String?,
     val photos: List<PhotoResourceDTO> = emptyList(),
