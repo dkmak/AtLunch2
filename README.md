@@ -25,7 +25,14 @@ information such as address, phone number, rating, and photos when available.
 
 | Video | List | Map | Details |
 |-------|------|---- |---------|
-| <video src="https://github.com/user-attachments/assets/3e02c491-29c4-41ad-840c-67fd4c2e3748" width="200"></video>      | <img width="200" alt="Screenshot 2026-03-21 at 9 13 52 PM" src="https://github.com/user-attachments/assets/ced9f1f5-7093-43bf-bf29-ccdd4e230f23" />  | <img width="200" alt="Screenshot 2026-03-21 at 9 14 18 PM" src="https://github.com/user-attachments/assets/5c32d77e-652a-4c56-8d8f-582bac7d3b87" /> | <img width="200" alt="Screenshot 2026-03-21 at 9 14 41 PM" src="https://github.com/user-attachments/assets/fd4a7014-574e-45ce-b2a2-29906e9d8192" /> |
+| <video src="https://github.com/user-attachments/assets/3e02c491-29c4-41ad-840c-67fd4c2e3748" width="200"></video>      | <img width="200" alt="Screenshot 2026-03-21 at 9 13 52 PM" src="https://github.com/user-attachments/assets/24e04ed4-d15b-4ba6-a181-96c3c28b2425" />  | <img width="200" alt="Screenshot 2026-03-21 at 9 14 18 PM" src="https://github.com/user-attachments/assets/e16ef256-20ec-4d99-81cd-7fdfaf9e5d4a" /> | <img width="200" alt="Screenshot 2026-03-21 at 9 14 41 PM" src="https://github.com/user-attachments/assets/fd4a7014-574e-45ce-b2a2-29906e9d8192" /> |
+
+
+<img width="354" height="813" alt="Screenshot 2026-04-06 at 8 35 49 PM" src="" />
+<img width="357" height="816" alt="Screenshot 2026-04-06 at 8 36 22 PM" src="" />
+
+
+
 
 ### Setup Instructions
 
