@@ -12,7 +12,6 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Singleton
 import okhttp3.logging.HttpLoggingInterceptor
 import com.atlunch.BuildConfig
-import com.google.android.gms.location.FusedLocationProviderClient
 
 @Module
 @InstallIn(SingletonComponent::class)

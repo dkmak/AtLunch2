@@ -1,5 +1,6 @@
 package com.atlunch.ui.placedetails
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
@@ -19,6 +20,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,15 +29,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +59,7 @@ import com.atlunch.R
 import com.atlunch.domain.Photo
 import com.atlunch.domain.PlaceDetails
 import com.atlunch.ui.theme.AtLunchTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,10 +68,63 @@ fun PlaceDetailsScreen(
     viewModel: PlaceDetailsViewModel = hiltViewModel(),
     onBackClicked: () -> Unit
 ) {
+    var showBottomSheet by remember {mutableStateOf(false)}
+    val sheetState = rememberModalBottomSheetState()
+    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(placeId) {
         viewModel.loadDetails(placeId)
     }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    if (showBottomSheet){
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = { showBottomSheet = false }
+        )  {
+            val placeDetails = uiState as? DetailsUiState.Success
+            var showLink by remember { mutableStateOf(false) }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally){
+                Text(text = "Share ${placeDetails?.placeDetails?.restaurantName?:""}")
+                Row(){
+                    Button(
+                        onClick = {
+                            showLink = true
+                            coroutineScope.launch {
+                                sheetState.hide()
+                            }.invokeOnCompletion { showBottomSheet = false }
+                        }
+                    ) {
+                        Text("Link")
+                    }
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                sheetState.hide()
+                            }
+                            val sendIntent = Intent().apply{
+                                action = Intent.ACTION_SEND
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, "Place")
+                            }
+
+                            val shareIntent = Intent.createChooser(sendIntent, "")
+                            context.startActivity(shareIntent)
+                        }
+                    ) {
+                        Text("Place")
+                    }
+                }
+
+                if (showLink){
+                    Text("Link to Restauraunt: https.....")
+                }
+            }
+        }
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -83,6 +143,18 @@ fun PlaceDetailsScreen(
                             contentDescription = "Back"
                         )
                     }
+                },
+                actions = {
+                        IconButton(
+                            onClick = {
+                                showBottomSheet = true
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Share"
+                            )
+                        }
                 }
             )
         }
