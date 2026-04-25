@@ -23,6 +23,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -91,14 +93,15 @@ fun PlaceDetailsScreen(
                 actions = {
                     val context = LocalContext.current
                     IconButton(onClick = {
-                        val placeDetailsSuccess = uiState as? PlacessDetailDataState.Success
+                        val placeDetailsSuccess = uiState as? PlacesDetailDataState.Success
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
                             type = "text/plain"
-                            
+
                             putExtra(
                                 Intent.EXTRA_TEXT,
-                                placeDetailsSuccess?.placeDetails?.googleMapsUri?: "No Google Maps link found."
+                                placeDetailsSuccess?.placeDetails?.googleMapsUri
+                                    ?: "No Google Maps link found."
                             )
 
 
@@ -126,7 +129,7 @@ fun PlaceDetailsScreen(
                 .fillMaxWidth()
         ) {
             when (val state = uiState.placeDetailsDataState) {
-                is PlacessDetailDataState.Failure -> {
+                is PlacesDetailDataState.Failure -> {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -136,7 +139,7 @@ fun PlaceDetailsScreen(
                     }
                 }
 
-                PlacessDetailDataState.Loading -> {
+                PlacesDetailDataState.Loading -> {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -147,7 +150,7 @@ fun PlaceDetailsScreen(
                     }
                 }
 
-                is PlacessDetailDataState.Success -> {
+                is PlacesDetailDataState.Success -> {
                     DisplayPlacePhotos(
                         state.photos,
                         restaurantName = state.placeDetails.restaurantName
@@ -163,14 +166,15 @@ fun PlaceDetailsScreen(
                             }
 
                         },
+                        summaryDataState = uiState.summaryDataState,
+                        onWhyButtonClicked = {
+                            viewModel.askAi()
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
                     )
                 }
-            }
-            uiState.summary?.let{ summary ->
-                Text(summary)
             }
         }
     }
@@ -235,7 +239,9 @@ fun DisplayPlaceDetails(
     placeDetails: PlaceDetails,
     favorite: Boolean,
     modifier: Modifier = Modifier,
-    onFavoriteClicked: () -> Unit
+    onFavoriteClicked: () -> Unit,
+    summaryDataState: PlacesDetailSummaryDataState?,
+    onWhyButtonClicked: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -258,7 +264,6 @@ fun DisplayPlaceDetails(
             horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 6.dp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.star_filled),
@@ -285,10 +290,55 @@ fun DisplayPlaceDetails(
         }
 
         HoursItem(
-            placeDetails.openingHours
+            placeDetails.openingHours,
+            modifier = Modifier.padding(vertical = 6.dp)
         )
+
+        Button(
+            onClick = {
+                onWhyButtonClicked()
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary
+            )
+        ) {
+            Text("Why Here (AI)")
+        }
+
+
+        when(summaryDataState){
+            is PlacesDetailSummaryDataState.Failure -> {
+                Text(
+                    summaryDataState.message,
+                    modifier = modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            PlacesDetailSummaryDataState.Loading -> {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is PlacesDetailSummaryDataState.Success -> {
+                Text(
+                    summaryDataState.summaryText,
+                    modifier = modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            null -> {}
+        }
     }
 }
+
+
 
 @Composable
 fun HoursItem(
@@ -394,7 +444,9 @@ fun DisplayPlaceDetailsPreview() {
                 )
             ),
             favorite = false,
-            onFavoriteClicked = {}
+            summaryDataState = PlacesDetailSummaryDataState.Success(summaryText = "Joe is really nice."),
+            onFavoriteClicked = {},
+            onWhyButtonClicked = {}
         )
     }
 }
@@ -416,7 +468,9 @@ fun DisplayPlaceDefaultsPreview() {
 
             ),
             favorite = false,
-            onFavoriteClicked = {}
+            summaryDataState = PlacesDetailSummaryDataState.Loading,
+            onFavoriteClicked = {},
+            onWhyButtonClicked = {}
         )
     }
 }

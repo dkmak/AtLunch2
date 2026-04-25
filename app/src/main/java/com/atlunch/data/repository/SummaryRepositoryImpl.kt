@@ -32,7 +32,14 @@ class SummaryRepositoryImpl @Inject constructor(
             input = OPEN_SUMMARY_PROMPT
         )
         val response = openAiClient.generatePlacesSummary(request)
-        emit(SummaryResult.SummarySuccess(response.output.first().content.first().text?:"ChatGPT response string not found.")) // update later to domain
+        val summaryText = response.output
+            .asSequence()
+            .flatMap { outputItem -> outputItem.content.asSequence() }
+            .mapNotNull { contentItem -> contentItem.text?.trim() }
+            .filter { text -> text.isNotEmpty() }
+            .joinToString(separator = " ")
+
+        emit(SummaryResult.SummarySuccess(summaryText))
     }.catch { throwable ->
         if (throwable is CancellationException){
             throw throwable
