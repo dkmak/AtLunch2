@@ -333,18 +333,39 @@ fun DisplayPlaceDetails(
             modifier = Modifier.padding(vertical = 6.dp)
         )
 
-        Button(
-            onClick = {
-                onWhyButtonClicked()
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary
-            )
-        ) {
-            Text("Why Come Here? (AI)")
-        }
+        WhyHereItem(
+            summaryDataState = summaryDataState,
+            onWhyButtonClicked = onWhyButtonClicked
+        )
+    }
+}
 
+@Composable
+fun WhyHereItem(
+    summaryDataState: PlacesDetailSummaryDataState?,
+    onWhyButtonClicked: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    var isExpanded by remember { mutableStateOf(false) }
 
+    Button(
+        onClick = {
+            onWhyButtonClicked()
+            isExpanded = !isExpanded
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondary
+        ),
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Text("Why Come Here? (AI)",)
+    }
+
+    AnimatedVisibility(
+        visible = isExpanded,
+        enter = expandVertically(expandFrom = Alignment.Top),
+        exit = shrinkVertically(shrinkTowards = Alignment.Top)
+    ) {
         when(summaryDataState){
             is PlacesDetailSummaryDataState.Failure -> {
                 Text(
@@ -360,6 +381,7 @@ fun DisplayPlaceDetails(
                     horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(6.dp)
                 ) {
                     CircularProgressIndicator()
                 }
