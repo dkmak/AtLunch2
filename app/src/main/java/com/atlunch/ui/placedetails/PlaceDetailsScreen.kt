@@ -91,7 +91,7 @@ fun PlaceDetailsScreen(
                 actions = {
                     val context = LocalContext.current
                     IconButton(onClick = {
-                        val placeDetailsSuccess = uiState as? DetailsUiState.Success
+                        val placeDetailsSuccess = uiState as? PlacessDetailDataState.Success
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
                             type = "text/plain"
@@ -125,8 +125,8 @@ fun PlaceDetailsScreen(
                 .padding(innerPadding)
                 .fillMaxWidth()
         ) {
-            when (val state = uiState) {
-                is DetailsUiState.Failure -> {
+            when (val state = uiState.placeDetailsDataState) {
+                is PlacessDetailDataState.Failure -> {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -136,7 +136,7 @@ fun PlaceDetailsScreen(
                     }
                 }
 
-                DetailsUiState.Loading -> {
+                PlacessDetailDataState.Loading -> {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -147,7 +147,7 @@ fun PlaceDetailsScreen(
                     }
                 }
 
-                is DetailsUiState.Success -> {
+                is PlacessDetailDataState.Success -> {
                     DisplayPlacePhotos(
                         state.photos,
                         restaurantName = state.placeDetails.restaurantName
@@ -168,6 +168,9 @@ fun PlaceDetailsScreen(
                             .padding(8.dp)
                     )
                 }
+            }
+            uiState.summary?.let{ summary ->
+                Text(summary)
             }
         }
     }

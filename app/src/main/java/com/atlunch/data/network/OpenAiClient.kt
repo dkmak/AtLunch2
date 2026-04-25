@@ -1,6 +1,7 @@
 package com.atlunch.data.network
 
 import kotlinx.serialization.Serializable
+import retrofit2.http.Body
 import retrofit2.http.POST
 import javax.inject.Inject
 
@@ -15,7 +16,7 @@ class OpenAiClient @Inject constructor(
 interface  OpenApiService {
     @POST("v1/responses")
     suspend fun generatePlacesSummary(
-        request: OpenAiRequest
+        @Body request: OpenAiRequest
     ): OpenAiResponse
 }
 

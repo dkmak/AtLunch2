@@ -160,7 +160,7 @@ class PlacesRepositoryImpl @Inject constructor(
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal abstract class DataModule {
+internal abstract class PlacesRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPlacesRepository(placesRepositoryImpl: PlacesRepositoryImpl): PlacesRepository

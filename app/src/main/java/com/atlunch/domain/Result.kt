@@ -46,7 +46,7 @@ sealed class FavoriteResult {
 
 sealed class SummaryResult {
     data class SummarySuccess(
-        val isFavorite: Boolean
+        val summaryText: String
     ): SummaryResult()
 
     sealed class SummaryError() : SummaryResult() {
