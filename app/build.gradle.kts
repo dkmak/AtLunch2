@@ -37,6 +37,11 @@ android {
             "GOOGLE_PLACES_API_KEY",
             "\"${localProperty("GOOGLE_PLACES_API_KEY")}\""
         )
+        buildConfigField(
+            "String",
+            "OPENAI_API_KEY",
+            "\"${localProperty("OPENAI_API_KEY")}\""
+        )
         manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = localProperty("GOOGLE_MAPS_API_KEY")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
