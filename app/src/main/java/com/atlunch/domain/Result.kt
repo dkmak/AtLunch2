@@ -1,5 +1,7 @@
 package com.atlunch.domain
 
+import com.atlunch.domain.PlaceDetailsResult.DetailsError
+
 sealed class PlacesResult {
     data class PlacesSuccess(val places: List<PlacePreview>): PlacesResult()
     sealed class PlacesError: PlacesResult() {
@@ -39,6 +41,18 @@ sealed class FavoriteResult {
 
     sealed class FavoriteError() : FavoriteResult() {
         data object DatabaseError : FavoriteError()
+    }
+}
+
+sealed class SummaryResult {
+    data class SummarySuccess(
+        val isFavorite: Boolean
+    ): SummaryResult()
+
+    sealed class SummaryError() : SummaryResult() {
+        data object Network : SummaryError()
+        data object Backend : SummaryError()
+        data object Unknown : SummaryError()
     }
 }
 
