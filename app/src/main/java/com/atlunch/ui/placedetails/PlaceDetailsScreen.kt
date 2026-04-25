@@ -166,8 +166,8 @@ fun PlaceDetailsScreen(
                 .padding(innerPadding)
                 .fillMaxWidth()
         ) {
-            when (val state = uiState) {
-                is DetailsUiState.Failure -> {
+            when (val state = uiState.placeDetailsDataState) {
+                is PlacessDetailDataState.Failure -> {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -177,7 +177,7 @@ fun PlaceDetailsScreen(
                     }
                 }
 
-                DetailsUiState.Loading -> {
+                PlacessDetailDataState.Loading -> {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -188,7 +188,7 @@ fun PlaceDetailsScreen(
                     }
                 }
 
-                is DetailsUiState.Success -> {
+                is PlacessDetailDataState.Success -> {
                     DisplayPlacePhotos(
                         state.photos,
                         restaurantName = state.placeDetails.restaurantName
@@ -209,6 +209,9 @@ fun PlaceDetailsScreen(
                             .padding(8.dp)
                     )
                 }
+            }
+            uiState.summary?.let{ summary ->
+                Text(summary)
             }
         }
     }
