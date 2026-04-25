@@ -4,6 +4,7 @@ import com.atlunch.domain.FavoriteResult
 import com.atlunch.domain.LocationResult
 import com.atlunch.domain.PlaceDetailsResult
 import com.atlunch.domain.PlacesResult
+import com.atlunch.domain.SummaryResult
 
 fun PlacesResult.PlacesError.toUserMessage(): String =
     when (this) {
@@ -22,6 +23,16 @@ fun PlaceDetailsResult.DetailsError.toUserMessage(): String =
         is PlaceDetailsResult.DetailsError.Backend ->
             "We're having trouble reaching the Google API servers right now. Please try again in a moment."
         is PlaceDetailsResult.DetailsError.Unknown ->
+            "An unknown error occurred."
+    }
+
+fun SummaryResult.SummaryError.toUserMessage(): String =
+    when (this) {
+        is SummaryResult.SummaryError.Network ->
+            "Please check your internet connection and try again."
+        is SummaryResult.SummaryError.Backend ->
+            "We're having trouble reaching the OpenAi API servers right now. Please try again in a moment."
+        is SummaryResult.SummaryError.Unknown ->
             "An unknown error occurred."
     }
 

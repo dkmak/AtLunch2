@@ -15,23 +15,33 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 data class PlaceDetailsUIState(
-    val placeDetailsDataState: PlacessDetailDataState = PlacessDetailDataState.Loading,
-    val summary: String? = null
+    val placeDetailsDataState: PlacesDetailDataState = PlacesDetailDataState.Loading,
+    val summaryDataState: PlacesDetailSummaryDataState? = null
 )
 
-sealed interface PlacessDetailDataState {
+sealed interface PlacesDetailDataState {
     data class Success(
         val placeDetails: PlaceDetails,
         val photos: List<Photo>,
         val isFavorite: Boolean,
-    ) : PlacessDetailDataState
+    ) : PlacesDetailDataState
 
-    data class Failure(val message: String) : PlacessDetailDataState
-    data object Loading : PlacessDetailDataState
+    data class Failure(val message: String) : PlacesDetailDataState
+    data object Loading : PlacesDetailDataState
+}
+
+sealed interface PlacesDetailSummaryDataState {
+    data class Success(
+        val summaryText: String
+    ) : PlacesDetailSummaryDataState
+
+    data class Failure(val message: String) : PlacesDetailSummaryDataState
+    data object Loading : PlacesDetailSummaryDataState
 }
 
 @HiltViewModel
@@ -46,23 +56,27 @@ class PlaceDetailsViewModel @Inject constructor(
     fun loadDetails(id: String) {
         placesRepository.getPlaceDetails(id).onEach { result ->
             _uiState.update { currentState ->
-                currentState.copy(placeDetailsDataState = result.toUiState())
-            }
-        }.launchIn(viewModelScope)
-
-        summaryRepository.getSummary().onEach { result ->
-            _uiState.update { currentState ->
-                when (result) {
-                    is SummaryResult.SummarySuccess -> currentState.copy(summary = result.summaryText)
-                    else -> currentState.copy(summary = "Something went wrong.")
-                }
+                currentState.copy(placeDetailsDataState = result.toDataState())
             }
         }.launchIn(viewModelScope)
     }
 
+    fun askAi(){
+        summaryRepository.getSummary().onEach { result ->
+            _uiState.update { currentState ->
+                currentState.copy(summaryDataState = result.toDataState())
+            }
+        }.onStart {
+            _uiState.update { currentState ->
+                currentState.copy(summaryDataState = PlacesDetailSummaryDataState.Loading)
+            }
+        }.launchIn(viewModelScope)
+
+    }
+
 
     fun addFavorite() {
-        val curr = uiState.value.placeDetailsDataState as? PlacessDetailDataState.Success
+        val curr = uiState.value.placeDetailsDataState as? PlacesDetailDataState.Success
         curr?.placeDetails?.id.let { placeDetailsId ->
             placeDetailsId?.let { id ->
                 placesRepository.addFavorite(id).onEach { result ->
@@ -70,7 +84,7 @@ class PlaceDetailsViewModel @Inject constructor(
                         when (result) {
                             is FavoriteResult.FavoriteError -> {
                                 currentState.copy(
-                                    placeDetailsDataState = PlacessDetailDataState.Failure(
+                                    placeDetailsDataState = PlacesDetailDataState.Failure(
                                         message = result.toUserMessage()
                                     )
                                 )
@@ -80,7 +94,7 @@ class PlaceDetailsViewModel @Inject constructor(
                                 currentState.copy(
                                     placeDetailsDataState = curr?.copy(
                                         isFavorite = result.isFavorite
-                                    ) ?: PlacessDetailDataState.Failure(
+                                    ) ?: PlacesDetailDataState.Failure(
                                         message = FavoriteResult.FavoriteError.DatabaseError.toUserMessage()
                                     )
                                 )
@@ -93,7 +107,7 @@ class PlaceDetailsViewModel @Inject constructor(
     }
 
     fun removeFavorites() {
-        val curr = uiState.value.placeDetailsDataState as? PlacessDetailDataState.Success
+        val curr = uiState.value.placeDetailsDataState as? PlacesDetailDataState.Success
         curr?.placeDetails?.id.let { placeDetailsId ->
             placeDetailsId?.let { id ->
                 placesRepository.removeFavorite(id).onEach { result ->
@@ -101,7 +115,7 @@ class PlaceDetailsViewModel @Inject constructor(
                         when (result) {
                             is FavoriteResult.FavoriteError -> {
                                 currentState.copy(
-                                    placeDetailsDataState = PlacessDetailDataState.Failure(
+                                    placeDetailsDataState = PlacesDetailDataState.Failure(
                                         message = result.toUserMessage()
                                     )
                                 )
@@ -111,7 +125,7 @@ class PlaceDetailsViewModel @Inject constructor(
                                 currentState.copy(
                                     placeDetailsDataState = curr?.copy(
                                         isFavorite = result.isFavorite
-                                    ) ?: PlacessDetailDataState.Failure(
+                                    ) ?: PlacesDetailDataState.Failure(
                                         message = FavoriteResult.FavoriteError.DatabaseError.toUserMessage()
                                     )
                                 )
@@ -123,17 +137,28 @@ class PlaceDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun PlaceDetailsResult.toUiState(): PlacessDetailDataState {
+    private fun PlaceDetailsResult.toDataState(): PlacesDetailDataState {
         return when (this) {
-            is PlaceDetailsResult.DetailsSuccess -> PlacessDetailDataState.Success(
+            is PlaceDetailsResult.DetailsSuccess -> PlacesDetailDataState.Success(
                 placeDetails = this.placeDetails,
                 photos = this.photos,
                 isFavorite = this.favorite
             )
 
-            is PlaceDetailsResult.DetailsError.Backend -> PlacessDetailDataState.Failure(this.toUserMessage())
-            is PlaceDetailsResult.DetailsError.Network -> PlacessDetailDataState.Failure(this.toUserMessage())
-            is PlaceDetailsResult.DetailsError.Unknown -> PlacessDetailDataState.Failure(this.toUserMessage())
+            is PlaceDetailsResult.DetailsError.Backend -> PlacesDetailDataState.Failure(this.toUserMessage())
+            is PlaceDetailsResult.DetailsError.Network -> PlacesDetailDataState.Failure(this.toUserMessage())
+            is PlaceDetailsResult.DetailsError.Unknown -> PlacesDetailDataState.Failure(this.toUserMessage())
+        }
+    }
+
+    private fun SummaryResult.toDataState(): PlacesDetailSummaryDataState {
+        return when (this) {
+            is SummaryResult.SummaryError.Backend -> PlacesDetailSummaryDataState.Failure(this.toUserMessage())
+            is SummaryResult.SummaryError.Network -> PlacesDetailSummaryDataState.Failure(this.toUserMessage())
+            is SummaryResult.SummaryError.Unknown -> PlacesDetailSummaryDataState.Failure(this.toUserMessage())
+            is SummaryResult.SummarySuccess -> PlacesDetailSummaryDataState.Success(
+                summaryText = this.summaryText?: "OpenAI failed."
+            )
         }
     }
 

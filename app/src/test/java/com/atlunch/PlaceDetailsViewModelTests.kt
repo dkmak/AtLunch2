@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import com.atlunch.domain.Photo
 import com.atlunch.domain.PlaceDetails
 import com.atlunch.domain.PlaceDetailsResult
-import com.atlunch.ui.placedetails.PlacessDetailDataState
+import com.atlunch.ui.placedetails.PlacesDetailDataState
 import com.atlunch.ui.placedetails.PlaceDetailsViewModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -49,13 +49,13 @@ class PlaceDetailsViewModelTests {
 
         placeDetailsViewModel = PlaceDetailsViewModel(repository)
         placeDetailsViewModel.uiState.test {
-            assertThat(awaitItem()).isEqualTo(PlacessDetailDataState.Loading)
+            assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
 
             placeDetailsViewModel.loadDetails("")
             testDispatcher.scheduler.advanceUntilIdle()
 
             assertThat(awaitItem()).isEqualTo(
-                PlacessDetailDataState.Success(
+                PlacesDetailDataState.Success(
                     placeDetails = expectedPlaceDetails,
                     photos = expectedPhotos,
                     isFavorite = false
@@ -81,13 +81,13 @@ class PlaceDetailsViewModelTests {
 
             placeDetailsViewModel = PlaceDetailsViewModel(repository)
             placeDetailsViewModel.uiState.test {
-                assertThat(awaitItem()).isEqualTo(PlacessDetailDataState.Loading)
+                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
 
                 placeDetailsViewModel.loadDetails("")
                 testDispatcher.scheduler.advanceUntilIdle()
 
                 assertThat(awaitItem()).isEqualTo(
-                    PlacessDetailDataState.Success(
+                    PlacesDetailDataState.Success(
                         placeDetails = expectedPlaceDetails,
                         photos = expectedPhotos,
                         isFavorite = false
@@ -115,13 +115,13 @@ class PlaceDetailsViewModelTests {
 
         placeDetailsViewModel = PlaceDetailsViewModel(repository)
         placeDetailsViewModel.uiState.test {
-            assertThat(awaitItem()).isEqualTo(PlacessDetailDataState.Loading)
+            assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
 
             placeDetailsViewModel.loadDetails("")
             testDispatcher.scheduler.advanceUntilIdle()
 
             assertThat(awaitItem()).isEqualTo(
-                PlacessDetailDataState.Success(
+                PlacesDetailDataState.Success(
                     placeDetails = expectedPlaceDetails,
                     photos = expectedPhotos,
                     isFavorite = false
@@ -153,12 +153,12 @@ class PlaceDetailsViewModelTests {
             placeDetailsViewModel = PlaceDetailsViewModel(repository)
 
             placeDetailsViewModel.uiState.test {
-                assertThat(awaitItem()).isEqualTo(PlacessDetailDataState.Loading)
+                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
 
                 placeDetailsViewModel.loadDetails(id = "")
                 testDispatcher.scheduler.advanceUntilIdle()
 
-                assertThat(awaitItem()).isEqualTo(PlacessDetailDataState.Failure("Please check your internet connection and try again."))
+                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Failure("Please check your internet connection and try again."))
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -172,12 +172,12 @@ class PlaceDetailsViewModelTests {
             placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository)
 
             placeDetailsViewModel.uiState.test {
-                assertThat(awaitItem()).isEqualTo(PlacessDetailDataState.Loading)
+                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
 
                 placeDetailsViewModel.loadDetails("")
                 testDispatcher.scheduler.advanceUntilIdle()
 
-                assertThat(awaitItem()).isEqualTo(PlacessDetailDataState.Failure("We're having trouble reaching the Google API servers right now. Please try again in a moment."))
+                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Failure("We're having trouble reaching the Google API servers right now. Please try again in a moment."))
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -191,12 +191,12 @@ class PlaceDetailsViewModelTests {
             placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository)
 
             placeDetailsViewModel.uiState.test {
-                assertThat(awaitItem()).isEqualTo(PlacessDetailDataState.Loading)
+                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
 
                 placeDetailsViewModel.loadDetails("")
                 testDispatcher.scheduler.advanceUntilIdle()
 
-                assertThat(awaitItem()).isEqualTo(PlacessDetailDataState.Failure("An unknown error occurred."))
+                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Failure("An unknown error occurred."))
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -214,7 +214,7 @@ class PlaceDetailsViewModelTests {
         placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository)
 
         placeDetailsViewModel.uiState.test {
-            assertThat(awaitItem()).isEqualTo(PlacessDetailDataState.Loading)
+            assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
 
             placeDetailsViewModel.loadDetails("")
             testDispatcher.scheduler.advanceUntilIdle()
@@ -223,7 +223,7 @@ class PlaceDetailsViewModelTests {
             placeDetailsViewModel.onBackClicked()
             testDispatcher.scheduler.advanceUntilIdle()
 
-            assertThat(awaitItem()).isEqualTo(PlacessDetailDataState.Loading)
+            assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
             cancelAndIgnoreRemainingEvents()
         }
     }
