@@ -62,16 +62,18 @@ class PlaceDetailsViewModel @Inject constructor(
     }
 
     fun askAi(){
-        summaryRepository.getSummary().onEach { result ->
-            _uiState.update { currentState ->
-                currentState.copy(summaryDataState = result.toDataState())
-            }
-        }.onStart {
-            _uiState.update { currentState ->
-                currentState.copy(summaryDataState = PlacesDetailSummaryDataState.Loading)
-            }
-        }.launchIn(viewModelScope)
-
+        val curr = uiState.value.placeDetailsDataState as? PlacesDetailDataState.Success
+        curr?.placeDetails?.let { details ->
+            summaryRepository.getSummary(placeDetails = details).onEach { result ->
+                _uiState.update { currentState ->
+                    currentState.copy(summaryDataState = result.toDataState())
+                }
+            }.onStart {
+                _uiState.update { currentState ->
+                    currentState.copy(summaryDataState = PlacesDetailSummaryDataState.Loading)
+                }
+            }.launchIn(viewModelScope)
+        }
     }
 
 
