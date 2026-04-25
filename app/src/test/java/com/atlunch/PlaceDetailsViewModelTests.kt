@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.atlunch.domain.Photo
 import com.atlunch.domain.PlaceDetails
 import com.atlunch.domain.PlaceDetailsResult
+import com.atlunch.ui.placedetails.PlaceDetailsUIState
 import com.atlunch.ui.placedetails.PlacesDetailDataState
 import com.atlunch.ui.placedetails.PlaceDetailsViewModel
 import com.google.common.truth.Truth.assertThat
@@ -21,11 +22,13 @@ import kotlin.test.Test
 class PlaceDetailsViewModelTests {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var repository: FakePlacesRepository
+    private lateinit var summaryRepository: FakeSummaryRepository
     private lateinit var placeDetailsViewModel: PlaceDetailsViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
+        summaryRepository = FakeSummaryRepository()
     }
 
     @After
@@ -47,18 +50,20 @@ class PlaceDetailsViewModelTests {
             )
         }
 
-        placeDetailsViewModel = PlaceDetailsViewModel(repository)
+        placeDetailsViewModel = PlaceDetailsViewModel(repository, summaryRepository)
         placeDetailsViewModel.uiState.test {
-            assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
+            assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
 
             placeDetailsViewModel.loadDetails("")
             testDispatcher.scheduler.advanceUntilIdle()
 
             assertThat(awaitItem()).isEqualTo(
-                PlacesDetailDataState.Success(
-                    placeDetails = expectedPlaceDetails,
-                    photos = expectedPhotos,
-                    isFavorite = false
+                PlaceDetailsUIState(
+                    placeDetailsDataState = PlacesDetailDataState.Success(
+                        placeDetails = expectedPlaceDetails,
+                        photos = expectedPhotos,
+                        isFavorite = false
+                    )
                 )
             )
             cancelAndIgnoreRemainingEvents()
@@ -79,18 +84,20 @@ class PlaceDetailsViewModelTests {
                 )
             }
 
-            placeDetailsViewModel = PlaceDetailsViewModel(repository)
+            placeDetailsViewModel = PlaceDetailsViewModel(repository, summaryRepository)
             placeDetailsViewModel.uiState.test {
-                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
+                assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
 
                 placeDetailsViewModel.loadDetails("")
                 testDispatcher.scheduler.advanceUntilIdle()
 
                 assertThat(awaitItem()).isEqualTo(
-                    PlacesDetailDataState.Success(
-                        placeDetails = expectedPlaceDetails,
-                        photos = expectedPhotos,
-                        isFavorite = false
+                    PlaceDetailsUIState(
+                        placeDetailsDataState = PlacesDetailDataState.Success(
+                            placeDetails = expectedPlaceDetails,
+                            photos = expectedPhotos,
+                            isFavorite = false
+                        )
                     )
                 )
                 cancelAndIgnoreRemainingEvents()
@@ -113,18 +120,20 @@ class PlaceDetailsViewModelTests {
             )
         }
 
-        placeDetailsViewModel = PlaceDetailsViewModel(repository)
+        placeDetailsViewModel = PlaceDetailsViewModel(repository, summaryRepository)
         placeDetailsViewModel.uiState.test {
-            assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
+            assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
 
             placeDetailsViewModel.loadDetails("")
             testDispatcher.scheduler.advanceUntilIdle()
 
             assertThat(awaitItem()).isEqualTo(
-                PlacesDetailDataState.Success(
-                    placeDetails = expectedPlaceDetails,
-                    photos = expectedPhotos,
-                    isFavorite = false
+                PlaceDetailsUIState(
+                    placeDetailsDataState = PlacesDetailDataState.Success(
+                        placeDetails = expectedPlaceDetails,
+                        photos = expectedPhotos,
+                        isFavorite = false
+                    )
                 )
             )
             cancelAndIgnoreRemainingEvents()
@@ -136,7 +145,7 @@ class PlaceDetailsViewModelTests {
         repository = FakePlacesRepository().apply {
             placeDetailsResult = PlaceDetailsResult.DetailsError.Unknown
         }
-        placeDetailsViewModel = PlaceDetailsViewModel(repository)
+        placeDetailsViewModel = PlaceDetailsViewModel(repository, summaryRepository)
 
         placeDetailsViewModel.loadDetails("place-123")
         testDispatcher.scheduler.advanceUntilIdle()
@@ -150,15 +159,21 @@ class PlaceDetailsViewModelTests {
             repository = FakePlacesRepository().apply {
                 placeDetailsResult = PlaceDetailsResult.DetailsError.Network
             }
-            placeDetailsViewModel = PlaceDetailsViewModel(repository)
+            placeDetailsViewModel = PlaceDetailsViewModel(repository, summaryRepository)
 
             placeDetailsViewModel.uiState.test {
-                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
+                assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
 
                 placeDetailsViewModel.loadDetails(id = "")
                 testDispatcher.scheduler.advanceUntilIdle()
 
-                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Failure("Please check your internet connection and try again."))
+                assertThat(awaitItem()).isEqualTo(
+                    PlaceDetailsUIState(
+                        placeDetailsDataState = PlacesDetailDataState.Failure(
+                            "Please check your internet connection and try again."
+                        )
+                    )
+                )
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -169,15 +184,21 @@ class PlaceDetailsViewModelTests {
             val fakePlacesRepository = FakePlacesRepository().apply {
                 placeDetailsResult = PlaceDetailsResult.DetailsError.Backend
             }
-            placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository)
+            placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository, summaryRepository)
 
             placeDetailsViewModel.uiState.test {
-                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
+                assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
 
                 placeDetailsViewModel.loadDetails("")
                 testDispatcher.scheduler.advanceUntilIdle()
 
-                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Failure("We're having trouble reaching the Google API servers right now. Please try again in a moment."))
+                assertThat(awaitItem()).isEqualTo(
+                    PlaceDetailsUIState(
+                        placeDetailsDataState = PlacesDetailDataState.Failure(
+                            "We're having trouble reaching the Google API servers right now. Please try again in a moment."
+                        )
+                    )
+                )
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -188,15 +209,21 @@ class PlaceDetailsViewModelTests {
             val fakePlacesRepository = FakePlacesRepository().apply {
                 placeDetailsResult = PlaceDetailsResult.DetailsError.Unknown
             }
-            placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository)
+            placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository, summaryRepository)
 
             placeDetailsViewModel.uiState.test {
-                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
+                assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
 
                 placeDetailsViewModel.loadDetails("")
                 testDispatcher.scheduler.advanceUntilIdle()
 
-                assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Failure("An unknown error occurred."))
+                assertThat(awaitItem()).isEqualTo(
+                    PlaceDetailsUIState(
+                        placeDetailsDataState = PlacesDetailDataState.Failure(
+                            "An unknown error occurred."
+                        )
+                    )
+                )
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -211,10 +238,10 @@ class PlaceDetailsViewModelTests {
             )
         }
 
-        placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository)
+        placeDetailsViewModel = PlaceDetailsViewModel(fakePlacesRepository, summaryRepository)
 
         placeDetailsViewModel.uiState.test {
-            assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
+            assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
 
             placeDetailsViewModel.loadDetails("")
             testDispatcher.scheduler.advanceUntilIdle()
@@ -223,7 +250,7 @@ class PlaceDetailsViewModelTests {
             placeDetailsViewModel.onBackClicked()
             testDispatcher.scheduler.advanceUntilIdle()
 
-            assertThat(awaitItem()).isEqualTo(PlacesDetailDataState.Loading)
+            assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -233,6 +260,7 @@ class PlaceDetailsViewModelTests {
             restaurantName = "Cafe",
             id = "123",
             rating = 4.5,
+            googleMapsUri = null,
             userRatingCount = 100,
             formattedAddress = "123 Main St",
             nationalPhoneNumber = "555-1234",

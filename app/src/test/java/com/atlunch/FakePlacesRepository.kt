@@ -21,6 +21,8 @@ class FakePlacesRepository : PlacesRepository {
         private set
     var lastNearbyLong: Double? = null
         private set
+    var lastFavoritePlaceId: String? = null
+        private set
 
     override fun searchNearby(
         lat: Double,
@@ -48,10 +50,12 @@ class FakePlacesRepository : PlacesRepository {
     }
 
     override fun addFavorite(id: String): Flow<FavoriteResult> {
-        TODO("Not yet implemented")
+        lastFavoritePlaceId = id
+        return flowOf(FavoriteResult.FavoriteSuccess(isFavorite = true))
     }
 
     override fun removeFavorite(id: String): Flow<FavoriteResult> {
-        TODO("Not yet implemented")
+        lastFavoritePlaceId = id
+        return flowOf(FavoriteResult.FavoriteSuccess(isFavorite = false))
     }
 }

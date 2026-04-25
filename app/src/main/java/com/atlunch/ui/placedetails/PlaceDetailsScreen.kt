@@ -341,7 +341,7 @@ fun DisplayPlaceDetails(
                 containerColor = MaterialTheme.colorScheme.secondary
             )
         ) {
-            Text("Why Here (AI)")
+            Text("Why Come Here? (AI)")
         }
 
 
