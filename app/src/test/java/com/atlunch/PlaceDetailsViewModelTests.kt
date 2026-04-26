@@ -4,9 +4,11 @@ import app.cash.turbine.test
 import com.atlunch.domain.Photo
 import com.atlunch.domain.PlaceDetails
 import com.atlunch.domain.PlaceDetailsResult
+import com.atlunch.domain.SummaryResult
 import com.atlunch.ui.placedetails.PlaceDetailsUIState
 import com.atlunch.ui.placedetails.PlacesDetailDataState
 import com.atlunch.ui.placedetails.PlaceDetailsViewModel
+import com.atlunch.ui.placedetails.PlacesDetailSummaryDataState
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -251,6 +253,70 @@ class PlaceDetailsViewModelTests {
             testDispatcher.scheduler.advanceUntilIdle()
 
             assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `askAi updates summaryDataState to Success when summary repository returns text`() = runTest {
+        repository = FakePlacesRepository().apply {
+            placeDetailsResult = PlaceDetailsResult.DetailsSuccess(
+                placeDetails = BaseExamplePlaceDetails,
+                photos = BaseExamplePhotos,
+                favorite = false
+            )
+        }
+
+        summaryRepository = FakeSummaryRepository().apply {
+            summaryResult = SummaryResult.SummarySuccess(
+                summaryText = "Popular lunch spot with strong ratings."
+            )
+        }
+
+        placeDetailsViewModel = PlaceDetailsViewModel(repository, summaryRepository)
+
+        placeDetailsViewModel.uiState.test {
+            // assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
+
+            placeDetailsViewModel.loadDetails("")
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertThat(awaitItem()).isEqualTo(
+                PlaceDetailsUIState(
+                    placeDetailsDataState = PlacesDetailDataState.Success(
+                        placeDetails = BaseExamplePlaceDetails,
+                        photos = BaseExamplePhotos,
+                        isFavorite = false
+                    )
+                )
+            )
+
+            placeDetailsViewModel.askAi()
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(
+                PlaceDetailsUIState(
+                    placeDetailsDataState = PlacesDetailDataState.Success(
+                        placeDetails = BaseExamplePlaceDetails,
+                        photos = BaseExamplePhotos,
+                        isFavorite = false
+                    ),
+                    summaryDataState = PlacesDetailSummaryDataState.Loading
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(
+                PlaceDetailsUIState(
+                    placeDetailsDataState = PlacesDetailDataState.Success(
+                        placeDetails = BaseExamplePlaceDetails,
+                        photos = BaseExamplePhotos,
+                        isFavorite = false
+                    ),
+                    summaryDataState = PlacesDetailSummaryDataState.Success(
+                        summaryText = "Popular lunch spot with strong ratings."
+                    )
+                )
+            )
+
             cancelAndIgnoreRemainingEvents()
         }
     }
