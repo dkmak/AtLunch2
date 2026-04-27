@@ -29,7 +29,8 @@ when available.
 
 | Video | List | Map | Details |
 |-------|------|---- |---------|
-| <video src="https://github.com/user-attachments/assets/3e02c491-29c4-41ad-840c-67fd4c2e3748" width="200"></video>      | <img width="200" alt="Screenshot 2026-03-21 at 9 13 52 PM" src="https://github.com/user-attachments/assets/24e04ed4-d15b-4ba6-a181-96c3c28b2425" />  | <img width="200" alt="Screenshot 2026-03-21 at 9 14 18 PM" src="https://github.com/user-attachments/assets/e16ef256-20ec-4d99-81cd-7fdfaf9e5d4a" /> | <img width="200" alt="Screenshot 2026-03-21 at 9 14 41 PM" src="https://github.com/user-attachments/assets/fd4a7014-574e-45ce-b2a2-29906e9d8192" /> |
+| <video src="https://github.com/user-attachments/assets/a443607f-78ad-414f-98b9-0d46ea4b0987" width="200"></video>      | <img width="200" alt="Screenshot 2026-03-21 at 9 13 52 PM" src="https://github.com/user-attachments/assets/24e04ed4-d15b-4ba6-a181-96c3c28b2425" />  | <img width="200" alt="Screenshot 2026-03-21 at 9 14 18 PM" src="https://github.com/user-attachments/assets/e16ef256-20ec-4d99-81cd-7fdfaf9e5d4a" /> | <img width="200" alt="Screenshot 2026-03-21 at 9 14 41 PM" src="https://github.com/user-attachments/assets/620a145e-05a1-40ea-8e48-d0ad98eac2d0" /> |
+
 
 ### Setup Instructions
 
