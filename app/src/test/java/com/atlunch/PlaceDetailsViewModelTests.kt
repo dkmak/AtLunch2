@@ -42,7 +42,8 @@ class PlaceDetailsViewModelTests {
         repository = FakePlacesRepository().apply {
             placeDetailsResult = PlaceDetailsResult.DetailsSuccess(
                 placeDetails = expectedPlaceDetails,
-                photos = expectedPhotos
+                photos = expectedPhotos,
+                favorite = false
             )
         }
 
@@ -56,7 +57,8 @@ class PlaceDetailsViewModelTests {
             assertThat(awaitItem()).isEqualTo(
                 DetailsUiState.Success(
                     placeDetails = expectedPlaceDetails,
-                    photos = expectedPhotos
+                    photos = expectedPhotos,
+                    isFavorite = false
                 )
             )
             cancelAndIgnoreRemainingEvents()
@@ -72,7 +74,8 @@ class PlaceDetailsViewModelTests {
             repository = FakePlacesRepository().apply {
                 placeDetailsResult = PlaceDetailsResult.DetailsSuccess(
                     placeDetails = expectedPlaceDetails,
-                    photos = expectedPhotos
+                    photos = expectedPhotos,
+                    favorite = false
                 )
             }
 
@@ -86,7 +89,8 @@ class PlaceDetailsViewModelTests {
                 assertThat(awaitItem()).isEqualTo(
                     DetailsUiState.Success(
                         placeDetails = expectedPlaceDetails,
-                        photos = expectedPhotos
+                        photos = expectedPhotos,
+                        isFavorite = false
                     )
                 )
                 cancelAndIgnoreRemainingEvents()
@@ -104,7 +108,8 @@ class PlaceDetailsViewModelTests {
         repository = FakePlacesRepository().apply {
             placeDetailsResult = PlaceDetailsResult.DetailsSuccess(
                 placeDetails = expectedPlaceDetails,
-                photos = expectedPhotos
+                photos = expectedPhotos,
+                favorite = false
             )
         }
 
@@ -118,7 +123,8 @@ class PlaceDetailsViewModelTests {
             assertThat(awaitItem()).isEqualTo(
                 DetailsUiState.Success(
                     placeDetails = expectedPlaceDetails,
-                    photos = expectedPhotos
+                    photos = expectedPhotos,
+                    isFavorite = false
                 )
             )
             cancelAndIgnoreRemainingEvents()
@@ -200,7 +206,8 @@ class PlaceDetailsViewModelTests {
         val fakePlacesRepository = FakePlacesRepository().apply {
             placeDetailsResult = PlaceDetailsResult.DetailsSuccess(
                 placeDetails = BaseExamplePlaceDetails,
-                photos = BaseExamplePhotos
+                photos = BaseExamplePhotos,
+                favorite = false
             )
         }
 
@@ -237,7 +244,8 @@ class PlaceDetailsViewModelTests {
                 "Friday: 8:30AM–3:30PM, 5:30–10:00PM",
                 "Saturday: 8:30AM–4:00PM, 5:30–10:00PM",
                 "Sunday: 8:30AM–4:00PM"
-            )
+            ),
+            googleMapsUri = ""
         )
 
         val BaseExamplePhotos = listOf(
