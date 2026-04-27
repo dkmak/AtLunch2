@@ -21,6 +21,6 @@ jobs:
 
       - name: grant execution permission
         run: chmod +x gradlew
-        
+
       - name: run unit tests
         run: ./gradlew clean testDebugUnitTest

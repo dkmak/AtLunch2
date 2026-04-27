@@ -276,7 +276,7 @@ class PlaceDetailsViewModelTests {
         placeDetailsViewModel = PlaceDetailsViewModel(repository, summaryRepository)
 
         placeDetailsViewModel.uiState.test {
-            // assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
+            assertThat(awaitItem()).isEqualTo(PlaceDetailsUIState())
 
             placeDetailsViewModel.loadDetails("")
             testDispatcher.scheduler.advanceUntilIdle()
@@ -338,8 +338,7 @@ class PlaceDetailsViewModelTests {
                 "Friday: 8:30AM–3:30PM, 5:30–10:00PM",
                 "Saturday: 8:30AM–4:00PM, 5:30–10:00PM",
                 "Sunday: 8:30AM–4:00PM"
-            ),
-            googleMapsUri = ""
+            )
         )
 
         val BaseExamplePhotos = listOf(
