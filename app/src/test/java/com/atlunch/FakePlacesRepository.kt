@@ -1,5 +1,6 @@
 package com.atlunch
 
+import com.atlunch.domain.FavoriteResult
 import com.atlunch.domain.PlaceDetailsResult
 import com.atlunch.domain.PlacesRepository
 import com.atlunch.domain.PlacesResult
@@ -10,6 +11,7 @@ class FakePlacesRepository : PlacesRepository {
     var placeDetailsResult: PlaceDetailsResult = PlaceDetailsResult.DetailsError.Unknown
     var nearbyResult: PlacesResult = PlacesResult.PlacesError.Unknown
     var queryResult: PlacesResult = PlacesResult.PlacesError.Unknown
+    var favoriteResult: FavoriteResult = FavoriteResult.FavoriteError.DatabaseError
 
     var lastRequestedPlaceId: String? = null
         private set
@@ -43,5 +45,13 @@ class FakePlacesRepository : PlacesRepository {
         lastNearbyLat = lat
         lastNearbyLong = long
         return flowOf(queryResult)
+    }
+
+    override fun addFavorite(id: String): Flow<FavoriteResult> {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeFavorite(id: String): Flow<FavoriteResult> {
+        TODO("Not yet implemented")
     }
 }
