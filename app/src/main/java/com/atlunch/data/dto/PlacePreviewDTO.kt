@@ -1,6 +1,6 @@
 package com.atlunch.data.dto
 
-import com.atlunch.data.network.LatLngDTO
+import com.atlunch.data.network.places.LatLngDTO
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

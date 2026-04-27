@@ -1,4 +1,4 @@
-package com.atlunch.data.network
+package com.atlunch.data.network.places
 
 import com.atlunch.BuildConfig
 import com.atlunch.data.dto.PhotoMediaDTO

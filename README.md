@@ -3,7 +3,8 @@
 At Lunch is an Android app for finding nearby restaurants using the Google Places API. On launch,
 the app requests location access, fetches nearby restaurant results, and lets the user explore them
 as either a scrollable list or on a map. Tapping a restaurant opens a detail screen with additional
-information such as address, phone number, rating, and photos when available.
+information such as address, phone number, rating, photos, favorites, and an AI-generated summary
+when available.
 
 **Features**
 -  The app uses the Google Places API for its data source
@@ -13,6 +14,8 @@ information such as address, phone number, rating, and photos when available.
 - The user can choose to display the search results as a list, or as pins on a map
 - The user can select a search result to present a restaurant detail page with basic information
   about the restaurant
+- The user can favorite or unfavorite a restaurant from the details screen
+- The user can request a short AI-generated "Why Come Here?" summary on the details screen
 
 **Non-Functional Features**
 - Jetpack Compose for UI, comprising two distinct screens (e.g. list/detail)
@@ -22,6 +25,7 @@ information such as address, phone number, rating, and photos when available.
   UI (See *Data Persistence* for details)
 - Dependency Injection using Hilt
 - Unit Tests
+- OpenAI Responses API integration for lightweight on-device AI enrichment
 
 | Video | List | Map | Details |
 |-------|------|---- |---------|
@@ -46,11 +50,12 @@ information such as address, phone number, rating, and photos when available.
 1. Open the project root in Android Studio.
 2. Let Gradle sync complete.
 3. Confirm Android Studio is using JDK 17 for Gradle.
-4. Add your Google API keys to your local, untracked `local.properties` file:
+4. Add your API keys to your local, untracked `local.properties` file:
 
 ```properties
 GOOGLE_PLACES_API_KEY=your_places_api_key
 GOOGLE_MAPS_API_KEY=your_maps_sdk_api_key
+OPENAI_API_KEY=your_openai_api_key
 ```
 
 5. Build and run the `app` configuration on an emulator or physical Android device.
@@ -70,6 +75,8 @@ GOOGLE_MAPS_API_KEY=your_maps_sdk_api_key
 
 - The app integrates with
   the [Google Places API](https://developers.google.com/maps/documentation/places/web-service/overview).
+- The app also integrates with the [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses/create)
+  to generate a short "Why Come Here?" explanation from structured restaurant details.
 - Retrofit and Kotlinx Serialization are used for HTTP and JSON parsing.
 - Google field masks are explicitly defined for search and detail requests so the app only requests
   the fields it needs.
@@ -90,11 +97,24 @@ GOOGLE_MAPS_API_KEY=your_maps_sdk_api_key
 | `GET /v1/places/{id}`          | Fetches details for the selected restaurant.                     |
 | `GET /v1/{photoName}/media`    | Fetches photo media metadata for a place photo resource.         |
 
+#### AI Summary API Reference
+
+**Base URL:** `https://api.openai.com/`
+
+**Common headers**
+- `Authorization: Bearer <OPENAI_API_KEY>`
+- `Content-Type: application/json`
+
+| Endpoint             | Description                                                             |
+|----------------------|-------------------------------------------------------------------------|
+| `POST /v1/responses` | Generates a short AI summary for why a restaurant may be a good choice. |
+
 ### Data Layer: Data Persistence
 
 - Room is used to cache nearby place preview results locally.
 - If the connection is the lost, the user will still see locally cached nearby restaurant data.
 - Successful results from network are cached by the network and emitted by the UI.
+- Room is also used to persist favorited restaurants locally.
 
 ### UI
 - The presentation layer follows an **MVVM** structure.
@@ -103,6 +123,7 @@ GOOGLE_MAPS_API_KEY=your_maps_sdk_api_key
   details screen.
 - The list screen supports loading, error, empty, list, and map states.
 - The details screen renders place metadata and photo content returned by the Places API.
+- The details screen also supports toggling favorites and requesting a short AI-generated summary.
 - Map overlays are provided using the Google Maps Compose SDK
 
 ### Testing

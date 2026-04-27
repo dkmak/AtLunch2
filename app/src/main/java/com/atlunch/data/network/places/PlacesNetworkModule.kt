@@ -1,4 +1,4 @@
-package com.atlunch.data.network
+package com.atlunch.data.network.places
 
 import dagger.Module
 import dagger.Provides
@@ -12,11 +12,10 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Singleton
 import okhttp3.logging.HttpLoggingInterceptor
 import com.atlunch.BuildConfig
-import com.google.android.gms.location.FusedLocationProviderClient
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
+object PlacesNetworkModule {
     const val BASE_URL = "https://places.googleapis.com/"
 
     @Provides

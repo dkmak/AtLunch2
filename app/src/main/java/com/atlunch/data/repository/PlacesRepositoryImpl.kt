@@ -5,13 +5,13 @@ import com.atlunch.data.database.FavoritesEntity
 import com.atlunch.data.database.PlacesDAO
 import com.atlunch.data.dto.toDomain
 import com.atlunch.data.dto.toEntity
-import com.atlunch.data.network.Circle
-import com.atlunch.data.network.LatLngDTO
-import com.atlunch.data.network.LocationBias
-import com.atlunch.data.network.LocationRestriction
-import com.atlunch.data.network.PlacesApiClient
-import com.atlunch.data.network.SearchNearbyRequest
-import com.atlunch.data.network.SearchQueryRequest
+import com.atlunch.data.network.places.Circle
+import com.atlunch.data.network.places.LatLngDTO
+import com.atlunch.data.network.places.LocationBias
+import com.atlunch.data.network.places.LocationRestriction
+import com.atlunch.data.network.places.PlacesApiClient
+import com.atlunch.data.network.places.SearchNearbyRequest
+import com.atlunch.data.network.places.SearchQueryRequest
 import com.atlunch.data.toPlaceDetailsDomainError
 import com.atlunch.data.toPlacesDomainError
 import com.atlunch.domain.FavoriteResult
@@ -151,7 +151,7 @@ class PlacesRepositoryImpl @Inject constructor(
     }
 
     companion object {
-        const val MAX_PHOTOS = 6
+        const val MAX_PHOTOS = 4
         const val MAX_RESULTS = 20
         const val MAX_RADIUS = 1000.0
         const val INCLUDED_TYPE = "restaurant"
@@ -160,7 +160,7 @@ class PlacesRepositoryImpl @Inject constructor(
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal abstract class DataModule {
+internal abstract class PlacesRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPlacesRepository(placesRepositoryImpl: PlacesRepositoryImpl): PlacesRepository

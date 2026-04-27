@@ -1,4 +1,3 @@
-// app/src/main/java/com/atlunch/data/DispatchersModule.kt
 package com.atlunch.data
 
 import dagger.Module
