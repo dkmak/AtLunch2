@@ -1,0 +1,52 @@
+name: deploy-to-firebase
+
+on:
+  push:
+    branches: [main]
+
+
+jobs:
+  unitTest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup jdk-17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
+
+      - name: grant execution permission
+        run: chmod +x gradlew
+
+      - name: run unit tests
+        run: ./gradlew clean testDebugUnitTest
+
+  distribute:
+    name: distribute-to-firebase
+    needs: unitTest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup jdk-17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
+
+      - name: build-release
+        run: ./gradlew assembleRelease
+
+      - name: upload-to-firebase
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.APP_ID}}
+          serviceCredentialsFileContent: ${{secrets.CREDENTIALS_FILE_CONTENT}}
+          groups: testers
+          file: app/build/outputs/apk/release/app-release-unsigned.apk
