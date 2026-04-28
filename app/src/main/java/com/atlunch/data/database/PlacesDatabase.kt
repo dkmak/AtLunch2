@@ -6,11 +6,11 @@ import androidx.room.RoomDatabase
 @Database(
     entities = [
         PlacePreviewEntity::class,
-        FavoritesEntity::class
+        FavoritesEntity::class,
     ],
     version = 2,
-    exportSchema = true
+    exportSchema = true,
 )
-abstract class PlacesDatabase: RoomDatabase() {
+abstract class PlacesDatabase : RoomDatabase() {
     abstract fun placeDAO(): PlacesDAO
 }

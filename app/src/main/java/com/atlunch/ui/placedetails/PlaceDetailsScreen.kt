@@ -5,7 +5,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,13 +12,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -28,14 +23,11 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -52,11 +44,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -77,7 +66,7 @@ import kotlinx.coroutines.launch
 fun PlaceDetailsScreen(
     placeId: String,
     viewModel: PlaceDetailsViewModel = hiltViewModel(),
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
 ) {
     var showBottomSheet by remember {mutableStateOf(false)}
     val sheetState = rememberModalBottomSheetState()
@@ -141,9 +130,10 @@ fun PlaceDetailsScreen(
         topBar = {
             TopAppBar(
                 title = {},
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                    ),
                 navigationIcon = {
                     IconButton(onClick = {
                         onBackClicked()
@@ -151,7 +141,7 @@ fun PlaceDetailsScreen(
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
                         )
                     }
                 },
@@ -168,19 +158,21 @@ fun PlaceDetailsScreen(
                         }
                 }
             )
-        }
+        },
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxWidth()
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxWidth(),
         ) {
             when (val state = uiState.placeDetailsDataState) {
                 is PlacesDetailDataState.Failure -> {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
                     ) {
                         Text(text = state.message)
                     }
@@ -188,10 +180,11 @@ fun PlaceDetailsScreen(
 
                 PlacesDetailDataState.Loading -> {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.Center
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                        horizontalArrangement = Arrangement.Center,
                     ) {
                         CircularProgressIndicator()
                     }
@@ -200,7 +193,7 @@ fun PlaceDetailsScreen(
                 is PlacesDetailDataState.Success -> {
                     DisplayPlacePhotosCarousel(
                         state.photos,
-                        restaurantName = state.placeDetails.restaurantName
+                        restaurantName = state.placeDetails.restaurantName,
                     )
                     DisplayPlaceDetails(
                         placeDetails = state.placeDetails,
@@ -211,15 +204,15 @@ fun PlaceDetailsScreen(
                             } else {
                                 viewModel.addFavorite()
                             }
-
                         },
                         summaryDataState = uiState.summaryDataState,
                         onWhyButtonClicked = {
                             viewModel.askAi()
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
                     )
                 }
             }
@@ -232,26 +225,27 @@ fun PlaceDetailsScreen(
 fun DisplayPlacePhotosCarousel(
     photos: List<Photo>,
     restaurantName: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val state = rememberCarouselState { photos.size }
     HorizontalMultiBrowseCarousel(
         state,
         preferredItemWidth = 400.dp,
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-
-        ) { i ->
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+    ) { i ->
         val photo = photos[i]
         AsyncImage(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
             model = photo.photoUrl,
             contentDescription = "Photo of {$restaurantName}",
             contentScale = ContentScale.Fit,
-            error = painterResource(R.drawable.star_filled)
+            error = painterResource(R.drawable.star_filled),
         )
     }
 }
@@ -263,62 +257,64 @@ fun DisplayPlaceDetails(
     modifier: Modifier = Modifier,
     onFavoriteClicked: () -> Unit,
     summaryDataState: PlacesDetailSummaryDataState?,
-    onWhyButtonClicked: () -> Unit
+    onWhyButtonClicked: () -> Unit,
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth(),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             placeDetails.restaurantName,
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
         )
         Text(
             placeDetails.formattedAddress ?: "Address not available.",
             style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         Text(placeDetails.nationalPhoneNumber ?: "")
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.star_filled),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.secondary
+                tint = MaterialTheme.colorScheme.secondary,
             )
 
             Text(
                 text = (placeDetails.rating ?: 0.0).toString(),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
 
             Text(
                 text = "• (${placeDetails.userRatingCount ?: 0} reviews)",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
 
             Icon(
                 imageVector = if (favorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                 contentDescription = "Favorites",
                 tint = MaterialTheme.colorScheme.tertiary,
-                modifier = Modifier.clickable { onFavoriteClicked() }
+                modifier = Modifier.clickable { onFavoriteClicked() },
             )
         }
 
         HoursItem(
             placeDetails.openingHours,
-            modifier = Modifier.padding(vertical = 6.dp)
+            modifier = Modifier.padding(vertical = 6.dp),
         )
 
         WhyHereItem(
             summaryDataState = summaryDataState,
-            onWhyButtonClicked = onWhyButtonClicked
+            onWhyButtonClicked = onWhyButtonClicked,
         )
     }
 }
@@ -327,8 +323,8 @@ fun DisplayPlaceDetails(
 fun WhyHereItem(
     summaryDataState: PlacesDetailSummaryDataState?,
     onWhyButtonClicked: () -> Unit,
-    modifier: Modifier = Modifier
-){
+    modifier: Modifier = Modifier,
+) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Button(
@@ -336,35 +332,37 @@ fun WhyHereItem(
             onWhyButtonClicked()
             isExpanded = !isExpanded
         },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondary
-        ),
-        modifier = Modifier.padding(vertical = 4.dp)
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+            ),
+        modifier = Modifier.padding(vertical = 4.dp),
     ) {
-        Text("Why Come Here? (AI)",)
+        Text("Why Come Here? (AI)")
     }
 
     AnimatedVisibility(
         visible = isExpanded,
         enter = expandVertically(expandFrom = Alignment.Top),
-        exit = shrinkVertically(shrinkTowards = Alignment.Top)
+        exit = shrinkVertically(shrinkTowards = Alignment.Top),
     ) {
-        when(summaryDataState){
+        when (summaryDataState) {
             is PlacesDetailSummaryDataState.Failure -> {
                 Text(
                     summaryDataState.message,
                     modifier = modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
             PlacesDetailSummaryDataState.Loading -> {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(6.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(6.dp),
                 ) {
                     CircularProgressIndicator()
                 }
@@ -374,7 +372,7 @@ fun WhyHereItem(
                     summaryDataState.summaryText,
                     modifier = modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
             null -> {}
@@ -382,69 +380,69 @@ fun WhyHereItem(
     }
 }
 
-
-
 @Composable
 fun HoursItem(
     openingHours: List<String>?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var isExpanded by remember { mutableStateOf(true) }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(
-                indication = null,
-                interactionSource = null,
-            ) { isExpanded = !isExpanded }
-            .padding(vertical = 4.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable(
+                    indication = null,
+                    interactionSource = null,
+                ) { isExpanded = !isExpanded }
+                .padding(vertical = 4.dp),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
         ) {
             Text(
                 text = "Hours",
                 modifier = Modifier.padding(start = 6.dp),
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.titleSmall,
             )
 
             val rotation by animateFloatAsState(
                 targetValue = if (isExpanded) 0f else 180f,
-                label = "HoursArrowRotation"
+                label = "HoursArrowRotation",
             )
 
             Icon(
                 imageVector = Icons.Filled.ArrowDropDown,
                 contentDescription = if (isExpanded) "Collapse hours" else "Expand hours",
-                modifier = Modifier.rotate(rotation)
+                modifier = Modifier.rotate(rotation),
             )
         }
         AnimatedVisibility(
             visible = isExpanded,
             enter = expandVertically(expandFrom = Alignment.Top),
-            exit = shrinkVertically(shrinkTowards = Alignment.Top)
+            exit = shrinkVertically(shrinkTowards = Alignment.Top),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth(),
                 verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 openingHours?.forEach { openHoursString ->
                     Text(
                         text = openHoursString,
                         modifier = Modifier.padding(start = 6.dp),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 } ?: run {
                     Text(
                         text = "Opening hours unavailable",
                         modifier = Modifier.padding(start = 6.dp),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
@@ -459,39 +457,40 @@ fun DisplayPlacePhotosPreview() {
     AtLunchTheme {
         DisplayPlacePhotosCarousel(
             photos = List(6) { Photo(photoUrl = "") },
-            restaurantName = "Preview Restaurant"
+            restaurantName = "Preview Restaurant",
         )
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
 fun DisplayPlaceDetailsPreview() {
     AtLunchTheme {
         DisplayPlaceDetails(
-            placeDetails = PlaceDetails(
-                restaurantName = "Joe's Pizza",
-                id = "preview-place-id",
-                rating = 4.7,
-                googleMapsUri = "",
-                userRatingCount = 128,
-                formattedAddress = "123 Main St, New York, NY 10001",
-                nationalPhoneNumber = "(212) 555-1234",
-                openingHours = listOf(
-                    "Monday: 8:30AM–3:30PM",
-                    "Tuesday: 8:30AM–3:30PM",
-                    "Wednesday: 8:30AM–3:30PM, 5:30–10:00PM",
-                    "Thursday: 8:30AM–3:30PM, 5:30–10:00PM",
-                    "Friday: 8:30AM–3:30PM, 5:30–10:00PM",
-                    "Saturday: 8:30AM–4:00PM, 5:30–10:00PM",
-                    "Sunday: 8:30AM–4:00PM"
-                )
-            ),
+            placeDetails =
+                PlaceDetails(
+                    restaurantName = "Joe's Pizza",
+                    id = "preview-place-id",
+                    rating = 4.7,
+                    googleMapsUri = "",
+                    userRatingCount = 128,
+                    formattedAddress = "123 Main St, New York, NY 10001",
+                    nationalPhoneNumber = "(212) 555-1234",
+                    openingHours =
+                        listOf(
+                            "Monday: 8:30AM–3:30PM",
+                            "Tuesday: 8:30AM–3:30PM",
+                            "Wednesday: 8:30AM–3:30PM, 5:30–10:00PM",
+                            "Thursday: 8:30AM–3:30PM, 5:30–10:00PM",
+                            "Friday: 8:30AM–3:30PM, 5:30–10:00PM",
+                            "Saturday: 8:30AM–4:00PM, 5:30–10:00PM",
+                            "Sunday: 8:30AM–4:00PM",
+                        ),
+                ),
             favorite = false,
             summaryDataState = PlacesDetailSummaryDataState.Success(summaryText = "Joe is really nice."),
             onFavoriteClicked = {},
-            onWhyButtonClicked = {}
+            onWhyButtonClicked = {},
         )
     }
 }
@@ -501,21 +500,21 @@ fun DisplayPlaceDetailsPreview() {
 fun DisplayPlaceDefaultsPreview() {
     AtLunchTheme {
         DisplayPlaceDetails(
-            placeDetails = PlaceDetails(
-                restaurantName = "Joe's Pizza",
-                id = "preview-place-id",
-                rating = null,
-                googleMapsUri = "",
-                userRatingCount = null,
-                formattedAddress = null,
-                nationalPhoneNumber = null,
-                openingHours = null
-
-            ),
+            placeDetails =
+                PlaceDetails(
+                    restaurantName = "Joe's Pizza",
+                    id = "preview-place-id",
+                    rating = null,
+                    googleMapsUri = "",
+                    userRatingCount = null,
+                    formattedAddress = null,
+                    nationalPhoneNumber = null,
+                    openingHours = null,
+                ),
             favorite = false,
             summaryDataState = PlacesDetailSummaryDataState.Loading,
             onFavoriteClicked = {},
-            onWhyButtonClicked = {}
+            onWhyButtonClicked = {},
         )
     }
 }

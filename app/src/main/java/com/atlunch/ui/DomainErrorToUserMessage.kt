@@ -41,7 +41,6 @@ fun LocationResult.LocationError.toUserMessage(): String =
         LocationResult.LocationError.Unknown -> "We couldn't determine your current location."
     }
 
-
 fun FavoriteResult.FavoriteError.toUserMessage(): String =
     when (this) {
         FavoriteResult.FavoriteError.DatabaseError -> "An error occurred, this item was not added to Favorites"

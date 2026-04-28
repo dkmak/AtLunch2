@@ -32,68 +32,76 @@ fun MapPlaces(
     placePreviews: List<PlacePreview>,
     userLocation: Location?,
     onPlaceClicked: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var selectedPlaceId by rememberSaveable { mutableStateOf<String?>(null) }
-    val selectedPlacePreview = selectedPlaceId?.let { placeId ->
-        placePreviews.firstOrNull { preview -> preview.id == placeId }
-    }
+    val selectedPlacePreview =
+        selectedPlaceId?.let { placeId ->
+            placePreviews.firstOrNull { preview -> preview.id == placeId }
+        }
 
     userLocation?.let { location ->
         Box(
             modifier = modifier.background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             val location = LatLng(userLocation.latitude, userLocation.longitude)
-            val cameraPositionState = rememberCameraPositionState {
-                position = CameraPosition.fromLatLngZoom(location, 15f)
-            }
+            val cameraPositionState =
+                rememberCameraPositionState {
+                    position = CameraPosition.fromLatLngZoom(location, 15f)
+                }
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState
+                cameraPositionState = cameraPositionState,
             ) {
-                placePreviews.mapNotNull { preview ->
-                    preview.location?.let { location -> preview to location }
-                }.forEach { (preview, location) ->
-                    val isSelected = selectedPlaceId == preview.id
-                    MarkerComposable(
-                        keys = arrayOf(preview.id, isSelected),
-                        state = rememberMarkerState(
-                            position = LatLng(location.latitude, location.longitude)
-                        ),
-                        title = preview.restaurantName,
-                        snippet = preview.shortFormattedAddress,
-                        onClick = {
-                            selectedPlaceId = preview.id
-                            true
-                        }
-                    ) {
-                        Image(
-                            painter = painterResource(
-                                id = if (isSelected) {
-                                    R.drawable.selected_pin
-                                } else {
-                                    R.drawable.resting_pin
-                                }
-                            ),
-                            contentDescription = null,
-                            modifier = Modifier.clickable {
+                placePreviews
+                    .mapNotNull { preview ->
+                        preview.location?.let { location -> preview to location }
+                    }.forEach { (preview, location) ->
+                        val isSelected = selectedPlaceId == preview.id
+                        MarkerComposable(
+                            keys = arrayOf(preview.id, isSelected),
+                            state =
+                                rememberMarkerState(
+                                    position = LatLng(location.latitude, location.longitude),
+                                ),
+                            title = preview.restaurantName,
+                            snippet = preview.shortFormattedAddress,
+                            onClick = {
                                 selectedPlaceId = preview.id
-                            }
-                        )
+                                true
+                            },
+                        ) {
+                            Image(
+                                painter =
+                                    painterResource(
+                                        id =
+                                            if (isSelected) {
+                                                R.drawable.selected_pin
+                                            } else {
+                                                R.drawable.resting_pin
+                                            },
+                                    ),
+                                contentDescription = null,
+                                modifier =
+                                    Modifier.clickable {
+                                        selectedPlaceId = preview.id
+                                    },
+                            )
+                        }
                     }
-                }
             }
 
             Column(
-                modifier = Modifier
-                    .align(Alignment.Center)
+                modifier =
+                    Modifier
+                        .align(Alignment.Center),
             ) {
                 selectedPlacePreview?.let { placePreview ->
                     PlacePreviewListItem(
                         placePreview = placePreview,
                         onPlaceClicked = onPlaceClicked,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
                     )
                 }
             }

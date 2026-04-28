@@ -34,37 +34,36 @@ class MainActivity : ComponentActivity() {
 
 @Serializable
 data class DetailsDestination(
-    val placeId: String
-): NavKey
-
+    val placeId: String,
+) : NavKey
 
 @Composable
 fun AtLunchApp() {
     val navBackStack = rememberNavBackStack(PlaceDestination)
     NavDisplay(
         backStack = navBackStack,
-        entryProvider = entryProvider {
-            entry<PlaceDestination> {
-                PlacesScreen(
-                    onPlacePreviewClicked = {id ->navBackStack.add(DetailsDestination(placeId = id))}
-                )
-            }
+        entryProvider =
+            entryProvider {
+                entry<PlaceDestination> {
+                    PlacesScreen(
+                        onPlacePreviewClicked = { id -> navBackStack.add(DetailsDestination(placeId = id)) },
+                    )
+                }
 
-            entry<DetailsDestination> { detailsDestination ->
-                PlaceDetailsScreen(
-                    placeId = detailsDestination.placeId,
-                    onBackClicked = {navBackStack.removeLastOrNull()}
-                )
-            }
-        },
+                entry<DetailsDestination> { detailsDestination ->
+                    PlaceDetailsScreen(
+                        placeId = detailsDestination.placeId,
+                        onBackClicked = { navBackStack.removeLastOrNull() },
+                    )
+                }
+            },
         transitionSpec = {
             slideInHorizontally { it } togetherWith
-                    slideOutHorizontally { -it }
+                slideOutHorizontally { -it }
         },
         popTransitionSpec = {
             slideInHorizontally { -it } togetherWith
-                    slideOutHorizontally { it }
-
-        }
+                slideOutHorizontally { it }
+        },
     )
 }

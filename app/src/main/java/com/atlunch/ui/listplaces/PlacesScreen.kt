@@ -55,7 +55,7 @@ data object PlaceDestination : NavKey
 @Composable
 fun PlacesScreen(
     viewModel: ListPlacesViewModel = hiltViewModel(),
-    onPlacePreviewClicked: (String) -> Unit
+    onPlacePreviewClicked: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -66,25 +66,28 @@ fun PlacesScreen(
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-        viewModel.onLocationPermissionChanged(granted)
-        if (granted) {
-            viewModel.loadInitialNearbyPlaces()
+    val locationPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions(),
+        ) { permissions ->
+            val granted =
+                permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+            viewModel.onLocationPermissionChanged(granted)
+            if (granted) {
+                viewModel.loadInitialNearbyPlaces()
+            }
         }
-    }
 
     LaunchedEffect(Unit) {
-        val hasLocationPermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED ||
+        val hasLocationPermission =
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ) == PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(
                     context,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
                 ) == PackageManager.PERMISSION_GRANTED
 
         viewModel.onLocationPermissionChanged(hasLocationPermission)
@@ -95,8 +98,8 @@ fun PlacesScreen(
             locationPermissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                ),
             )
         }
     }
@@ -108,11 +111,11 @@ fun PlacesScreen(
             FloatingActionButton(
                 onClick = { isMapView = !isMapView },
                 modifier = Modifier.padding(bottom = 16.dp),
-                containerColor = MaterialTheme.colorScheme.secondary
+                containerColor = MaterialTheme.colorScheme.secondary,
             ) {
                 Text(
                     text = if (isMapView) "List" else "Map",
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
                 )
             }
         },
@@ -125,30 +128,33 @@ fun PlacesScreen(
                     keyboardController?.hide()
                     viewModel.search(textFieldValue)
                     focusManager.clearFocus()
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxWidth()
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxWidth(),
         ) {
             if (!uiState.isLocationPermissionEnabled) {
                 Text(
                     text = "Location permission denied. Please enable location services.",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    style = MaterialTheme.typography.bodyMedium
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             } else {
                 when (val state = uiState.dataState) {
                     is ListPlacesUiState.DataState.Failure -> {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
                         ) {
                             Text(text = state.message)
                         }
@@ -156,10 +162,11 @@ fun PlacesScreen(
 
                     ListPlacesUiState.DataState.Loading -> {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             CircularProgressIndicator()
                         }
@@ -168,9 +175,10 @@ fun PlacesScreen(
                     is ListPlacesUiState.DataState.Success -> {
                         if (state.placesPreviews.isEmpty()) {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
                             ) {
                                 Text("No results found.")
                             }
@@ -180,17 +188,19 @@ fun PlacesScreen(
                                     placePreviews = state.placesPreviews,
                                     userLocation = uiState.location,
                                     onPlaceClicked = onPlacePreviewClicked,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp)
+                                    modifier =
+                                        Modifier
+                                            .fillMaxSize()
+                                            .padding(8.dp),
                                 )
                             } else {
                                 ListPlaces(
                                     placePreviews = state.placesPreviews,
                                     onPlaceClicked = onPlacePreviewClicked,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp)
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
                                 )
                             }
                         }
@@ -206,38 +216,41 @@ fun SearchPlacesTopBar(
     query: String,
     onQueryChange: (String) -> Unit,
     onSearch: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(16.dp),
     ) {
         Image(
             painter = painterResource(id = R.drawable.at_lunch),
             contentDescription = "AtLunch",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             OutlinedTextField(
                 value = query,
                 onValueChange = onQueryChange,
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Search restaurants") },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { onSearch() }
-                ),
-                shape = RoundedCornerShape(35.dp)
+                keyboardOptions =
+                    KeyboardOptions(
+                        imeAction = ImeAction.Done,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = { onSearch() },
+                    ),
+                shape = RoundedCornerShape(35.dp),
             )
         }
     }
@@ -250,7 +263,7 @@ fun SearchPlacesTopBarPreview() {
         SearchPlacesTopBar(
             query = "Sushi",
             onQueryChange = {},
-            onSearch = {}
+            onSearch = {},
         )
     }
 }
