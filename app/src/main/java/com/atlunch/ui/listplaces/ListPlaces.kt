@@ -32,95 +32,99 @@ import com.atlunch.ui.theme.AtLunchTheme
 fun ListPlaces(
     placePreviews: List<PlacePreview>,
     onPlaceClicked: (String) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     LazyColumn(
-        modifier = modifier.background(MaterialTheme.colorScheme.background)
+        modifier = modifier.background(MaterialTheme.colorScheme.background),
     ) {
         items(
             items = placePreviews,
-            key = { placePreview -> placePreview.id }
+            key = { placePreview -> placePreview.id },
         ) { preview ->
             PlacePreviewListItem(
                 preview,
                 onPlaceClicked = onPlaceClicked,
-                modifier.padding(8.dp)
+                modifier.padding(8.dp),
             )
         }
     }
-
 }
 
 @Composable
 fun PlacePreviewListItem(
     placePreview: PlacePreview,
     onPlaceClicked: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onPlaceClicked(placePreview.id) },
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { onPlaceClicked(placePreview.id) },
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 AsyncImage(
                     model = placePreview.iconBaseUri,
                     contentDescription = "${placePreview.restaurantName} icon",
-                    modifier = Modifier
-                        .size(48.dp),
+                    modifier =
+                        Modifier
+                            .size(48.dp),
                     contentScale = ContentScale.Fit,
                     placeholder = painterResource(R.drawable.selected_pin),
-                    error = painterResource(R.drawable.selected_pin)
+                    error = painterResource(R.drawable.selected_pin),
                 )
 
                 Column(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .fillMaxWidth()
+                    modifier =
+                        Modifier
+                            .padding(start = 16.dp)
+                            .fillMaxWidth(),
                 ) {
                     Text(
                         text = placePreview.restaurantName,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
                     )
 
                     Row(
                         modifier = Modifier.padding(top = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.star_filled),
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary
+                            tint = MaterialTheme.colorScheme.tertiary,
                         )
 
                         Text(
                             text = (placePreview.rating ?: 0.0).toString(),
                             modifier = Modifier.padding(start = 6.dp),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
 
                         Text(
                             text = "• (${placePreview.userRatingCount ?: 0} reviews)",
                             modifier = Modifier.padding(start = 6.dp),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
 
                     Text(
                         text = placePreview.shortFormattedAddress ?: "Address not available.",
                         style = MaterialTheme.typography.bodyMedium,
-                        overflow = TextOverflow.Visible
+                        overflow = TextOverflow.Visible,
                     )
                 }
             }
@@ -133,17 +137,18 @@ fun PlacePreviewListItem(
 fun PlacePreviewListItemPreview() {
     AtLunchTheme {
         PlacePreviewListItem(
-            placePreview = PlacePreview(
-                restaurantName = "Joe's Pizza",
-                id = "preview-place-id",
-                rating = 4.7,
-                userRatingCount = 128,
-                shortFormattedAddress = "123 Main St",
-                location = Location(0.0, 0.0),
-                iconBaseUri = ""
-            ),
+            placePreview =
+                PlacePreview(
+                    restaurantName = "Joe's Pizza",
+                    id = "preview-place-id",
+                    rating = 4.7,
+                    userRatingCount = 128,
+                    shortFormattedAddress = "123 Main St",
+                    location = Location(0.0, 0.0),
+                    iconBaseUri = "",
+                ),
             onPlaceClicked = {},
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
         )
     }
 }
@@ -153,38 +158,40 @@ fun PlacePreviewListItemPreview() {
 fun ListPlacesPreview() {
     AtLunchTheme {
         ListPlaces(
-            placePreviews = listOf(
-                PlacePreview(
-                    restaurantName = "Joe's Pizza",
-                    id = "preview-place-1",
-                    rating = 4.7,
-                    userRatingCount = 128,
-                    shortFormattedAddress = "123 Main St",
-                    location = Location(0.0, 0.0),
-                    iconBaseUri = ""
+            placePreviews =
+                listOf(
+                    PlacePreview(
+                        restaurantName = "Joe's Pizza",
+                        id = "preview-place-1",
+                        rating = 4.7,
+                        userRatingCount = 128,
+                        shortFormattedAddress = "123 Main St",
+                        location = Location(0.0, 0.0),
+                        iconBaseUri = "",
+                    ),
+                    PlacePreview(
+                        restaurantName = "Sushi Corner",
+                        id = "preview-place-2",
+                        rating = 4.5,
+                        userRatingCount = 84,
+                        shortFormattedAddress = "456 Elm St",
+                        location = Location(0.0, 0.0),
+                        iconBaseUri = "",
+                    ),
+                    PlacePreview(
+                        restaurantName = "Burger House",
+                        id = "preview-place-3",
+                        rating = 4.3,
+                        userRatingCount = 201,
+                        shortFormattedAddress = "789 Oak Ave",
+                        location = Location(0.0, 0.0),
+                        iconBaseUri = "",
+                    ),
                 ),
-                PlacePreview(
-                    restaurantName = "Sushi Corner",
-                    id = "preview-place-2",
-                    rating = 4.5,
-                    userRatingCount = 84,
-                    shortFormattedAddress = "456 Elm St",
-                    location = Location(0.0, 0.0),
-                    iconBaseUri = ""
-                ),
-                PlacePreview(
-                    restaurantName = "Burger House",
-                    id = "preview-place-3",
-                    rating = 4.3,
-                    userRatingCount = 201,
-                    shortFormattedAddress = "789 Oak Ave",
-                    location = Location(0.0, 0.0),
-                    iconBaseUri = ""
-                )
-            ),
             onPlaceClicked = {},
-            modifier = Modifier
-                .padding(8.dp)
+            modifier =
+                Modifier
+                    .padding(8.dp),
         )
     }
 }

@@ -5,14 +5,14 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Qualifier
-import javax.inject.Singleton
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import javax.inject.Qualifier
+import javax.inject.Singleton
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -30,50 +30,48 @@ object OpenAiNetworkModule {
     @Provides
     @Singleton
     @OpenAiOkHttpClient
-    fun provideOpenAiOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
+    fun provideOpenAiOkHttpClient(): OkHttpClient =
+        OkHttpClient
+            .Builder()
             .addInterceptor { chain ->
-                val updatedRequest = chain.request()
-                    .newBuilder()
-                    .addHeader("Authorization", "Bearer ${BuildConfig.OPENAI_API_KEY}")
-                    .build()
+                val updatedRequest =
+                    chain
+                        .request()
+                        .newBuilder()
+                        .addHeader("Authorization", "Bearer ${BuildConfig.OPENAI_API_KEY}")
+                        .build()
                 chain.proceed(updatedRequest)
-            }
-            .apply {
+            }.apply {
                 if (BuildConfig.DEBUG) {
                     addNetworkInterceptor(
                         HttpLoggingInterceptor().apply {
                             level = HttpLoggingInterceptor.Level.BODY
-                        }
+                        },
                     )
                 }
-            }
-            .build()
-    }
+            }.build()
 
     @Provides
     @Singleton
     @OpenAiRetrofit
     fun provideOpenAiRetrofit(
         json: Json,
-        @OpenAiOkHttpClient okHttpClient: OkHttpClient
-    ): Retrofit {
-        return Retrofit.Builder()
+        @OpenAiOkHttpClient okHttpClient: OkHttpClient,
+    ): Retrofit =
+        Retrofit
+            .Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
-    }
 
     @Provides
     @Singleton
-    fun provideOpenApiService(@OpenAiRetrofit retrofit: Retrofit): OpenApiService {
-        return retrofit.create(OpenApiService::class.java)
-    }
+    fun provideOpenApiService(
+        @OpenAiRetrofit retrofit: Retrofit,
+    ): OpenApiService = retrofit.create(OpenApiService::class.java)
 
     @Provides
     @Singleton
-    fun provideOpenAiClient(openApiService: OpenApiService): OpenAiClient {
-        return OpenAiClient(openApiService)
-    }
+    fun provideOpenAiClient(openApiService: OpenApiService): OpenAiClient = OpenAiClient(openApiService)
 }

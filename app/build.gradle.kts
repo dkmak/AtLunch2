@@ -7,14 +7,16 @@ plugins {
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.ktlint)
 }
 
-val localProperties = Properties().apply {
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        localPropertiesFile.inputStream().use(::load)
+val localProperties =
+    Properties().apply {
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use(::load)
+        }
     }
-}
 
 fun localProperty(name: String): String =
     providers.gradleProperty(name).orNull
@@ -35,12 +37,12 @@ android {
         buildConfigField(
             "String",
             "GOOGLE_PLACES_API_KEY",
-            "\"${localProperty("GOOGLE_PLACES_API_KEY")}\""
+            "\"${localProperty("GOOGLE_PLACES_API_KEY")}\"",
         )
         buildConfigField(
             "String",
             "OPENAI_API_KEY",
-            "\"${localProperty("OPENAI_API_KEY")}\""
+            "\"${localProperty("OPENAI_API_KEY")}\"",
         )
         manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = localProperty("GOOGLE_MAPS_API_KEY")
 
@@ -52,7 +54,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }

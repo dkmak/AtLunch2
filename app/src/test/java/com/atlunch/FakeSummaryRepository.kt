@@ -9,7 +9,5 @@ import kotlinx.coroutines.flow.flowOf
 class FakeSummaryRepository : SummaryRepository {
     var summaryResult: SummaryResult = SummaryResult.SummaryError.Unknown
 
-    override fun getSummary(placeDetails: PlaceDetails): Flow<SummaryResult> {
-        return flowOf(summaryResult)
-    }
+    override fun getSummary(placeDetails: PlaceDetails): Flow<SummaryResult> = flowOf(summaryResult)
 }

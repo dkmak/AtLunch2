@@ -12,10 +12,10 @@ data class PlacePreviewDTO(
     val userRatingCount: Int? = null,
     val shortFormattedAddress: String? = null,
     @SerialName("location") val placeLocation: LatLngDTO? = null,
-    @SerialName("iconMaskBaseUri") val iconBaseUri: String
+    @SerialName("iconMaskBaseUri") val iconBaseUri: String,
 )
 
 @Serializable
 data class DisplayName(
-    val text: String
+    val text: String,
 )

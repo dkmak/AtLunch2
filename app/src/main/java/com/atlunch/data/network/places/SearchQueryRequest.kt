@@ -7,10 +7,10 @@ data class SearchQueryRequest(
     val textQuery: String,
     val includedType: String? = null,
     val pageSize: Int? = null,
-    val locationBias: LocationBias? = null
+    val locationBias: LocationBias? = null,
 )
 
 @Serializable
 data class LocationBias(
-    val circle: Circle
+    val circle: Circle,
 )

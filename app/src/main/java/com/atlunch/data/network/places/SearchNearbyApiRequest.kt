@@ -6,22 +6,22 @@ import kotlinx.serialization.Serializable
 data class SearchNearbyRequest(
     val includedTypes: List<String>,
     val maxResultCount: Int,
-    val locationRestriction: LocationRestriction
+    val locationRestriction: LocationRestriction,
 )
 
 @Serializable
 data class LocationRestriction(
-    val circle: Circle
+    val circle: Circle,
 )
 
 @Serializable
 data class Circle(
     val center: LatLngDTO,
-    val radius: Double
+    val radius: Double,
 )
 
 @Serializable
 data class LatLngDTO(
     val latitude: Double,
-    val longitude: Double
+    val longitude: Double,
 )
