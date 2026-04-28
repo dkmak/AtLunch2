@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -36,6 +39,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.carousel.CarouselState
+import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,8 +49,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -151,7 +159,7 @@ fun PlaceDetailsScreen(
                 }
 
                 is PlacesDetailDataState.Success -> {
-                    DisplayPlacePhotos(
+                    DisplayPlacePhotosCarousel(
                         state.photos,
                         restaurantName = state.placeDetails.restaurantName
                     )
@@ -172,7 +180,7 @@ fun PlaceDetailsScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp)
+                            .padding(16.dp)
                     )
                 }
             }
@@ -180,57 +188,32 @@ fun PlaceDetailsScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DisplayPlacePhotos(
+fun DisplayPlacePhotosCarousel(
     photos: List<Photo>,
     restaurantName: String,
     modifier: Modifier = Modifier
 ) {
-    LazyVerticalGrid(
-        modifier = modifier,
-        columns = GridCells.Fixed(2),
-    ) {
-        items(
-            photos
-        ) { picture ->
-            PictureItem(picture, restaurantName)
-        }
-    }
-}
-
-@Composable
-fun PictureItem(
-    photo: Photo,
-    restaurantName: String
-) {
-    Card(
-        modifier = Modifier
+    val state = rememberCarouselState { photos.size }
+    HorizontalMultiBrowseCarousel(
+        state,
+        preferredItemWidth = 400.dp,
+        modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        border = BorderStroke(
-            width = 2.dp,
-            color = Color.DarkGray
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            .wrapContentHeight()
+
+        ) { i ->
+        val photo = photos[i]
+        AsyncImage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            model = photo.photoUrl,
+            contentDescription = "Photo of {$restaurantName}",
+            contentScale = ContentScale.Fit,
+            error = painterResource(R.drawable.star_filled)
         )
-    ) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(128.dp)
-                        .padding(8.dp),
-                    model = photo.photoUrl,
-                    contentDescription = "Photo of {$restaurantName}",
-                    contentScale = ContentScale.Fit,
-                    error = painterResource(R.drawable.star_filled)
-                )
-            }
-        }
     }
 }
 
@@ -430,11 +413,12 @@ fun HoursItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun DisplayPlacePhotosPreview() {
     AtLunchTheme {
-        DisplayPlacePhotos(
+        DisplayPlacePhotosCarousel(
             photos = List(6) { Photo(photoUrl = "") },
             restaurantName = "Preview Restaurant"
         )
