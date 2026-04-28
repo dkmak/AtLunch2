@@ -21,5 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "AtLunch"
 include(":app")
-include(":data")
-include(":feature")

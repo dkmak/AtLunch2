@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PhotoMediaDTO(
     val name: String,
-    val photoUri: String
+    val photoUri: String,
 )

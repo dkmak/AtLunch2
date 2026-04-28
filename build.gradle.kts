@@ -6,4 +6,5 @@ plugins {
     alias(libs.plugins.hilt.plugin) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.ktlint) apply false
 }

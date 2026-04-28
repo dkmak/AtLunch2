@@ -26,7 +26,7 @@ class FakePlacesRepository : PlacesRepository {
 
     override fun searchNearby(
         lat: Double,
-        long: Double
+        long: Double,
     ): Flow<PlacesResult> {
         lastNearbyLat = lat
         lastNearbyLong = long
@@ -41,7 +41,7 @@ class FakePlacesRepository : PlacesRepository {
     override fun searchQuery(
         query: String,
         lat: Double,
-        long: Double
+        long: Double,
     ): Flow<PlacesResult> {
         lastSearchQuery = query
         lastNearbyLat = lat

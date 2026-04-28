@@ -13,10 +13,10 @@ data class PlaceDetailsDTO(
     val formattedAddress: String?,
     val photos: List<PhotoResourceDTO> = emptyList(),
     val nationalPhoneNumber: String? = null,
-    @SerialName("regularOpeningHours") val openingHours : OpeningHours? = null
+    @SerialName("regularOpeningHours") val openingHours: OpeningHours? = null,
 )
 
 @Serializable
 data class OpeningHours(
-    val weekdayDescriptions: List<String>
+    val weekdayDescriptions: List<String>,
 )

@@ -12,5 +12,5 @@ data class PlacePreviewEntity(
     val shortFormattedAddress: String?,
     val latitude: Double?,
     val longitude: Double?,
-    val iconBaseUri: String
+    val iconBaseUri: String,
 )

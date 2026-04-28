@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 data class PlaceDetailsUIState(
     val placeDetailsDataState: PlacesDetailDataState = PlacesDetailDataState.Loading,
-    val summaryDataState: PlacesDetailSummaryDataState? = null
+    val summaryDataState: PlacesDetailSummaryDataState? = null,
 )
 
 sealed interface PlacesDetailDataState {
@@ -31,140 +31,158 @@ sealed interface PlacesDetailDataState {
         val isFavorite: Boolean,
     ) : PlacesDetailDataState
 
-    data class Failure(val message: String) : PlacesDetailDataState
+    data class Failure(
+        val message: String,
+    ) : PlacesDetailDataState
+
     data object Loading : PlacesDetailDataState
 }
 
 sealed interface PlacesDetailSummaryDataState {
     data class Success(
-        val summaryText: String
+        val summaryText: String,
     ) : PlacesDetailSummaryDataState
 
-    data class Failure(val message: String) : PlacesDetailSummaryDataState
+    data class Failure(
+        val message: String,
+    ) : PlacesDetailSummaryDataState
+
     data object Loading : PlacesDetailSummaryDataState
 }
 
 @HiltViewModel
-class PlaceDetailsViewModel @Inject constructor(
-    private val placesRepository: PlacesRepository,
-    private val summaryRepository: SummaryRepository
-) : ViewModel() {
+class PlaceDetailsViewModel
+    @Inject
+    constructor(
+        private val placesRepository: PlacesRepository,
+        private val summaryRepository: SummaryRepository,
+    ) : ViewModel() {
+        private val _uiState = MutableStateFlow<PlaceDetailsUIState>(PlaceDetailsUIState())
+        val uiState = _uiState.asStateFlow()
 
-    private val _uiState = MutableStateFlow<PlaceDetailsUIState>(PlaceDetailsUIState())
-    val uiState = _uiState.asStateFlow()
-
-    fun loadDetails(id: String) {
-        placesRepository.getPlaceDetails(id).onEach { result ->
-            _uiState.update { currentState ->
-                currentState.copy(placeDetailsDataState = result.toDataState())
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    fun askAi(){
-        val curr = uiState.value.placeDetailsDataState as? PlacesDetailDataState.Success
-        curr?.placeDetails?.let { details ->
-            summaryRepository.getSummary(placeDetails = details).onEach { result ->
-                _uiState.update { currentState ->
-                    currentState.copy(summaryDataState = result.toDataState())
-                }
-            }.onStart {
-                _uiState.update { currentState ->
-                    currentState.copy(summaryDataState = PlacesDetailSummaryDataState.Loading)
-                }
-            }.launchIn(viewModelScope)
-        }
-    }
-
-
-    fun addFavorite() {
-        val curr = uiState.value.placeDetailsDataState as? PlacesDetailDataState.Success
-        curr?.placeDetails?.id.let { placeDetailsId ->
-            placeDetailsId?.let { id ->
-                placesRepository.addFavorite(id).onEach { result ->
+        fun loadDetails(id: String) {
+            placesRepository
+                .getPlaceDetails(id)
+                .onEach { result ->
                     _uiState.update { currentState ->
-                        when (result) {
-                            is FavoriteResult.FavoriteError -> {
-                                currentState.copy(
-                                    placeDetailsDataState = PlacesDetailDataState.Failure(
-                                        message = result.toUserMessage()
-                                    )
-                                )
-                            }
-
-                            is FavoriteResult.FavoriteSuccess -> {
-                                currentState.copy(
-                                    placeDetailsDataState = curr?.copy(
-                                        isFavorite = result.isFavorite
-                                    ) ?: PlacesDetailDataState.Failure(
-                                        message = FavoriteResult.FavoriteError.DatabaseError.toUserMessage()
-                                    )
-                                )
-                            }
-                        }
+                        currentState.copy(placeDetailsDataState = result.toDataState())
                     }
                 }.launchIn(viewModelScope)
-            }
         }
-    }
 
-    fun removeFavorites() {
-        val curr = uiState.value.placeDetailsDataState as? PlacesDetailDataState.Success
-        curr?.placeDetails?.id.let { placeDetailsId ->
-            placeDetailsId?.let { id ->
-                placesRepository.removeFavorite(id).onEach { result ->
-                    _uiState.update { currentState ->
-                        when (result) {
-                            is FavoriteResult.FavoriteError -> {
-                                currentState.copy(
-                                    placeDetailsDataState = PlacesDetailDataState.Failure(
-                                        message = result.toUserMessage()
-                                    )
-                                )
-                            }
-
-                            is FavoriteResult.FavoriteSuccess -> {
-                                currentState.copy(
-                                    placeDetailsDataState = curr?.copy(
-                                        isFavorite = result.isFavorite
-                                    ) ?: PlacesDetailDataState.Failure(
-                                        message = FavoriteResult.FavoriteError.DatabaseError.toUserMessage()
-                                    )
-                                )
-                            }
+        fun askAi() {
+            val curr = uiState.value.placeDetailsDataState as? PlacesDetailDataState.Success
+            curr?.placeDetails?.let { details ->
+                summaryRepository
+                    .getSummary(placeDetails = details)
+                    .onEach { result ->
+                        _uiState.update { currentState ->
+                            currentState.copy(summaryDataState = result.toDataState())
                         }
-                    }
-                }.launchIn(viewModelScope)
+                    }.onStart {
+                        _uiState.update { currentState ->
+                            currentState.copy(summaryDataState = PlacesDetailSummaryDataState.Loading)
+                        }
+                    }.launchIn(viewModelScope)
             }
         }
-    }
 
-    private fun PlaceDetailsResult.toDataState(): PlacesDetailDataState {
-        return when (this) {
-            is PlaceDetailsResult.DetailsSuccess -> PlacesDetailDataState.Success(
-                placeDetails = this.placeDetails,
-                photos = this.photos,
-                isFavorite = this.favorite
-            )
+        fun addFavorite() {
+            val curr = uiState.value.placeDetailsDataState as? PlacesDetailDataState.Success
+            curr?.placeDetails?.id.let { placeDetailsId ->
+                placeDetailsId?.let { id ->
+                    placesRepository
+                        .addFavorite(id)
+                        .onEach { result ->
+                            _uiState.update { currentState ->
+                                when (result) {
+                                    is FavoriteResult.FavoriteError -> {
+                                        currentState.copy(
+                                            placeDetailsDataState =
+                                                PlacesDetailDataState.Failure(
+                                                    message = result.toUserMessage(),
+                                                ),
+                                        )
+                                    }
 
-            is PlaceDetailsResult.DetailsError.Backend -> PlacesDetailDataState.Failure(this.toUserMessage())
-            is PlaceDetailsResult.DetailsError.Network -> PlacesDetailDataState.Failure(this.toUserMessage())
-            is PlaceDetailsResult.DetailsError.Unknown -> PlacesDetailDataState.Failure(this.toUserMessage())
+                                    is FavoriteResult.FavoriteSuccess -> {
+                                        currentState.copy(
+                                            placeDetailsDataState =
+                                                curr?.copy(
+                                                    isFavorite = result.isFavorite,
+                                                ) ?: PlacesDetailDataState.Failure(
+                                                    message = FavoriteResult.FavoriteError.DatabaseError.toUserMessage(),
+                                                ),
+                                        )
+                                    }
+                                }
+                            }
+                        }.launchIn(viewModelScope)
+                }
+            }
+        }
+
+        fun removeFavorites() {
+            val curr = uiState.value.placeDetailsDataState as? PlacesDetailDataState.Success
+            curr?.placeDetails?.id.let { placeDetailsId ->
+                placeDetailsId?.let { id ->
+                    placesRepository
+                        .removeFavorite(id)
+                        .onEach { result ->
+                            _uiState.update { currentState ->
+                                when (result) {
+                                    is FavoriteResult.FavoriteError -> {
+                                        currentState.copy(
+                                            placeDetailsDataState =
+                                                PlacesDetailDataState.Failure(
+                                                    message = result.toUserMessage(),
+                                                ),
+                                        )
+                                    }
+
+                                    is FavoriteResult.FavoriteSuccess -> {
+                                        currentState.copy(
+                                            placeDetailsDataState =
+                                                curr?.copy(
+                                                    isFavorite = result.isFavorite,
+                                                ) ?: PlacesDetailDataState.Failure(
+                                                    message = FavoriteResult.FavoriteError.DatabaseError.toUserMessage(),
+                                                ),
+                                        )
+                                    }
+                                }
+                            }
+                        }.launchIn(viewModelScope)
+                }
+            }
+        }
+
+        private fun PlaceDetailsResult.toDataState(): PlacesDetailDataState =
+            when (this) {
+                is PlaceDetailsResult.DetailsSuccess ->
+                    PlacesDetailDataState.Success(
+                        placeDetails = this.placeDetails,
+                        photos = this.photos,
+                        isFavorite = this.favorite,
+                    )
+
+                is PlaceDetailsResult.DetailsError.Backend -> PlacesDetailDataState.Failure(this.toUserMessage())
+                is PlaceDetailsResult.DetailsError.Network -> PlacesDetailDataState.Failure(this.toUserMessage())
+                is PlaceDetailsResult.DetailsError.Unknown -> PlacesDetailDataState.Failure(this.toUserMessage())
+            }
+
+        private fun SummaryResult.toDataState(): PlacesDetailSummaryDataState =
+            when (this) {
+                is SummaryResult.SummaryError.Backend -> PlacesDetailSummaryDataState.Failure(this.toUserMessage())
+                is SummaryResult.SummaryError.Network -> PlacesDetailSummaryDataState.Failure(this.toUserMessage())
+                is SummaryResult.SummaryError.Unknown -> PlacesDetailSummaryDataState.Failure(this.toUserMessage())
+                is SummaryResult.SummarySuccess ->
+                    PlacesDetailSummaryDataState.Success(
+                        summaryText = this.summaryText ?: "OpenAI failed.",
+                    )
+            }
+
+        fun onBackClicked() {
+            _uiState.update { PlaceDetailsUIState() }
         }
     }
-
-    private fun SummaryResult.toDataState(): PlacesDetailSummaryDataState {
-        return when (this) {
-            is SummaryResult.SummaryError.Backend -> PlacesDetailSummaryDataState.Failure(this.toUserMessage())
-            is SummaryResult.SummaryError.Network -> PlacesDetailSummaryDataState.Failure(this.toUserMessage())
-            is SummaryResult.SummaryError.Unknown -> PlacesDetailSummaryDataState.Failure(this.toUserMessage())
-            is SummaryResult.SummarySuccess -> PlacesDetailSummaryDataState.Success(
-                summaryText = this.summaryText?: "OpenAI failed."
-            )
-        }
-    }
-
-    fun onBackClicked() {
-        _uiState.update { PlaceDetailsUIState() }
-    }
-}
