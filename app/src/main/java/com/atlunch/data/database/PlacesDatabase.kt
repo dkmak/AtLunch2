@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase
         FavoritesEntity::class,
     ],
     version = 2,
-    exportSchema = true,
+    exportSchema = false
 )
 abstract class PlacesDatabase : RoomDatabase() {
     abstract fun placeDAO(): PlacesDAO
