@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.google.firebase.appdistribution)
     alias(libs.plugins.ktlint)
 }
 
