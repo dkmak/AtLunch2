@@ -42,6 +42,16 @@ jobs:
 
       - name: build-release
         run: ./gradlew assembleRelease
+        
+      - name: debug firebase service account
+        run: |
+          echo '${{ secrets.CREDENTIALS_FILE_CONTENT }}' > firebase-service-account.json
+          echo "Service account project:"
+          jq -r '.project_id' firebase-service-account.json
+          echo "Service account email:"
+          jq -r '.client_email' firebase-service-account.json
+          echo "Firebase app id:"
+          echo '${{ secrets.APP_ID }}'  
 
       - name: upload-to-firebase
         uses: wzieba/Firebase-Distribution-Github-Action@v1
