@@ -62,7 +62,7 @@ jobs:
           file: app/build/outputs/apk/release/app-release-unsigned.apk
 
   distribute-to-google-play:
-    name: distribute-to-firebase
+    name: distribute-to-google-play
     needs: unitTest
     runs-on: ubuntu-latest
 
