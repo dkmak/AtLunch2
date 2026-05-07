@@ -1,6 +1,9 @@
 package com.atlunch.ui.placedetails
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,7 +28,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PlaceDetailsShareSheet(
     sheetState: SheetState,
-    placeDetails: PlacesDetailDataState,
+    placeDetailsDataState: PlacesDetailDataState.Success,
     onDismiss: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -35,13 +38,13 @@ fun PlaceDetailsShareSheet(
         sheetState = sheetState,
         onDismissRequest = { onDismiss() }
     ) {
-        val placeDetails = placeDetails as? PlacesDetailDataState.Success
+        val placeDetailsDataState = placeDetailsDataState
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Share ${placeDetails?.placeDetails?.restaurantName ?: ""}",
+                text = "Share ${placeDetailsDataState?.placeDetails?.restaurantName ?: ""}",
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
             )
@@ -52,6 +55,16 @@ fun PlaceDetailsShareSheet(
                         coroutineScope.launch {
                             sheetState.hide()
                         }.invokeOnCompletion { onDismiss() }
+
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, placeDetailsDataState?.placeDetails?.formattedAddress?:"No Address Found.")
+                            putExtra(Intent.EXTRA_TITLE, "Share Restaurant Address")
+                        }
+
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        context.startActivity(shareIntent)
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary
@@ -62,17 +75,27 @@ fun PlaceDetailsShareSheet(
                 }
                 Button(
                     onClick = {
+                        val googleMapsUri = placeDetailsDataState?.placeDetails?.googleMapsUri
+
+                        if(googleMapsUri.isNullOrBlank()){
+                            Toast
+                                .makeText(context, "No Google Maps Uri Found.", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            val uri = Uri.parse(googleMapsUri)
+                            val mapsIntent = Intent(Intent.ACTION_VIEW, uri).apply {
+                                setPackage(GOOGLE_MAPS_URI_PACKAGE)
+                            }
+
+                            try {
+                                context.startActivity(mapsIntent)
+                            } catch (e: ActivityNotFoundException){
+                                context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                            }
+                        }
                         coroutineScope.launch {
                             sheetState.hide()
                         }
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, "Place")
-                        }
-
-                        val shareIntent = Intent.createChooser(sendIntent, "")
-                        context.startActivity(shareIntent)
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary
@@ -85,3 +108,5 @@ fun PlaceDetailsShareSheet(
         }
     }
 }
+
+private const val GOOGLE_MAPS_URI_PACKAGE = "com.google.android.apps.maps"
