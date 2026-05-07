@@ -1,14 +1,14 @@
-package com.atlunch
+package dkmak.atlunch
 
 import app.cash.turbine.test
-import com.atlunch.domain.Photo
-import com.atlunch.domain.PlaceDetails
-import com.atlunch.domain.PlaceDetailsResult
-import com.atlunch.domain.SummaryResult
-import com.atlunch.ui.placedetails.PlaceDetailsUIState
-import com.atlunch.ui.placedetails.PlaceDetailsViewModel
-import com.atlunch.ui.placedetails.PlacesDetailDataState
-import com.atlunch.ui.placedetails.PlacesDetailSummaryDataState
+import dkmak.atlunch.domain.Photo
+import dkmak.atlunch.domain.PlaceDetails
+import dkmak.atlunch.domain.PlaceDetailsResult
+import dkmak.atlunch.domain.SummaryResult
+import dkmak.atlunch.ui.placedetails.PlaceDetailsUIState
+import dkmak.atlunch.ui.placedetails.PlaceDetailsViewModel
+import dkmak.atlunch.ui.placedetails.PlacesDetailDataState
+import dkmak.atlunch.ui.placedetails.PlacesDetailSummaryDataState
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

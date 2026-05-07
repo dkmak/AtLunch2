@@ -62,7 +62,7 @@ jobs:
           file: app/build/outputs/apk/release/app-release-unsigned.apk
 
   distribute-to-google-play:
-    name: distribute-to-firebase
+    name: distribute-to-google-play
     needs: unitTest
     runs-on: ubuntu-latest
 
@@ -101,7 +101,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1.1.3
         with:
           serviceAccountJson: service_account.json
-          packageName: com.atlunch
+          packageName: dkmak.atlunch
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: 'internal'
           status: 'completed'

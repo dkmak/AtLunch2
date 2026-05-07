@@ -1,9 +1,9 @@
-package com.atlunch
+package dkmak.atlunch
 
-import com.atlunch.domain.FavoriteResult
-import com.atlunch.domain.PlaceDetailsResult
-import com.atlunch.domain.PlacesRepository
-import com.atlunch.domain.PlacesResult
+import dkmak.atlunch.domain.FavoriteResult
+import dkmak.atlunch.domain.PlaceDetailsResult
+import dkmak.atlunch.domain.PlacesRepository
+import dkmak.atlunch.domain.PlacesResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
