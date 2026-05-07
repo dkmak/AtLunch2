@@ -1,0 +1,47 @@
+package dkmak.atlunch.data.dto
+
+import dkmak.atlunch.data.database.PlacePreviewEntity
+import dkmak.atlunch.domain.Location
+import dkmak.atlunch.domain.PlacePreview
+
+fun PlacePreviewDTO.toDomain(): PlacePreview =
+    PlacePreview(
+        restaurantName = this.displayName.text,
+        id = this.id,
+        rating = this.rating,
+        userRatingCount = this.userRatingCount,
+        shortFormattedAddress = this.shortFormattedAddress,
+        location = this.placeLocation?.toDomain(),
+        iconBaseUri = "${this.iconBaseUri}.png",
+    )
+
+fun PlacePreviewDTO.toEntity(): PlacePreviewEntity =
+    PlacePreviewEntity(
+        id = this.id,
+        restaurantName = this.displayName.text,
+        rating = this.rating,
+        userRatingCount = this.userRatingCount,
+        shortFormattedAddress = this.shortFormattedAddress,
+        latitude = this.placeLocation?.latitude,
+        longitude = this.placeLocation?.longitude,
+        iconBaseUri = "${this.iconBaseUri}.png",
+    )
+
+fun PlacePreviewEntity.toDomain(): PlacePreview =
+    PlacePreview(
+        restaurantName = this.restaurantName,
+        id = this.id,
+        rating = this.rating,
+        userRatingCount = this.userRatingCount,
+        shortFormattedAddress = this.shortFormattedAddress,
+        location =
+            if (this.latitude != null && this.longitude != null) {
+                Location(
+                    latitude = this.latitude,
+                    longitude = this.longitude,
+                )
+            } else {
+                null
+            },
+        iconBaseUri = this.iconBaseUri,
+    )
