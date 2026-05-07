@@ -26,11 +26,11 @@ fun localProperty(name: String): String =
         ?: ""
 
 android {
-    namespace = "com.atlunch"
+    namespace = "dkmak.atlunch"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.atlunch"
+        applicationId = "dkmak.atlunch"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
