@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +31,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -70,63 +72,23 @@ fun PlaceDetailsScreen(
     viewModel: PlaceDetailsViewModel = hiltViewModel(),
     onBackClicked: () -> Unit,
 ) {
-    var showBottomSheet by remember {mutableStateOf(false)}
+    var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(placeId) {
         viewModel.loadDetails(placeId)
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
-    if (showBottomSheet){
-        ModalBottomSheet(
+    if (showBottomSheet) {
+        PlaceDetailsShareSheet(
             sheetState = sheetState,
-            onDismissRequest = { showBottomSheet = false }
-        )  {
-            val placeDetails = uiState.placeDetailsDataState as? PlacesDetailDataState.Success
-            var showLink by remember { mutableStateOf(false) }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally){
-                Text(text = "Share ${placeDetails?.placeDetails?.restaurantName?:""}")
-                Row(){
-                    Button(
-                        onClick = {
-                            showLink = true
-                            coroutineScope.launch {
-                                sheetState.hide()
-                            }.invokeOnCompletion { showBottomSheet = false }
-                        }
-                    ) {
-                        Text("Link")
-                    }
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                sheetState.hide()
-                            }
-                            val sendIntent = Intent().apply{
-                                action = Intent.ACTION_SEND
-                                type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, "Place")
-                            }
-
-                            val shareIntent = Intent.createChooser(sendIntent, "")
-                            context.startActivity(shareIntent)
-                        }
-                    ) {
-                        Text("Place")
-                    }
-                }
-
-                if (showLink){
-                    Text("Link to Restauraunt: https.....")
-                }
-            }
-        }
+            placeDetails = uiState.placeDetailsDataState,
+            onDismiss = { showBottomSheet = false }
+        )
     }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -148,16 +110,16 @@ fun PlaceDetailsScreen(
                     }
                 },
                 actions = {
-                        IconButton(
-                            onClick = {
-                                showBottomSheet = true
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Share,
-                                contentDescription = "Share"
-                            )
+                    IconButton(
+                        onClick = {
+                            showBottomSheet = true
                         }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share"
+                        )
+                    }
                 }
             )
         }
@@ -352,15 +314,21 @@ fun WhyHereItem(
             is PlacesDetailSummaryDataState.Failure -> {
                 Text(
                     summaryDataState.message,
-                    modifier = modifier.fillMaxWidth(),
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
+
             PlacesDetailSummaryDataState.Loading -> {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        6.dp,
+                        Alignment.CenterHorizontally
+                    ),
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -369,6 +337,7 @@ fun WhyHereItem(
                     CircularProgressIndicator()
                 }
             }
+
             is PlacesDetailSummaryDataState.Success -> {
                 Text(
                     summaryDataState.summaryText,
@@ -377,6 +346,7 @@ fun WhyHereItem(
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
+
             null -> {}
         }
     }
