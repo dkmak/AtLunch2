@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "515963804773",
-    "project_id": "atlunch2-7f38d",
-    "storage_bucket": "atlunch2-7f38d.firebasestorage.app"
+    "project_number": "756262631619",
+    "project_id": "atlunch-ab0e2",
+    "storage_bucket": "atlunch-ab0e2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:515963804773:android:e637863e2fbd5d01de7a8c",
+        "mobilesdk_app_id": "1:756262631619:android:4882f69400678fd829ca76",
         "android_client_info": {
           "package_name": "dkmak.atlunch"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDgaNioUHbSgBxsSK1NNKE3ejYwbehB48E"
+          "current_key": "AIzaSyAVduUBNcXb3bf_MwTqitHNmyTckD_qwDc"
         }
       ],
       "services": {
