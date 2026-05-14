@@ -17,15 +17,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import dkmak.atlunch.R
-import dkmak.atlunch.domain.Location
-import dkmak.atlunch.domain.PlacePreview
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import dkmak.atlunch.R
+import dkmak.atlunch.domain.Location
+import dkmak.atlunch.domain.PlacePreview
 
 @Composable
 fun MapPlaces(

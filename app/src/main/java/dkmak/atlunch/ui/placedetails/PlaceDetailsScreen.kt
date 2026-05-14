@@ -1,8 +1,5 @@
 package dkmak.atlunch.ui.placedetails
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
@@ -15,12 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
@@ -37,6 +32,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,9 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,7 +54,6 @@ import dkmak.atlunch.R
 import dkmak.atlunch.domain.Photo
 import dkmak.atlunch.domain.PlaceDetails
 import dkmak.atlunch.ui.theme.AtLunchTheme
-import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,10 +62,23 @@ fun PlaceDetailsScreen(
     viewModel: PlaceDetailsViewModel = hiltViewModel(),
     onBackClicked: () -> Unit,
 ) {
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+
     LaunchedEffect(placeId) {
         viewModel.loadDetails(placeId)
     }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    if (showBottomSheet && uiState.placeDetailsDataState is PlacesDetailDataState.Success) {
+        PlaceDetailsShareSheet(
+            sheetState = sheetState,
+            placeDetailsDataState = uiState.placeDetailsDataState as PlacesDetailDataState.Success,
+            onDismiss = { showBottomSheet = false },
+        )
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -94,64 +100,14 @@ fun PlaceDetailsScreen(
                     }
                 },
                 actions = {
-                    val context = LocalContext.current
-                    IconButton(onClick = {
-                        val placeDetailsSuccess =
-                            uiState.placeDetailsDataState as? PlacesDetailDataState.Success
-                        val sendIntent =
-                            Intent().apply {
-                                action = Intent.ACTION_SEND
-                                type = "text/plain"
-
-                                putExtra(
-                                    Intent.EXTRA_TEXT,
-                                    placeDetailsSuccess?.placeDetails?.googleMapsUri
-                                        ?: "No Google Maps link found.",
-                                )
-
-                                putExtra(
-                                    Intent.EXTRA_TITLE,
-                                    "Check out ${placeDetailsSuccess?.placeDetails?.restaurantName}. Find it on Google Maps",
-                                )
-                            }
-
-                        val textIntent = Intent.createChooser(sendIntent, "Share Text")
-                        context.startActivity(textIntent)
-                    }) {
+                    IconButton(
+                        onClick = {
+                            showBottomSheet = true
+                        },
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Share,
-                            contentDescription = "Share Text",
-                        )
-                    }
-
-                    IconButton(onClick = {
-                        val placeDetailsSuccess =
-                            uiState.placeDetailsDataState as? PlacesDetailDataState.Success
-                        val googleMapsUri = placeDetailsSuccess?.placeDetails?.googleMapsUri
-
-                        if (googleMapsUri.isNullOrBlank()) {
-                            Toast.makeText(context, "No Google Maps URI found.", Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            val uri = (googleMapsUri.toUri())
-                            val mapsIntent = Intent(Intent.ACTION_VIEW, uri).apply {
-                                setPackage("com.google.android.apps.maps")
-                            }
-
-                            try {
-                                context.startActivity(mapsIntent)
-                            } catch (_: ActivityNotFoundException) {
-                                context.startActivity(Intent(Intent.ACTION_VIEW, uri))
-                            }
-
-                        }
-
-                    }) {
-                        Icon(
-                            painter = painterResource(R.drawable.resting_pin),
-                            contentDescription = "Open Google Maps",
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(24.dp)
+                            contentDescription = "Share",
                         )
                     }
                 },
@@ -348,7 +304,10 @@ fun WhyHereItem(
             is PlacesDetailSummaryDataState.Failure -> {
                 Text(
                     summaryDataState.message,
-                    modifier = modifier.fillMaxWidth(),
+                    modifier =
+                        modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -357,10 +316,11 @@ fun WhyHereItem(
             PlacesDetailSummaryDataState.Loading -> {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(
-                        6.dp,
-                        Alignment.CenterHorizontally
-                    ),
+                    horizontalArrangement =
+                        Arrangement.spacedBy(
+                            6.dp,
+                            Alignment.CenterHorizontally,
+                        ),
                     modifier =
                         Modifier
                             .fillMaxWidth()

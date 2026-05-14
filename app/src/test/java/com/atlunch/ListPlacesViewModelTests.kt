@@ -1,13 +1,13 @@
 package dkmak.atlunch
 
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import dkmak.atlunch.domain.Location
 import dkmak.atlunch.domain.LocationResult
 import dkmak.atlunch.domain.PlacePreview
 import dkmak.atlunch.domain.PlacesResult
 import dkmak.atlunch.ui.listplaces.ListPlacesUiState
 import dkmak.atlunch.ui.listplaces.ListPlacesViewModel
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher

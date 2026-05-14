@@ -2,6 +2,7 @@ package dkmak.atlunch.ui.listplaces
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dkmak.atlunch.domain.Location
 import dkmak.atlunch.domain.LocationRepository
 import dkmak.atlunch.domain.LocationResult
@@ -9,7 +10,6 @@ import dkmak.atlunch.domain.PlacePreview
 import dkmak.atlunch.domain.PlacesRepository
 import dkmak.atlunch.domain.PlacesResult
 import dkmak.atlunch.ui.toUserMessage
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

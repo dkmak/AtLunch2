@@ -2,6 +2,7 @@ package dkmak.atlunch.ui.placedetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dkmak.atlunch.domain.FavoriteResult
 import dkmak.atlunch.domain.Photo
 import dkmak.atlunch.domain.PlaceDetails
@@ -10,7 +11,6 @@ import dkmak.atlunch.domain.PlacesRepository
 import dkmak.atlunch.domain.SummaryRepository
 import dkmak.atlunch.domain.SummaryResult
 import dkmak.atlunch.ui.toUserMessage
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
