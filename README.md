@@ -15,6 +15,8 @@ when available.
 - The user can select a search result to present a restaurant detail page with basic information
   about the restaurant
 - The user can favorite or unfavorite a restaurant from the details screen
+- The user can open a custom share sheet from the details screen to share a restaurant address or
+  open the restaurant in Google Maps
 - The user can request a short AI-generated "Why Come Here?" summary on the details screen
 
 **Non-Functional Features**
