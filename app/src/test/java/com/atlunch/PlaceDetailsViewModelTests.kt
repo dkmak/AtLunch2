@@ -1,6 +1,7 @@
 package dkmak.atlunch
 
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import dkmak.atlunch.domain.Photo
 import dkmak.atlunch.domain.PlaceDetails
 import dkmak.atlunch.domain.PlaceDetailsResult
@@ -9,7 +10,6 @@ import dkmak.atlunch.ui.placedetails.PlaceDetailsUIState
 import dkmak.atlunch.ui.placedetails.PlaceDetailsViewModel
 import dkmak.atlunch.ui.placedetails.PlacesDetailDataState
 import dkmak.atlunch.ui.placedetails.PlacesDetailSummaryDataState
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher

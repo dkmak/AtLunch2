@@ -36,12 +36,12 @@ fun PlaceDetailsShareSheet(
 
     ModalBottomSheet(
         sheetState = sheetState,
-        onDismissRequest = { onDismiss() }
+        onDismissRequest = { onDismiss() },
     ) {
         val placeDetailsDataState = placeDetailsDataState
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
                 text = "Share ${placeDetailsDataState?.placeDetails?.restaurantName ?: ""}",
@@ -52,24 +52,27 @@ fun PlaceDetailsShareSheet(
             Row {
                 Button(
                     onClick = {
-                        coroutineScope.launch {
-                            sheetState.hide()
-                        }.invokeOnCompletion { onDismiss() }
+                        coroutineScope
+                            .launch {
+                                sheetState.hide()
+                            }.invokeOnCompletion { onDismiss() }
 
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, placeDetailsDataState?.placeDetails?.formattedAddress?:"No Address Found.")
-                            putExtra(Intent.EXTRA_TITLE, "Share Restaurant Address")
-                        }
+                        val sendIntent =
+                            Intent().apply {
+                                action = Intent.ACTION_SEND
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, placeDetailsDataState?.placeDetails?.formattedAddress ?: "No Address Found.")
+                                putExtra(Intent.EXTRA_TITLE, "Share Restaurant Address")
+                            }
 
                         val shareIntent = Intent.createChooser(sendIntent, null)
                         context.startActivity(shareIntent)
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
-                    ),
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                        ),
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Text("Share Address")
                 }
@@ -77,19 +80,20 @@ fun PlaceDetailsShareSheet(
                     onClick = {
                         val googleMapsUri = placeDetailsDataState?.placeDetails?.googleMapsUri
 
-                        if(googleMapsUri.isNullOrBlank()){
+                        if (googleMapsUri.isNullOrBlank()) {
                             Toast
                                 .makeText(context, "No Google Maps Uri Found.", Toast.LENGTH_SHORT)
                                 .show()
                         } else {
                             val uri = Uri.parse(googleMapsUri)
-                            val mapsIntent = Intent(Intent.ACTION_VIEW, uri).apply {
-                                setPackage(GOOGLE_MAPS_URI_PACKAGE)
-                            }
+                            val mapsIntent =
+                                Intent(Intent.ACTION_VIEW, uri).apply {
+                                    setPackage(GOOGLE_MAPS_URI_PACKAGE)
+                                }
 
                             try {
                                 context.startActivity(mapsIntent)
-                            } catch (e: ActivityNotFoundException){
+                            } catch (e: ActivityNotFoundException) {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, uri))
                             }
                         }
@@ -97,10 +101,11 @@ fun PlaceDetailsShareSheet(
                             sheetState.hide()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
-                    ),
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                        ),
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Text("Open In Google Maps")
                 }

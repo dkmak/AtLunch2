@@ -12,11 +12,11 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import dagger.hilt.android.AndroidEntryPoint
 import dkmak.atlunch.ui.listplaces.PlaceDestination
 import dkmak.atlunch.ui.listplaces.PlacesScreen
 import dkmak.atlunch.ui.placedetails.PlaceDetailsScreen
 import dkmak.atlunch.ui.theme.AtLunchTheme
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
 
 @AndroidEntryPoint

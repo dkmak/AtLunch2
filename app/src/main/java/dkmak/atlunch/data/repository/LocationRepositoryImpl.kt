@@ -1,10 +1,6 @@
 package dkmak.atlunch.data.repository
 
 import android.annotation.SuppressLint
-import dkmak.atlunch.data.IoDispatcher
-import dkmak.atlunch.domain.Location
-import dkmak.atlunch.domain.LocationRepository
-import dkmak.atlunch.domain.LocationResult
 import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
@@ -12,6 +8,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dkmak.atlunch.data.IoDispatcher
+import dkmak.atlunch.domain.Location
+import dkmak.atlunch.domain.LocationRepository
+import dkmak.atlunch.domain.LocationResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext

@@ -1,5 +1,9 @@
 package dkmak.atlunch.data.repository
 
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import dkmak.atlunch.data.IoDispatcher
 import dkmak.atlunch.data.database.FavoritesEntity
 import dkmak.atlunch.data.database.PlacesDAO
@@ -19,10 +23,6 @@ import dkmak.atlunch.domain.PlaceDetailsResult
 import dkmak.atlunch.domain.PlacePreview
 import dkmak.atlunch.domain.PlacesRepository
 import dkmak.atlunch.domain.PlacesResult
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async

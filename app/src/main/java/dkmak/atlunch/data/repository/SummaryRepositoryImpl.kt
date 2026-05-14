@@ -1,5 +1,9 @@
 package dkmak.atlunch.data.repository
 
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import dkmak.atlunch.data.IoDispatcher
 import dkmak.atlunch.data.network.OpenAiClient
 import dkmak.atlunch.data.network.OpenAiRequest
@@ -7,10 +11,6 @@ import dkmak.atlunch.data.toSummaryDomainError
 import dkmak.atlunch.domain.PlaceDetails
 import dkmak.atlunch.domain.SummaryRepository
 import dkmak.atlunch.domain.SummaryResult
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

@@ -30,9 +30,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -75,7 +75,7 @@ fun PlaceDetailsScreen(
         PlaceDetailsShareSheet(
             sheetState = sheetState,
             placeDetailsDataState = uiState.placeDetailsDataState as PlacesDetailDataState.Success,
-            onDismiss = { showBottomSheet = false }
+            onDismiss = { showBottomSheet = false },
         )
     }
 
@@ -103,16 +103,16 @@ fun PlaceDetailsScreen(
                     IconButton(
                         onClick = {
                             showBottomSheet = true
-                        }
+                        },
                     ) {
                         Icon(
                             imageVector = Icons.Default.Share,
-                            contentDescription = "Share"
+                            contentDescription = "Share",
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier =
@@ -304,9 +304,10 @@ fun WhyHereItem(
             is PlacesDetailSummaryDataState.Failure -> {
                 Text(
                     summaryDataState.message,
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
+                    modifier =
+                        modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -315,10 +316,11 @@ fun WhyHereItem(
             PlacesDetailSummaryDataState.Loading -> {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(
-                        6.dp,
-                        Alignment.CenterHorizontally
-                    ),
+                    horizontalArrangement =
+                        Arrangement.spacedBy(
+                            6.dp,
+                            Alignment.CenterHorizontally,
+                        ),
                     modifier =
                         Modifier
                             .fillMaxWidth()
