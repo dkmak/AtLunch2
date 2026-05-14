@@ -95,7 +95,7 @@ jobs:
           keyPassword: ${{secrets.ATLUNCH2_ALIAS_PASSWORD}}
 
       - name: auth google play store
-        run: echo '${{secrets.CREDENTIALS_FILE_CONTENT}}' > service_account.json
+        run: echo '${{secrets.GOOGLE_PLAY_CREDENTIALS_FILE_CONTENT}}' > service_account.json
 
       - name: distribute to internal track
         uses: r0adkll/upload-google-play@v1.1.3
