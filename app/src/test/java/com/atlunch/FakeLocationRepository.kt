@@ -1,7 +1,7 @@
-package com.atlunch
+package dkmak.atlunch
 
-import com.atlunch.domain.LocationRepository
-import com.atlunch.domain.LocationResult
+import dkmak.atlunch.domain.LocationRepository
+import dkmak.atlunch.domain.LocationResult
 
 class FakeLocationRepository : LocationRepository {
     var locationResult: LocationResult = LocationResult.LocationError.Unknown

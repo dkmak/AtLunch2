@@ -1,8 +1,8 @@
-package com.atlunch
+package dkmak.atlunch
 
-import com.atlunch.domain.PlaceDetails
-import com.atlunch.domain.SummaryRepository
-import com.atlunch.domain.SummaryResult
+import dkmak.atlunch.domain.PlaceDetails
+import dkmak.atlunch.domain.SummaryRepository
+import dkmak.atlunch.domain.SummaryResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
