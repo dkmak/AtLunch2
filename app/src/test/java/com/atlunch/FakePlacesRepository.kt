@@ -1,6 +1,5 @@
 package dkmak.atlunch
 
-import com.atlunch.domain.FavoriteResult
 import dkmak.atlunch.domain.FavoriteResult
 import dkmak.atlunch.domain.PlaceDetailsResult
 import dkmak.atlunch.domain.PlacesRepository
