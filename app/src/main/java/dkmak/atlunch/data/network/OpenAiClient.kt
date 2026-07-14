@@ -8,9 +8,9 @@ import javax.inject.Inject
 class OpenAiClient
     @Inject
     constructor(
-        val openAiClient: OpenApiService,
+        val openAiService: OpenApiService,
     ) {
-        suspend fun generatePlacesSummary(request: OpenAiRequest): OpenAiResponse = openAiClient.generatePlacesSummary(request)
+        suspend fun generatePlacesSummary(request: OpenAiRequest): OpenAiResponse = openAiService.generatePlacesSummary(request)
     }
 
 interface OpenApiService {
