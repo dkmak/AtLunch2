@@ -4,11 +4,10 @@ import dkmak.atlunch.BuildConfig
 import dkmak.atlunch.data.dto.PhotoMediaDTO
 import dkmak.atlunch.data.dto.PlaceDetailsDTO
 import dkmak.atlunch.data.dto.PlacePreviewDTO
+import dkmak.atlunch.data.network.bff.BffPlacesApiService
 import kotlinx.serialization.Serializable
-import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import javax.inject.Inject
@@ -33,8 +32,7 @@ class PlacesApiClient
             )
 
         suspend fun searchQuery(request: SearchQueryRequest): SearchResultsResponse =
-            placesApiService.searchQuery(
-                apiKey = API_KEY,
+            bffPlacesApiService.searchQuery(
                 fieldMask = SEARCH_RESULTS_FIELD_MASK,
                 request = request,
             )
@@ -64,13 +62,6 @@ interface PlacesApiService {
         @Header("X-Goog-FieldMask") fieldMask: String,
         @Path("id") id: String,
     ): PlaceDetailsDTO
-
-    @POST("/v1/places:searchText")
-    suspend fun searchQuery(
-        @Header("X-Goog-Api-Key") apiKey: String,
-        @Header("X-Goog-FieldMask") fieldMask: String,
-        @Body request: SearchQueryRequest,
-    ): SearchResultsResponse
 
     @GET("/v1/{name}")
     suspend fun getPhotoMedia(

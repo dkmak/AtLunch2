@@ -131,9 +131,9 @@ OPENAI_API_KEY=your_openai_api_key
 ### Testing
 - You can run the current test suite with `./gradlew clean testDebugUnitTest`.
 
-### Local BFF migration: nearby search
+### Local BFF migration: nearby and text search
 
-Nearby search now uses the local BFF. Other operations still use their existing
+Nearby and text search now use the local BFF. Other operations still use their existing
 vendor connections until their individual migration steps are verified.
 
 1. Start the BFF on port 8080 with its server-side Places and OpenAI keys.
@@ -147,4 +147,8 @@ Debug defaults to `BFF_BASE_URL=http://localhost:8080/`. Override `BFF_BASE_URL`
 through a Gradle property or untracked `local.properties` when needed. Local HTTP
 is allowed only for `localhost` in debug. Release builds require an explicit HTTPS
 base URL ending in `/`. Keep existing client vendor keys for unmigrated operations;
-nearby search no longer sends a vendor key. The Maps SDK key remains required.
+nearby and text search no longer send a vendor key. The Maps SDK key remains required.
+
+To verify text search, enter a restaurant or food query in the app and confirm
+results render. Logcat should show a successful
+`POST http://localhost:8080/proxy/google/v1/places:searchText`.
