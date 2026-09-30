@@ -39,11 +39,6 @@ android {
 
         buildConfigField(
             "String",
-            "GOOGLE_PLACES_API_KEY",
-            "\"${localProperty("GOOGLE_PLACES_API_KEY")}\"",
-        )
-        buildConfigField(
-            "String",
             "OPENAI_API_KEY",
             "\"${localProperty("OPENAI_API_KEY")}\"",
         )

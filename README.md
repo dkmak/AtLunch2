@@ -55,7 +55,6 @@ when available.
 4. Add your API keys to your local, untracked `local.properties` file:
 
 ```properties
-GOOGLE_PLACES_API_KEY=your_places_api_key
 GOOGLE_MAPS_API_KEY=your_maps_sdk_api_key
 OPENAI_API_KEY=your_openai_api_key
 ```
@@ -131,10 +130,10 @@ OPENAI_API_KEY=your_openai_api_key
 ### Testing
 - You can run the current test suite with `./gradlew clean testDebugUnitTest`.
 
-### Local BFF migration: searches and place details
+### Local BFF migration: all Places operations
 
-Nearby search, text search, and place details now use the local BFF. Other operations use their existing
-vendor connections until their individual migration steps are verified.
+Nearby search, text search, place details, and photo metadata now use the local BFF.
+AI summaries still use the direct OpenAI connection until the next migration step.
 
 1. Start the BFF on port 8080 with its server-side Places and OpenAI keys.
 2. Connect and authorize the Android phone over USB.
@@ -146,8 +145,8 @@ vendor connections until their individual migration steps are verified.
 Debug defaults to `BFF_BASE_URL=http://localhost:8080/`. Override `BFF_BASE_URL`
 through a Gradle property or untracked `local.properties` when needed. Local HTTP
 is allowed only for `localhost` in debug. Release builds require an explicit HTTPS
-base URL ending in `/`. Keep existing client vendor keys for unmigrated operations;
-searches and place details no longer send a vendor key. The Maps SDK key remains required.
+base URL ending in `/`. The Android build no longer requires a Places key.
+Keep the OpenAI key until AI summaries migrate. The Maps SDK key remains required.
 
 To verify text search, enter a restaurant or food query in the app and confirm
 results render. Logcat should show a successful
@@ -155,4 +154,7 @@ results render. Logcat should show a successful
 
 To verify place details, open a restaurant and confirm its details render. Logcat
 should show a successful `GET http://localhost:8080/proxy/google/v1/places/{id}`.
-Photo metadata still uses the direct Google route during this migration step.
+Photo metadata also uses the BFF. Open a restaurant with photos and confirm successful
+`GET /proxy/google/v1/places/{placeId}/photos/{photoRef}/media` requests and rendered
+images. Metadata requests send dimensions but no vendor key. Coil still downloads
+image bytes directly from the returned `photoUri`.
