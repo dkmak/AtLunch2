@@ -37,11 +37,6 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        buildConfigField(
-            "String",
-            "OPENAI_API_KEY",
-            "\"${localProperty("OPENAI_API_KEY")}\"",
-        )
         manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = localProperty("GOOGLE_MAPS_API_KEY")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

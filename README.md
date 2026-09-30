@@ -52,11 +52,11 @@ when available.
 1. Open the project root in Android Studio.
 2. Let Gradle sync complete.
 3. Confirm Android Studio is using JDK 17 for Gradle.
-4. Add your API keys to your local, untracked `local.properties` file:
+4. Add your Maps SDK key and BFF address to your local, untracked `local.properties` file:
 
 ```properties
 GOOGLE_MAPS_API_KEY=your_maps_sdk_api_key
-OPENAI_API_KEY=your_openai_api_key
+BFF_BASE_URL=http://localhost:8080/
 ```
 
 5. Build and run the `app` configuration on an emulator or physical Android device.
@@ -85,30 +85,28 @@ OPENAI_API_KEY=your_openai_api_key
 
 #### API Reference
 
-**Base URL:** `https://places.googleapis.com/`
+**Base URL:** `BuildConfig.BFF_BASE_URL` (debug default: `http://localhost:8080/`)
 
 **Common headers**
-- `X-Goog-Api-Key: <API_KEY>`
 - `X-Goog-FieldMask: <field mask for the endpoint>`
 
 | Endpoint                       | Description                                                      |
 |--------------------------------|------------------------------------------------------------------|
-| `POST /v1/places:searchNearby` | Returns nearby restaurant results for the main discovery screen. |
-| `POST /v1/places:searchText`   | Searches restaurants by a user-entered text query.               |
-| `GET /v1/places/{id}`          | Fetches details for the selected restaurant.                     |
-| `GET /v1/{photoName}/media`    | Fetches photo media metadata for a place photo resource.         |
+| `POST /proxy/google/v1/places:searchNearby` | Returns nearby restaurant results for the main discovery screen. |
+| `POST /proxy/google/v1/places:searchText`   | Searches restaurants by a user-entered text query.               |
+| `GET /proxy/google/v1/places/{id}`          | Fetches details for the selected restaurant.                     |
+| `GET /proxy/google/v1/{photoName}/media`    | Fetches photo media metadata for a place photo resource.         |
 
 #### AI Summary API Reference
 
-**Base URL:** `https://api.openai.com/`
+**Base URL:** `BuildConfig.BFF_BASE_URL`
 
 **Common headers**
-- `Authorization: Bearer <OPENAI_API_KEY>`
 - `Content-Type: application/json`
 
 | Endpoint             | Description                                                             |
 |----------------------|-------------------------------------------------------------------------|
-| `POST /v1/responses` | Generates a short AI summary for why a restaurant may be a good choice. |
+| `POST /proxy/openai/v1/responses` | Generates a short AI summary for why a restaurant may be a good choice. |
 
 ### Data Layer: Data Persistence
 
@@ -130,10 +128,10 @@ OPENAI_API_KEY=your_openai_api_key
 ### Testing
 - You can run the current test suite with `./gradlew clean testDebugUnitTest`.
 
-### Local BFF migration: all Places operations
+### Local BFF setup
 
-Nearby search, text search, place details, and photo metadata now use the local BFF.
-AI summaries still use the direct OpenAI connection until the next migration step.
+Nearby search, text search, place details, photo metadata, and AI summaries use the
+BFF. The BFF supplies vendor credentials; the Android app sends no vendor keys.
 
 1. Start the BFF on port 8080 with its server-side Places and OpenAI keys.
 2. Connect and authorize the Android phone over USB.
@@ -145,8 +143,9 @@ AI summaries still use the direct OpenAI connection until the next migration ste
 Debug defaults to `BFF_BASE_URL=http://localhost:8080/`. Override `BFF_BASE_URL`
 through a Gradle property or untracked `local.properties` when needed. Local HTTP
 is allowed only for `localhost` in debug. Release builds require an explicit HTTPS
-base URL ending in `/`. The Android build no longer requires a Places key.
-Keep the OpenAI key until AI summaries migrate. The Maps SDK key remains required.
+base URL ending in `/`. The Android build requires neither a Places key nor an
+OpenAI key. The Maps SDK key remains required. Old Places/OpenAI entries in
+`local.properties` are unused and can be removed.
 
 To verify text search, enter a restaurant or food query in the app and confirm
 results render. Logcat should show a successful
@@ -158,3 +157,7 @@ Photo metadata also uses the BFF. Open a restaurant with photos and confirm succ
 `GET /proxy/google/v1/places/{placeId}/photos/{photoRef}/media` requests and rendered
 images. Metadata requests send dimensions but no vendor key. Coil still downloads
 image bytes directly from the returned `photoUri`.
+
+To verify AI summaries, request a summary from a restaurant's details screen and
+confirm its text renders. Logcat should show a successful
+`POST http://localhost:8080/proxy/openai/v1/responses`.
