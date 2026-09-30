@@ -17,10 +17,10 @@ class PlacesApiClient
     @Inject
     constructor(
         val placesApiService: PlacesApiService,
+        private val bffPlacesApiService: BffPlacesApiService,
     ) {
         suspend fun searchNearby(request: SearchNearbyRequest): SearchResultsResponse =
-            placesApiService.searchNearby(
-                apiKey = API_KEY,
+            bffPlacesApiService.searchNearby(
                 fieldMask = SEARCH_RESULTS_FIELD_MASK,
                 request = request,
             )
@@ -58,13 +58,6 @@ class PlacesApiClient
     }
 
 interface PlacesApiService {
-    @POST("/v1/places:searchNearby")
-    suspend fun searchNearby(
-        @Header("X-Goog-Api-Key") apiKey: String,
-        @Header("X-Goog-FieldMask") fieldMask: String,
-        @Body request: SearchNearbyRequest,
-    ): SearchResultsResponse
-
     @GET("/v1/places/{id}")
     suspend fun getPlaceDetails(
         @Header("X-Goog-Api-Key") apiKey: String,

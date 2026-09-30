@@ -59,5 +59,8 @@ object PlacesNetworkModule {
 
     @Provides
     @Singleton
-    fun providePlacesApiClient(placesApiService: PlacesApiService): PlacesApiClient = PlacesApiClient(placesApiService)
+    fun providePlacesApiClient(
+        placesApiService: PlacesApiService,
+        bffPlacesApiService: BffPlacesApiService,
+    ): PlacesApiClient = PlacesApiClient(placesApiService, bffPlacesApiService)
 }

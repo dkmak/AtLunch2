@@ -1,3 +1,4 @@
+import java.net.URI
 import java.util.Properties
 
 plugins {
@@ -52,7 +53,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            val bffUrl = localProperty("BFF_BASE_URL").ifBlank { "http://localhost:8080/" }
+            buildConfigField("String", "BFF_BASE_URL", "\"${bffUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
+        }
         release {
+            val bffUrl = localProperty("BFF_BASE_URL")
+            buildConfigField("String", "BFF_BASE_URL", "\"${bffUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -132,4 +139,25 @@ dependencies {
     // Location and Play Services
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)
+}
+
+val validateReleaseBffUrl =
+    tasks.register("validateReleaseBffUrl") {
+        doLast {
+            val url = runCatching { URI(localProperty("BFF_BASE_URL")) }.getOrNull()
+            require(
+                url?.scheme == "https" &&
+                    !url.host.isNullOrBlank() &&
+                    url.userInfo == null &&
+                    url.query == null &&
+                    url.fragment == null &&
+                    url.path.endsWith("/"),
+            ) {
+                "Release builds require BFF_BASE_URL to be an HTTPS base URL ending in /, without credentials, query, or fragment."
+            }
+        }
+    }
+
+tasks.matching { it.name == "preReleaseBuild" || it.name == "generateReleaseBuildConfig" }.configureEach {
+    dependsOn(validateReleaseBffUrl)
 }
