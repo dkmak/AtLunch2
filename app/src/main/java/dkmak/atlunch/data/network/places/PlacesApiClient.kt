@@ -7,7 +7,6 @@ import dkmak.atlunch.data.dto.PlacePreviewDTO
 import dkmak.atlunch.data.network.bff.BffPlacesApiService
 import kotlinx.serialization.Serializable
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
 import javax.inject.Inject
@@ -25,8 +24,7 @@ class PlacesApiClient
             )
 
         suspend fun getPlaceDetails(id: String): PlaceDetailsDTO =
-            placesApiService.getPlaceDetails(
-                apiKey = API_KEY,
+            bffPlacesApiService.getPlaceDetails(
                 fieldMask = GET_DETAILS_FIELD_MASK,
                 id = id,
             )
@@ -56,13 +54,6 @@ class PlacesApiClient
     }
 
 interface PlacesApiService {
-    @GET("/v1/places/{id}")
-    suspend fun getPlaceDetails(
-        @Header("X-Goog-Api-Key") apiKey: String,
-        @Header("X-Goog-FieldMask") fieldMask: String,
-        @Path("id") id: String,
-    ): PlaceDetailsDTO
-
     @GET("/v1/{name}")
     suspend fun getPhotoMedia(
         @Path(value = "name", encoded = true) name: String,
