@@ -11,13 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-private val AppBackground = Color(0xFFEFEFEC)
-private val AppSurface = Color(0xffffffff)
-
-// private val AppTertiary = Color(0xff94f477)
-private val AppTertiary = Color(0xff5de372)
-private val AppSecondary = Color(0xff0f8a1e)
-
 private val DarkColorScheme =
     darkColorScheme(
         primary = Color(0xFF80DB89),
