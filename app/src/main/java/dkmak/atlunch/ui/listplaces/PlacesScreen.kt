@@ -115,7 +115,7 @@ fun PlacesScreen(
             ) {
                 Text(
                     text = if (isMapView) "List" else "Map",
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.onSecondary,
                 )
             }
         },
