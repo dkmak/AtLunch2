@@ -14,7 +14,7 @@ class OpenAiClient
     }
 
 interface OpenApiService {
-    @POST("v1/responses")
+    @POST("proxy/openai/v1/responses")
     suspend fun generatePlacesSummary(
         @Body request: OpenAiRequest,
     ): OpenAiResponse
