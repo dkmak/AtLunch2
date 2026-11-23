@@ -50,11 +50,13 @@ android {
         release {
             val bffUrl = localProperty("BFF_BASE_URL")
             buildConfigField("String", "BFF_BASE_URL", "\"${bffUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
